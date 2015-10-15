@@ -9,7 +9,7 @@
     "tests"
   ],
   "devDependencies": {
-    "sky": "git+https://github.com/blackbaud/sky#1.3.0-2"
+    "sky": "git@github.com:blackbaud/sky#1.3.0-2"
   },
   "resolutions": {
     "angular": "1.3.18",

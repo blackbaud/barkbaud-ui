@@ -18,10 +18,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<div class="bb-page-header">\n' +
         '    <div class="container-fluid">\n' +
         '        <div class="row">\n' +
-        '            <div class="col-xs-12 col-md-3 col-lg-2">\n' +
-        '                <img ng-src="api/dogs/{{dogPage.dog.objectId | encodeURIComponent}}/photo" class="bark-dog-photo img-circle center-block" />\n' +
+        '            <div class="col-md-3 col-lg-2">\n' +
+        '                <img ng-src="{{ dogPage.dog.image.url }}" class="bark-dog-photo img-circle center-block" />\n' +
         '            </div>\n' +
-        '            <div class="col-xs-12 col-md-9 col-lg-10">\n' +
+        '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>{{dogPage.dog.name}}</h1>\n' +
         '                <p></p>\n' +
         '                <p class="bark-dog-bio">{{dogPage.dog.bio}}</p>\n' +
