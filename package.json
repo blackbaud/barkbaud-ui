@@ -1,0 +1,14 @@
+{
+  "name": "sky-sample",
+  "version": "1.0.0",
+  "devDependencies": {
+    "grunt-bump": "~0.3.0",
+    "grunt-concat-sourcemap": "~0.4.3",
+    "grunt-contrib-copy": "~0.7.0",
+    "grunt-contrib-sass": "~0.8.1",
+    "grunt-contrib-uglify": "~0.7.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-html2js": "^0.3.2",
+    "grunt-skylint": "git+https://github.com/blackbaud/grunt-skylint.git"
+  }
+}
