@@ -9,9 +9,9 @@
         bbWindow.setWindowTitle('Dashboard');
 
         bbData.load({
-            resources: 'api/dogs'
+            data: 'api/dogs'
         }).then(function (result) {
-            self.dogs = result.resources.data;
+            self.dogs = result.data.data;
         });
     }
 
