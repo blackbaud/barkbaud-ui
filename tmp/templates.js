@@ -35,9 +35,12 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/notes/notestile.html',
         '<bb-tile bb-tile-header="\'Notes\'">\n' +
-        '    <div bb-tile-section>\n' +
-        '\n' +
+        '  <div bb-tile-section>\n' +
+        '    <div ng-repeat="note in dogNotesTile.notes">\n' +
+        '      <h4>{{ note.title }}</h4>\n' +
+        '      <p>{{ note.description }}</p>\n' +
         '    </div>\n' +
+        '  </div>\n' +
         '</bb-tile>\n' +
         '');
     $templateCache.put('pages/dogs/summary/summarytile.html',

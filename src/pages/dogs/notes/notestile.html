@@ -1,5 +1,8 @@
 <bb-tile bb-tile-header="'Notes'">
-    <div bb-tile-section>
-
+  <div bb-tile-section>
+    <div ng-repeat="note in dogNotesTile.notes">
+      <h4>{{ note.title }}</h4>
+      <p>{{ note.description }}</p>
     </div>
+  </div>
 </bb-tile>

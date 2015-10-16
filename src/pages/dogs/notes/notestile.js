@@ -9,7 +9,7 @@
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId) + '/notes'
         }).then(function (result) {
-            self.notes = result.data;
+            self.notes = result.data.data;
         });
     }
 
