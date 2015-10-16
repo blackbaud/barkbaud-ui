@@ -2,149 +2,107 @@
 
 /** @module Action Bar
 @icon bolt
-@summary Combines a group of buttons into a dropdown at the XS breakpoint.
-@description The action bar is used to create a Sky-themed container for buttons. It has the option to collapse a group of buttons into a dropdown when the screen is in extra-small mode.
-
-### Included directives: ###
-
+@summary The action bar provides a Sky UX-themed container for buttons that can collapse when the screen is in extra-small mode.
+@description The action bar creates a Sky UX-themed container for buttons. It includes the option to collapse groups of buttons into dropdowns when the screen is in extra-small mode.
+### Action Bar Settings ###
     - `bb-action-bar` Wraps the content in the action bar.
-    - `bb-action-bar-item` Wraps given content in an action button. Any `ng-click` applied to this directive will be applied to the action button.
-    - `bb-action-bar-item-group` When placed around `bb-action-bar-item` directives, it will collapse those buttons into a dropdown in extra-small mode. You can also pass an optional `bb-action-bar-item-group-title` as a label for the dropdown (by default it will be labeled "Actions").
+    - `bb-action-bar-item` Wraps the content in an action button. Any `ng-click` applied to this directive is applied to the action button.
+    - `bb-action-bar-item-group` Wraps `bb-action-bar-item` directives to collapse the buttons into a dropdown in extra-small mode. You can also pass an optional `bb-action-bar-item-group-title` to edit the default **Actions** label for the dropdown.
+
+If it is necessary to apply action bar stylying to more complicated scenarios (e.g. hiding and showing buttons at different breakpoints other than xs, collapsing dropdowns into submenus), then you can place any content in a `div` that has the `bb-action-bar` class. Some Bootstrap convenience classes for showing/hiding arbitrary content are the `hidden-xs`, `hidden-sm`, `hidden-md`, and `hidden-lg` classes. You can get more information on these in the [Bootstrap](http://getbootstrap.com/css/#responsive-utilities-classes) documentation.
 */
 
 (function () {
     'use strict';
-    angular.module('sky.actionbar', ['sky.resources'])
-        .directive('bbActionBar', [
-            function () {
-                return {
-                    transclude: true,
-                    restrict: 'E',
-                    templateUrl: 'sky/templates/actionbar/actionbar.html'
-                };
-            }
-        ])
-        .directive('bbActionBarItemGroup', ['bbResources',
-            function (bbResources) {
-                return {
-                    replace: true,
-                    transclude: true,
-                    restrict: 'E',
-                    scope: {
-                        title: '=?bbActionBarItemGroupTitle'
-                    },
-                    controller: ['$scope', '$element', function ($scope, $element) {
-                        $scope.items = [];
 
-                        
-                        function addDropdownElement(item) {
-                            var listEl = $element.find('ul');
-                            
-                            listEl.append(item.transcludeEl);
-                        }
-                        
-                        function getActionItemIndexById(itemId) {
-                            var i;
-                            
-                            for (i = 0; i < $scope.items.length; i++) {
-                                if ($scope.items[i].id === itemId) {
-                                    return i;
-                                }
-                            }
-                            /*istanbul ignore next: sanity check */
-                            return -1;
-                        }
-                        
-                        function removeItem(item) {
-                            item.transcludeEl.detach();
-                        }
-                        
-                        function orderDropdownActions() {
-                            var actionButtonEl = $element.find('button.bb-action-bar-item-button'),
-                                actionButtonScope,
-                                i,
-                                itemIndex,
-                                itemId;
-                            
-                            for (i = 0; i < $scope.items.length; i++) {
-                                removeItem($scope.items[i]);
-                            }
-                            
-                            for (i = 0; i < actionButtonEl.length; i++) {
-                                actionButtonScope = actionButtonEl.eq(i).isolateScope();
-                                if (angular.isDefined(actionButtonScope)) {
-                                    itemId = actionButtonScope.itemId;
-                                    itemIndex = getActionItemIndexById(itemId);
-                                    /*istanbul ignore else: sanity check */
-                                    if (itemIndex !== -1) {
-                                        addDropdownElement($scope.items[itemIndex]);
-                                    }
-                                } 
-                            }   
-                        }
-                        
-                        this.addItem = function (itemCallback, transcludeFn, itemId) {
-                            var transcludeEl = angular.element('<li id="' + itemId + '" role="presentation"><a role="menuitem" href="javascript:void(0)"></a></li>');
-                            
-                            transcludeFn(function (transEl, transScope) {
-                                var anchorEl = transcludeEl.find('a');
-                                anchorEl.append(transEl); 
-                                anchorEl.on('click', itemCallback);
-                                
-                                $scope.items.push({id: itemId, transScope: transScope, transcludeEl: transcludeEl});
-                                orderDropdownActions();
-                            });
+    function bbActionBar() {
+        return {
+            transclude: true,
+            restrict: 'E',
+            templateUrl: 'sky/templates/actionbar/actionbar.html'
+        };
+    }
 
-                        };
-                        
-                        this.destroyItem = function (itemId) {
-                            var itemIndex;
-                            
-                            itemIndex = getActionItemIndexById(itemId);
-                            /*istanbul ignore else: sanity check */
-                            if (itemIndex !== -1 && $scope.items[itemIndex]) {
-                                /*istanbul ignore else: sanity check */
-                                if ($scope.items[itemIndex].transcludeEl) {
-                                    $scope.items[itemIndex].transcludeEl.remove();
-                                }
-                            }
-                            
-                            $scope.items.splice(itemIndex, 1);
-                        };
-                    }],
-                    link: function ($scope) {
-                        if ($scope.title === null || angular.isUndefined($scope.title)) {
-                            $scope.title = bbResources.action_bar_actions;
+    function bbActionBarItemGroup(bbResources, bbMediaBreakpoints) {
+        return {
+            replace: true,
+            transclude: true,
+            controller: function () {
+
+            },
+            restrict: 'E',
+            scope: {
+                title: '=?bbActionBarItemGroupTitle'
+            },
+            link: function ($scope, el) {
+                if ($scope.title === null || angular.isUndefined($scope.title)) {
+                    $scope.title = bbResources.action_bar_actions;
+                }
+
+                function mediaBreakpointHandler(breakpoints) {
+                    if (breakpoints.xs) {
+                        el.find('.bb-action-bar-buttons > ng-transclude').appendTo(el.find('.bb-action-bar-dropdown > .dropdown > ul'));
+                    } else {
+                        el.find('.bb-action-bar-dropdown .dropdown > ul > ng-transclude').appendTo(el.find('.bb-action-bar-buttons'));
+                    }
+                }
+
+                bbMediaBreakpoints.register(mediaBreakpointHandler);
+
+                $scope.$on('$destroy', function () {
+                    bbMediaBreakpoints.unregister(mediaBreakpointHandler);
+                });
+
+            },
+            templateUrl: 'sky/templates/actionbar/actionbaritemgroup.html'
+        };
+    }
+
+    bbActionBarItemGroup.$inject = ['bbResources', 'bbMediaBreakpoints'];
+
+    function bbActionBarItem(bbMediaBreakpoints) {
+        return {
+            replace: true,
+            require: '?^bbActionBarItemGroup',
+            transclude: true,
+            restrict: 'E',
+            link: function ($scope, el, attrs, groupCtrl) {
+
+                function mediaBreakpointHandler(breakpoints) {
+                    if (breakpoints.xs) {
+                        if (!el.parent().is('li')) {
+                            el.wrap('<li></li>');
                         }
-                    },
-                    templateUrl: 'sky/templates/actionbar/actionbaritemgroup.html'
-                };
-            }
-        ])
-        .directive('bbActionBarItem', [
-            function () {
-                return {
-                    replace: true,
-                    transclude: true,
-                    restrict: 'E',
-                    require: '?^^bbActionBarItemGroup',
-                    scope: {
-                        actionCallback: '&ngClick'  
-                    },
-                    link: function ($scope, el, attrs, itemGroupCtrl, $transclude) {
-                        $scope.itemId = 'bb-action-bar-item-' + $scope.$id;
-                        if (itemGroupCtrl !== null && angular.isDefined(itemGroupCtrl)) {
-                            
-                            itemGroupCtrl.addItem($scope.actionCallback, $transclude, $scope.itemId);
-                            
-                            $scope.$on('$destroy', function () {
-                                itemGroupCtrl.destroyItem($scope.itemId);
-                            });
+
+                    } else {
+                        if (el.parent().is('li')) {
+                            el.unwrap();
                         }
-                    },
-                    templateUrl: 'sky/templates/actionbar/actionbaritem.html'
-                };
-            }]);
+                    }
+                }
+
+                if (groupCtrl !== null) {
+                    bbMediaBreakpoints.register(mediaBreakpointHandler);
+
+                    $scope.$on('$destroy', function () {
+                        bbMediaBreakpoints.unregister(mediaBreakpointHandler);
+                        //get rid of wrapper on destroy
+                        if (el.parent().is('li')) {
+                            el.unwrap();
+                        }
+                    });
+                }
+            },
+            templateUrl: 'sky/templates/actionbar/actionbaritem.html'
+        };
+    }
+
+    bbActionBarItem.$inject = ['bbMediaBreakpoints'];
+
+    angular.module('sky.actionbar', ['sky.resources', 'sky.mediabreakpoints'])
+        .directive('bbActionBar', bbActionBar)
+        .directive('bbActionBarItemGroup', bbActionBarItemGroup)
+        .directive('bbActionBarItem', bbActionBarItem);
 }());
 
 /*jshint browser: true */
@@ -153,9 +111,9 @@
 
 /** @module Autofocus
 @icon camera
-@summary  The Autofocus directive is used to set focus on a form item when rendered.
- @description The `bb-autofocus` directive is used to set focus on a form item when rendered. Use this when the HTML autofocus property behaves finicky with things like Angular dynamically loaded templates and such.
-Here focus is set on an input control inside a modal form when launched.
+@summary  The autofocus component specifies the input item on a form that should get focus when the form loads.
+ @description The `bb-autofocus` directive specifies the item on a form that should get focus when the form renders. You can use this directive when items such as Angular dynamically loaded templates do not play nicely with the HTML autofocus property.
+The **Open Modal** button below demonstrates a modal form where the `bb-autofocus` directive places the focus on an input control on the form.
  */
 
 (function () {
@@ -180,16 +138,16 @@ Here focus is set on an input control inside a modal form when launched.
 
 /** @module Autonumeric
 @icon calculator
-@summary The Autonumeric directive wraps up the autoNumeric jQuery plugin. It allows for formatting any kind of number, including currency.
- @description ### Additional Dependencies ###
+@summary The autonumeric component wraps up the autoNumeric jQuery plugin to format any type of number, including currency.
+ @description The `bb-autonumeric` directive wraps up the autoNumeric jQuery plugin to format any type of number, including currency. You must use this directive in conjunction with the `ngModel` directive where the property bound to `ngModel` is the raw numeric value on your model.
+ 
+ ### Dependencies ###
 
  - **[autoNumeric](http://www.decorplanit.com/plugin/) (1.9.27 or higher)** Used to format money values
 
 ---
 
-The Autonumeric directive wraps up the autoNumeric jQuery plugin.  It allows for formatting any kind of number, including currency.  This directive must be used in conjunction with the `ngModel` directive where the property bound to `ngModel` is the raw numeric value on your model.
-
-### Autonumeric Options ###
+### Autonumeric Settings ###
 
  - `bb-autonumeric` This  can optionally be assigned the name of a property from the `bbAutonumericConfig` object.  If none is specified, it defaults to `number`.
  - `bb-autonumeric-settings` This can be assigned a value that represents a settings object that can be passed to autoNumeric.  These options will override any default options specified in the `bb-autonumeric` attribute.  A complete list of options is available [here](http://www.decorplanit.com/plugin/).
@@ -987,14 +945,15 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
 
 /** @module Check
 @icon check-square
-@summary The check directive allows you to change an input element of type checkbox or radio into a commonly-styled selector.
- @description ### Additional Dependencies ###
+@summary The check applies a commonly styled selector to a checkbox or radio button.
+ @description The check directive allows you to change an input element of type checkbox or radio into a commonly-styled selector.  The value that is selected is driven through the `ng-model` attribute specified on the input element and for radio input types the value to set on the `ng-model` can be specified by the value attribute.
+
+ ### Dependencies ###
 
  - **[icheck.js](http://fronteed.com/iCheck/) (1.0.2 or higher)**
 
 ---
 
-The check directive allows you to change an input element of type checkbox or radio into a commonly-styled selector.  The value that is selected is driven through the `ng-model` attribute specified on the input element and for radio input types the value to set on the `ng-model` can be specified by the value attribute.
  */
 
 (function () {
@@ -1041,11 +1000,12 @@ The check directive allows you to change an input element of type checkbox or ra
 
 /** @module Checklist
 @icon list-ul
-@summary The checklist directive allows you to easily build a filterable checkbox list.
+@summary The checklist builds a filterable checkbox list that can display multiple columns of data.
  @description The checklist directive allows you to easily build a filterable checkbox list.  Multiple columns of data can be provided for the checkbox rows using the `bb-checklist-column` element.  Items can also be displayed in a list view with each row displaying a title and description.  The list view is preferable when building a responsive application.
 
 ### Checklist Settings ###
 
+ - `bb-checklist`
  - `bb-checklist-items` An array of objects representing the rows that will be shown in the list.
  - `bb-checklist-selected-items` An array representing the selected items in the list.
  - `bb-checklist-include-search` A Boolean to optionally include a search textbox for filtering the items.  The search text will be highlighted in the columns of the list.  A callback function can be used to filter the items based on the search text.
@@ -1424,11 +1384,13 @@ The check directive allows you to change an input element of type checkbox or ra
 /** @module Context Menu
 
 @icon ellipsis-h
-@summary The context menu directive allow you to easily create Sky-styled dropdown menus.
+@summary The context menu creates simple or complicated dropdown menus that you can incorporate into buttons.
 @description The context menu directives allow you to easily create Sky-styled  [dropdown](https://angular-ui.github.io/bootstrap/#/dropdown) menus. There are 3 directives in the context menu module:
   - `bb-context-menu` creates a dropdown with the context menu button.
   - `bb-context-menu-item` creates dropdown menu items within a dropdown that execute `bb-context-menu-action` on click.
   - `bb-context-menu-button` creates a button with the Sky context menu styles.
+  - `bb-submenu` creates an accordion style submenu in a dropdown, you can place it in a dropdown list element.
+    - `bb-submenu-heading` Can be either an attribute on `bb-submenu` that can be set equal to static header text, or can be used as a directive inside of `bb-submenu` to place arbitrary content in an accordion heading.
 */
 
 (function () {
@@ -1454,7 +1416,6 @@ The check directive allows you to change an input element of type checkbox or ra
             template: '<li role="presentation"><a role="menuitem" href="javascript:void(0)" ng-click="clickItem()"><ng-transclude/></a></li>'
         };
     }
-
     function bbContextMenuButton() {
         return {
             restrict: 'E',
@@ -1463,17 +1424,80 @@ The check directive allows you to change an input element of type checkbox or ra
         };
     }
 
-    angular.module('sky.contextmenu', ['ui.bootstrap.dropdown'])
+    function toggleAccordion($event, $scope) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.accordionLocals.accordionOpen = !$scope.accordionLocals.accordionOpen;
+    }
+
+    function BBSubmenuController($scope) {
+        var self = this;
+
+        self.toggleAccordion = function ($event) {
+            toggleAccordion($event, $scope);
+        };
+
+    }
+
+    BBSubmenuController.$inject = ['$scope'];
+
+    function bbSubmenu() {
+        return {
+            controller: 'bbSubmenuController',
+            restrict: 'E',
+            scope: {
+                heading: '=?bbSubmenuHeading'
+            },
+            link: function ($scope, el, attrs) {
+
+                $scope.accordionLocals = {
+                    accordionOpen: false,
+                    staticHeader: false
+                };
+
+                if (angular.isDefined(attrs.bbSubmenuHeading)) {
+                    $scope.accordionLocals.staticHeader = true;
+                }
+
+                $scope.toggleAccordion = function ($event) {
+                    toggleAccordion($event, $scope);
+                };
+
+            },
+            transclude: true,
+            templateUrl: 'sky/templates/contextmenu/submenu.html'
+        };
+    }
+
+    function bbSubmenuHeading() {
+        return {
+            restrict: 'E',
+            require: '^bbSubmenu',
+            scope: true,
+            link: function ($scope, el, attrs, submenuCtrl) {
+                $scope.toggleAccordion = function ($event) {
+                    submenuCtrl.toggleAccordion($event);
+                };
+            },
+            transclude: true,
+            templateUrl: 'sky/templates/contextmenu/submenuheading.html'
+        };
+    }
+
+    angular.module('sky.contextmenu', ['ui.bootstrap.dropdown', 'ui.bootstrap.accordion'])
+        .controller('bbSubmenuController', BBSubmenuController)
         .directive('bbContextMenu', bbContextMenu)
         .directive('bbContextMenuItem', bbContextMenuItem)
-        .directive('bbContextMenuButton', bbContextMenuButton);
+        .directive('bbContextMenuButton', bbContextMenuButton)
+        .directive('bbSubmenu', bbSubmenu)
+        .directive('bbSubmenuHeading', bbSubmenuHeading);
 }());
 
 /*global angular, jQuery, require */
 
 /** @module Data
 
-@summary The data service provides methods for loading data from and saving data to web service endpoints.
+@summary The data service provides access to convenience functions that allow you to manipulate data.
 @icon database
 @description The data service provides methods for loading data from and saving data to web service endpoints.
 
@@ -1886,28 +1910,28 @@ The check directive allows you to change an input element of type checkbox or ra
 /*jshint browser: true */
 /*global angular, jQuery */
 
-/** @module Datepicker
+/** @module Date Picker
 @icon calendar-o
-@summary The bb-datepicker directive wraps the ui.bootstrap.datepicker directive from angular ui bootstrap.
-@description The `bb-datepicker` directive wraps the ui.bootstrap.datepicker directive from [angular ui bootstrap](https://angular-ui.github.io/bootstrap/). It creates a input text box and a calendar picker for choosing the date.
+@summary The date picker wraps the ui.bootstrap.datepicker directive from Angular UI Bootstrap to create an input text box that includes a calendar for selecting dates.
+@description The `bb-datepicker` directive wraps the ui.bootstrap.datepicker directive from [Angular UI Bootstrap](https://angular-ui.github.io/bootstrap/). It creates an input text box with a calendar picker for selecting dates.
 
-## Datepicker settings
+## Date Picker Settings
   - `bb-custom-validation` an object containing the following:
     - `formatValue` A function that will be called when text is entered directly into the textbox. The only parameter to the function will be the raw value of the textbox. The function should return an object or a promise of an object with properties of `formattedValue` and optionally `formattingErrorMessage` if there was a problem when trying to format the input value.
   - `bb-date-format` The format string that the date should display as in the input text box. This will override the default set in the `bbDatepickerConfig` `currentCultureDateFormatString` property. The default format in sky is set as `MM/dd/yyyy`. The format string should be set up like the [angular](https://docs.angularjs.org/api/ng/filter/date) date filter format strings.
-  - `bb-date-options` Options object for customizing the datepicker. The options included are all of those valid for the angular ui bootstrap `datepicker-options` object. You can set application defaults for the `showWeeks` and `startingDay` properties of the angular ui bootstrap datepicker in the `bbDatepickerConfig` constant defined in `sky.datepicker`. In sky the default for `showWeeks` is false and `startingDay` is 0 unless overridden in `bbDatepickerConfig`.
-  - `bb-datepicker-name` This value gets bound to the `name` attribute of the datepicker input for use in validation and form submission.
+  - `bb-date-options` Options object for customizing the date picker. The options included are all of those valid for the angular ui bootstrap `datepicker-options` object. You can set application defaults for the `showWeeks` and `startingDay` properties of the angular ui bootstrap date picker in the `bbDatepickerConfig` constant defined in `sky.datepicker`. In sky the default for `showWeeks` is false and `startingDay` is 0 unless overridden in `bbDatepickerConfig`.
+  - `bb-datepicker-name` This value gets bound to the `name` attribute of the date picker input for use in validation and form submission.
   - `close-on-date-selection` *(Default: true):*  Whether to close calendar when a date is chosen.
-  - `datepicker-append-to-body` *(Default: false):*  Append the datepicker popup element to `body`, rather than inserting after the datepicker input.
-  - `max-date` A Javascript Date object that can set a maximum date for the datepicker control and input. Input validation will be bound to `$scope.myFormName.inputName.$error.maxDate`. This value can also be set globally in the `bbDatepickerConfig` object property `maxDate`.
-  - `min-date` A Javascript Date object that can set a minimum date for the datepicker control and input. Input validation will be bound to `$scope.myFormName.inputName.$error.minDate`. This value can also be set globally in the `bbDatepickerConfig` object property `minDate`.
-  - `ng-model` An object to bind the date value in and out of the datepicker. This will be set to a Javascript Date object when set or parsed from the bootstrap datepicker.
+  - `datepicker-append-to-body` *(Default: false):*  Append the date picker popup element to `body`, rather than inserting after the date picker input.
+  - `max-date` A Javascript Date object that can set a maximum date for the date picker control and input. Input validation will be bound to `$scope.myFormName.inputName.$error.maxDate`. This value can also be set globally in the `bbDatepickerConfig` object property `maxDate`.
+  - `min-date` A Javascript Date object that can set a minimum date for the date picker control and input. Input validation will be bound to `$scope.myFormName.inputName.$error.minDate`. This value can also be set globally in the `bbDatepickerConfig` object property `minDate`.
+  - `ng-model` An object to bind the date value in and out of the date picker. This will be set to a Javascript Date object when set or parsed from the bootstrap date picker.
   - `placeholder` overrides the default placeholder text of the `bb-datepicker` input
   - `required` Attribute present if the `bb-datepicker` value is required.
-  - `show-button-bar` *(Default: false):*  Whether to display a button bar underneath the datepicker. (see angular ui bootstrap datepicker)
+  - `show-button-bar` *(Default: false):*  Whether to display a button bar underneath the date picker. (see angular ui bootstrap date picker)
 
 ## Validation
-`bb-datepicker` sets validation on the datepicker input using `bb-datepicker-name` for the input name, and the validity of the date entered in the input is in the `dateFormat` validator. So if you want to see if the date value is valid, you can access this through `$scope.myFormName.inputName.$error.dateFormat`. The error message for an invalid date will be in `$scope.myFormName.inputName.invalidFormatMessage`.
+`bb-datepicker` sets validation on the date picker input using `bb-datepicker-name` for the input name, and the validity of the date entered in the input is in the `dateFormat` validator. So if you want to see if the date value is valid, you can access this through `$scope.myFormName.inputName.$error.dateFormat`. The error message for an invalid date will be in `$scope.myFormName.inputName.invalidFormatMessage`.
 
 */
 (function ($) {
@@ -2431,25 +2455,25 @@ The check directive allows you to change an input element of type checkbox or ra
 /*jshint browser: true */
 /*global angular */
 
-/** @module Daterangepicker
+/** @module Date Range Picker
 @icon calendar
-@summary The DateRangePicker directive allows you to easily choose a date range from a well-known set of options.
- @description The DateRangePicker directive allows you to easily choose a date range from a well-known set of options.  A DateRangePicker service also exists to work hand-in-hand with the directive to provide more service-oriented functionality.
+@summary The date range picker creates an input text box that includes a dropdown for selecting date ranges from a well-known set of options.
+ @description The date range picker directive allows you to easily choose a date range from a well-known set of options. A date range picker service also exists to work hand-in-hand with the directive to provide more service-oriented functionality.
 
 ### Date Range Picker Settings ###
 
- - `bb-date-range-picker-value` An object tracking the value of the date range picker control.  Right now, the only proeprty of the object is `.dateRangeType` gives you the integer (ENUM) value of the date range typ that was selected in the picker.  See the DateRangePicker service for details of this ENUM.
+ - `bb-date-range-picker-value` An object tracking the value of the date range picker control.  Right now, the only proeprty of the object is `.dateRangeType` gives you the integer (ENUM) value of the date range typ that was selected in the picker. See the date range picker service for details of this ENUM.
  - `bb-date-range-picker-automation-id` A string to use when creating the bb-auto-field attribute on elements in the date range picker
  - `bb-date-range-picker-options` Optional. An options object that can be provided to customize the behavior of the date range picker.
 
 ### Date Range Picker Options Settings ###
 
- - `availableDateRangeTypes` Optional. An array of integers (`dateRangeTypes` ENUM) to specify the ordered list of date range types to be included in the dropdown.  Common variations can be found in the DateRangePicker service.
+ - `availableDateRangeTypes` Optional. An array of integers (`dateRangeTypes` ENUM) to specify the ordered list of date range types to be included in the dropdown.  Common variations can be found in the date range picker service.
 
 ### Date Range Picker Service ###
 This service provides additional functionality that works closely with the directive.  Below are a list of members provided by the service.
 
- - `dateRangeTypes` An ENUM of all types of date ranges that are understood by the DateRangePicker and can be available in the dropdown.
+ - `dateRangeTypes` An ENUM of all types of date ranges that are understood by the date range picker and can be available in the dropdown.
  - `defaultDateRangeOptions` An array of `dateRangeTypes` providing the default order and set of date range types that are included in the dropdown.
  - `pastDateRangeOptions` An array of `dateRangeTypes` that are appropriate for filtering for things that have occurred in the past.  For example, you wouldn't want to be able to search for items created 'next month'.
  - `getDateRangeTypeCaption` A function for getting the caption of the dropdown item selected for a given `bb-date-range-picker-value`.
@@ -2717,9 +2741,9 @@ This service provides additional functionality that works closely with the direc
 /*jshint browser: true */
 /*global angular */
 
-/** @module File attachments
+/** @module File Attachments
 @icon cloud-upload
-@summary The file attachments module contains two directives to make it easier to add multiple files to a form.
+@summary The file attachments module provides the ability to add multiple files to a form and to display information about files after they are added.
 @description The file attachments module contains two directives to make it easier to add multiple files to a form.
 The `bb-file-drop` directive provides an element that can both be clicked to select a file from the user's
 local drive or serve as a drop zone where files can be dragged from the user's local drive.  The directive can
@@ -3014,11 +3038,11 @@ to the function.
 
 /** @module Format
 @icon paragraph
-@summary The formatting service provides methods for formatting text and escaping html.
+@summary The format service provides functions to format text with a format string and to escape HTML characters.
 @description The format service gives you the following functions:
 
-  - `formatText(formatString, args)` Formats the args with a given format string
-  - `escape(text)` Replaces the `<`, `>`, and `&` tags with `&lt;`, `&gt;`, and `&amp;`
+  - `formatText(formatString, args)` Formats the args with a given format string.
+  - `escape(text)` Replaces the `<`, `>`, and `&` tags with `&lt;`, `&gt;`, and `&amp;`.
 
 */
 
@@ -3474,17 +3498,19 @@ to the function.
 /*jslint plusplus: true */
 /*global angular, jQuery */
 
-/** @module Grids
+/** @module Grid
 @icon table
-@summary The Grid directive allows you to build a full-featured grid with a search box, column picker and filter form.
- @description ### Additional dependencies ###
+@summary The grid builds a full-featured grid with a search box, column picker, and filter form.
+ @description The grid directive allows you to build a full-featured grid with a search box, column picker, and filter form.
+ 
+ ### Dependencies ###
 
 - **[jqGrid](http://www.trirand.com/blog/) (4.6.0 or higher)**
 - **[icheck.js](http://fronteed.com/iCheck/) (1.0.2 or higher)**
 - **[enquire.js](http://wicky.nillia.ms/enquire.js/) (2.1.2 or later)**
 ---
 
-The Grid directive allows you to build a full-featured grid with a search box, column picker and filter form.
+The grid directive allows you to build a full-featured grid with a search box, column picker and filter form.
 
 ### Grid Settings ###
 - `bb-grid-filters` A directive you can use inside the bb-grid directive to create a filter flyout menu.
@@ -5131,14 +5157,14 @@ reloading the grid with the current data after the event has fired.
 
 /** @module Help
 @icon question
-@summary The Help service allows other Angular components to open or close the help panel programmatically.
- @description ### Additional Dependencies ###
+@summary The help service allows Angular components to open and close the help panel programmatically.
+ @description The help service allows other Angular components to open or close the help panel programmatically. When the widget opens, it interrogates the page to identify the current help topic and display the relevant help content. Settings for this service are controlled with the `bbHelpConfig` object.
+ 
+ ### Dependencies ###
 
  - **[easyXDM](http://easyxdm.net/wp/) (2.4.19 or higher)** Used to make cross-domain requests to the help server
 
 ---
-
-The Help service allows other Angular components to open or close the help panel programmatically.  When the widget is opened, it will interrogate the page to identify the current help topic and display the relevant help content.  Settings for this service are controlled with the `bbHelpConfig` object.
 
 ### bbHelp Methods ###
 
@@ -5250,10 +5276,10 @@ The Help service allows other Angular components to open or close the help panel
 /*jslint browser: true, plusplus: true */
 /*global angular */
 
-/** @module Helpbutton
+/** @module Help Button
 @icon question-circle
-@summary The Helpbutton directive creates a help icon which can be clicked to launch a specific help key that is different than the default page help context.
- @description The Helpbutton directive creates a help icon which can be clicked to launch a specific help key that is different than the default page help context.  Optionally, it can override the page help context throughout the duration that the helpbutton exists on the page.
+@summary The help button creates a help icon to launch a help key that is different than the default help based on page context.
+ @description The help button directive creates a help icon that can be clicked to launch a specific help key that is different than the default help based on page context. Optionally, it can override the page help context throughout the duration that the help button exists on the page.
 
 ### Help Button Settings ###
 
@@ -5385,12 +5411,12 @@ The Helpwidget directive includes the help widget on the page.  When the widget 
 
 /** @module Highlight
 @icon paint-brush
-@summary The Highlight directive allows you to highlight portions of text inside DOM elements.
- @description The Highlight directive allows you to highlight portions of text inside DOM elements.  Set the `bb-highlight` attribute to the text you want to highlight and all matching text within the element will be highlighted.
+@summary The highlight component highlights portions of text inside DOM elements.
+ @description The highlight directive allows you to highlight portions of text inside DOM elements. Set the `bb-highlight` attribute to the text you want to highlight, and all matching text within the element will be highlighted.
 
 ### Highlight Options ###
 
-- `bb-highlight-beacon` A property on your scope that will cause highlighting to occur when its value changes.  This is needed when the highlight directive can't tell that the contents of the element to be highlighted has changed.  For instance, if the element with the `bb-highlight` attribute also has the `ng-bind` attribute, the highlight directive can detect this and update highlighting whenever this value changes.  However if you use a different directive to update the element's contents or the `bb-highlight` attribute is specified on a parent element of the element to be highlighted, you will need to use `bb-highlight-beacon` to notify the highlight directive to update the highlighted text.
+- `bb-highlight-beacon` A property on your scope that will cause highlighting to occur when its value changes. This is needed when the highlight directive can't tell that the contents of the element to be highlighted has changed. For instance, if the element with the `bb-highlight` attribute also has the `ng-bind` attribute, the highlight directive can detect this and update highlighting whenever this value changes. However if you use a different directive to update the element's contents or the `bb-highlight` attribute is specified on a parent element of the element to be highlighted, you will need to use `bb-highlight-beacon` to notify the highlight directive to update the highlighted text.
  */
 
 (function () {
@@ -5497,23 +5523,22 @@ The Helpwidget directive includes the help widget on the page.  When the widget 
 
 /*global angular, define, enquire, require */
 
-/** @module Mediabreakpoints
+/** @module Media Breakpoints
 @icon mobile
-@summary The Media Breakpoints service can call one or more callback functions whenever a Bootstrap grid system breakpoint is hit.
- @description ### Additional Dependencies ##
+@summary The media breakpoints service calls callback functions when a Bootstrap grid system breakpoint is hit to manipulate the user interface programmatically when CSS media queries are not sufficient.
+ @description The media breakpoints service can call one or more callback functions whenever a [Bootstrap grid system breakpoint](http://getbootstrap.com/css/#grid-media-queries) is hit. This allows for manipulating the UI programmatically in cases where CSS media queries are not sufficient.
+
+### Dependencies ##
 
  - **[enquire.js](http://wicky.nillia.ms/enquire.js/) (2.1.2 or later)**
 
 ---
 
-The Media Breakpoints service can call one or more callback functions whenever a [Bootstrap grid system breakpoint](http://getbootstrap.com/css/#grid-media-queries) is hit.  This allows for
-manipulating the UI programmatically in cases where CSS media queries are not sufficient.
-
 ### Media Breakpoint Methods ###
 
- - `register(callback)` Registers a callback method with the service that will be called any time a media breakpoint is hit.  The callback function will be called with the following arguments:
-  - `breakpoint` An object with `xs`, `sm`, `md` and `lg` properties.  The property corresponding with the current breakpoint will be set to `true` and the rest set to `false`.
- - `unregister(callback)` Unregisters the specified callback method.  This should be called whenever the controller's `$scope` is destroyed.
+ - `register(callback)` Registers a callback method with the service that will be called any time a media breakpoint is hit. The callback function will be called with the following arguments:
+  - `breakpoint` An object with `xs`, `sm`, `md` and `lg` properties. The property corresponding with the current breakpoint will be set to `true` and the rest set to `false`.
+ - `unregister(callback)` Unregisters the specified callback method. This should be called whenever the controller's `$scope` is destroyed.
  - `getCurrent()` Gets the current media breakpoint object.
  */
 
@@ -5619,22 +5644,22 @@ manipulating the UI programmatically in cases where CSS media queries are not su
 
 /** @module Modal
 @icon list-alt
-@summary The Modal directive and service can be used to launch modals in a consistent way in a Sky application.
- @description The Modal directive and service can be used to launch modals in a consistent way in a Sky application.  Rather than using the ui-bootstrap `$modal.open`, use `bbModal.open` instead.  This will take the same options object but allows for some custom default behaviors in Sky.
+@summary The modal component launches modals in a way that is consistent with Sky UX applications.
+ @description The modal directive and service can be used to launch modals in a consistent way in a Sky UX application. Rather than using the ui-bootstrap `$modal.open`, use `bbModal.open` instead. This takes the same options object but allows for some custom default behaviors in Sky UX.
 
-In addition to the `bbModal` service for lauching modals, a `bb-modal` directive should be used to have common look-and-feel for modal content.  Within `bb-modal`, use `bb-modal-header` to include a common modal header, `bb-modal-footer` to include a common modal footer and buttons, and `bb-modal-body` to wrap the modal's body content.
+In addition to the `bbModal` service for lauching modals, a `bb-modal` directive should be used to have common look-and-feel for modal content. Within `bb-modal`, use `bb-modal-header` to include a common modal header, `bb-modal-footer` to include a common modal footer and buttons, and `bb-modal-body` to wrap the modal's body content.
 
 ### Modal Header Settings ###
 
- - `bb-modal-help-key` Specifies the help key for the modal.  This will be be linked from a help button included in the modal header.
+ - `bb-modal-help-key` Specifies the help key for the modal. This will be be linked from a help button included in the modal header.
 
 ### Modal Footer Buttons ##
 
- - `bb-modal-footer-button` Generic button for the modal footer.  HTML included in this tag will be included in the contents of the button.  You must register events for the button manually.
+ - `bb-modal-footer-button` Generic button for the modal footer. HTML included in this tag will be included in the contents of the button. You must register events for the button manually.
 
- - `bb-modal-footer-button-primary` Primary button for the modal footer which will have a custom look.  Default content is 'Save', but HTML included in this tag will be included as the contents of the button if provided.  You must register events for the button manually.
+ - `bb-modal-footer-button-primary` Primary button for the modal footer which will have a custom look.  Default content is 'Save', but HTML included in this tag will be included as the contents of the button if provided. You must register events for the button manually.
 
- - `bb-modal-footer-button-cancel` Cancel button for the modal footer.  Default content is 'Cancel', but HTML included in this tag will be included as the contents of the button if provided.  This button will automatically cancel the modal form.
+ - `bb-modal-footer-button-cancel` Cancel button for the modal footer. Default content is 'Cancel', but HTML included in this tag will be included as the contents of the button if provided. This button automatically cancels the modal form.
 
  */
 
@@ -5851,9 +5876,8 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
 
 /** @module Moment
 @icon clock-o
-@summary The moment module allows you to use the moment library.
+@summary The moment module use the moment.js library to parse, validate, manipulate, or display dates.
 @description The moment module allows you to use the [moment](http://momentjs.com/) library.
-
 */
 
 (function (window) {
@@ -5878,8 +5902,8 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
 
 /** @module Navbar
 @icon compass
-@summary The navbar directive creates a Bootstrap nav element with the appropriate Sky classes applied to it and its children.
- @description The navbar directive creates a Bootstrap `nav` element with the appropriate Sky classes applied to it and its children, and also adds behavior such as showing sub-navigation items when the user hovers over the dropdown.
+@summary The navbar creates a Bootstrap `nav` element and applies Sky UX classes to it.
+ @description The navbar directive creates a Bootstrap `nav` element with the appropriate Sky UX classes applied to it and its children, and also adds behavior such as showing sub-navigation items when the user hovers over the dropdown.
  */
 
 (function ($) {
@@ -6069,8 +6093,8 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
 
 /** @module Page
 @icon file-o
-@summary The Page directive provides functionality around loading pages.
- @description The Page directive provides functionality around loading pages.
+@summary The page component handles functionality around loading pages.
+ @description The page directive provides functionality around loading pages.
 
 ### Page Settings ###
 
@@ -6181,10 +6205,10 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
 
 /** @module Pagination
 @icon files-o
-@summary The Pagination directive allows list data to be displayed across multiple pages. When the number of items in the list exceeds the page size, a pagination control is displayed.
- @description The Pagination directive allows list data to be displayed across multiple pages.  When the number of items in the list exceeds the page size, a pagination control is displayed.
+@summary The pagination component displays data across multiple pages and inserts a pagination control to page through the data.
+ @description The pagination directive allows list data to be displayed across multiple pages. When the number of items in the list exceeds the page size, a pagination control is displayed.
 
-The `bb-pagination-content` directive and the `bbPaging` service are used in conjunction with this directive.  The `bb-pagination-content` is used to wrap the paged content so that the height of the wrapper can be kept as a constant height across pages regardless of contents.  When the list data is bound, the height of the largest page will be used for the wrapper so that the height of the list will not fluctuate as the user pages through it.
+The `bb-pagination-content` directive and the `bbPaging` service are used in conjunction with this directive. The `bb-pagination-content` is used to wrap the paged content so that the height of the wrapper can be kept as a constant height across pages regardless of contents. When the list data is bound, the height of the largest page will be used for the wrapper so that the height of the list will not fluctuate as the user pages through it.
 The `bbPaging` service is used to create the paged data and responds to changes in the pagination directive.
 
 ### Pagination Settings ###
@@ -6199,8 +6223,8 @@ The `bbPaging` service is used to create the paged data and responds to changes 
 ### Paging Settings ##
 These are optional properties of the object passed to `bbPaging.init()`
 
- - `currentPage` *(Default: `1`)* The initial page to display
- - `itemsPerPage` *(Default: `5`)* The number of items to display per page
+ - `currentPage` *(Default: `1`)* The initial page to display.
+ - `itemsPerPage` *(Default: `5`)* The number of items to display per page.
  */
 
 (function () {
@@ -6484,14 +6508,13 @@ angular.module('sky.palette.config', [])
 
 /** @module Popover
 @icon newspaper-o
-@summary The bb-popover-template directive enables an HTML-formatted popover to be displayed via a trigger element.
- @description The `bb-popover-template` directive enables an HTML-formatted popover to be displayed via a trigger element. This directive is an alternative to the `popover` directive from Angular UI Bootstrap, making it easier
-to define markup in a template rather than directly in the view's controller.
+@summary The popover component wraps the Angular UI Bootstrap popover directive to create an HTML-formatted popover that is displayed by a trigger element.
+ @description The `bb-popover-template` directive enables an HTML-formatted popover to be displayed via a trigger element. This directive is an alternative to the `popover` directive from Angular UI Bootstrap, making it easier to define markup in a template rather than directly in the view's controller.
 
-The `bb-popover-template` attribute should specify a URL for a template in the `$templateCache` that will be used as the popover content. The scope applied to this template inherits the current scope.  A `hide` function is also
+The `bb-popover-template` attribute should specify a URL for a template in the `$templateCache` that will be used as the popover content. The scope applied to this template inherits the current scope. A `hide` function is also
 provided on the scope to dismiss the popover.
 
-The directive is built as a thin wrapper of the [Angular UI Bootstrap Popver](http://angular-ui.github.io/bootstrap/) directive and supports all of it's optional properties.
+The directive is built as a thin wrapper of the [Angular UI Bootstrap Popover](http://angular-ui.github.io/bootstrap/) directive and supports all of it's optional properties.
  */
 
 (function ($) {
@@ -6597,12 +6620,12 @@ The directive is built as a thin wrapper of the [Angular UI Bootstrap Popver](ht
 /*jshint browser: true */
 /*global angular */
 
-/** @module Scroll into view
+/** @module Scroll into View
 @icon eye
-@summary The bb-scroll-into-view directive causes an element to scroll into the viewport whenever its bound value changes.
- @description The `bb-scroll-into-view` directive causes an element to scroll into the viewport whenever its bound value changes.
+@summary The scroll-into-view component causes an element to scroll into the viewport when its bound value changes.
+ @description The scroll-into-view directive causes an element to scroll into the viewport whenever its bound value changes.
 
-### Settings ###
+### Scroll-into-view Settings ###
 
  - `bb-scroll-into-view` The value that triggers the scroll.
  - `bb-scroll-into-view-highlight` A Boolean indicating whether the element should be highlighted when scrolling completes.
@@ -6820,18 +6843,18 @@ The directive is built as a thin wrapper of the [Angular UI Bootstrap Popver](ht
 /*jslint browser: true */
 /*global angular, jQuery */
 
-/** @module Searchfield
+/** @module Search Field
 @icon search
-@summary The Searchfield directive allows you to easily build single- and multi-search fields that can be filtered as the user types.
- @description ### Additional Dependencies ###
+@summary The search field builds single- and multi-search fields for local searches or for remote searches of larger datasets on a server.
+ @description The search field directive allows you to easily build single- and multi-search fields that can be filtered as the user types. This directive uses all the syntax and settings of the `ui-select` third party control (see the `ui-select` documentation for more information, options, and settings).
+
+The search field can be used for a local search (i.e. dropdown box where you have all the data already loaded), or it can be used for a remote search to search larger datasets on a server.  Both types support single- and multi-search capabilities.
+
+### Dependencies ###
 
  - **[ui-select](https://github.com/angular-ui/ui-select) (0.11.0 or higher - .js and .css files needed)**
 
 ---
-
-The Searchfield directive allows you to easily build single- and multi-search fields that can be filtered as the user types.  This directive uses all the syntax and settings of the `ui-select` third party control (see the `ui-select` documentation for more information, options, and settings).
-
-The search field can be used for a local search (i.e. dropdown box where you have all the data already loaded), or it can be used for a remote search to search larger datasets on a server.  Both types support single- and multi-search capabilities.
 
 ### Local Search Settings ###
 
@@ -7012,10 +7035,10 @@ The search field can be used for a local search (i.e. dropdown box where you hav
 /*jslint nomen: true, plusplus: true */
 /*global angular, jQuery */
 
-/** @module Tabscroll
+/** @module Tab Scroll
 @icon arrows-h
-@summary The bb-tab-scroll directive causes the row of tabs to be horizontally scrollable when the width of the tabs exceeds the width of its container.
- @description ### Additional Dependencies ###
+@summary The tab scroll component makes a row of tabs horizontally scrollable when the row is wider than its container.
+ @description ### Dependencies ###
 
 The `bb-tab-scroll` directive causes the row of tabs to be horizontally scrollable when the width of the tabs exceeds the width of its container.  The tabs are also animated to indicate to the user that they can be scrolled.
 
@@ -7389,16 +7412,16 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
 
 /*global angular */
 
-/** @module Tabsref
+/** @module Tab Sref
 @icon link
-@summary The Tab Sref directive adds the ability to change the page's URL when the user clicks a tab.
- @description ### Additional Dependencies ###
+@summary The tab sref component provides tab info in page URLs so that hyperlinks can point to specific tabs.
+ @description The tab sref directive adds the ability to change the page's URL when the user clicks a tab. This also allows for users to navigate straight to a selected tab from a hyperlink.
+
+### Dependencies ###
 
  - **[Angular UI Router](https://github.com/angular-ui/ui-router) (0.2.13 or higher)**
 
 ---
-
-The Tab Sref directive adds the ability to change the page's URL when the user clicks a tab.  This also allows for users to navigate straight to a selected tab from a hyperlink.
 
 ### Tab Sref Settings ###
 
@@ -7457,15 +7480,16 @@ The Tab Sref directive adds the ability to change the page's URL when the user c
 /*jslint nomen: true, plusplus: true */
 /*global angular */
 
-/** @module Templating
+/** @module Template
 @icon building-o
-@summary The Templating directives allow you to place formatted text inside a tokenized string template.
- @description The Templating directives allow you to place formatted text inside a tokenized string template.  This avoids the need to build HTML manually on the server or in a custom directive where HTML injection bugs are common.
+@summary The template component places formatted text inside a tokenized string template.
+ @description The template directives allow you to place formatted text inside a tokenized string template. This avoids the need to build HTML manually on the server or in a custom directive where HTML injection bugs are common.
 The string template is specified with the `bb-template` attribute, and child elements with the `bb-template-item` attribute are the elements that contain the formatted text.
 
 ### Template Settings ###
 
- - `bb-template` The tokenized string that represents the template.  Tokens use the {n} notation where n is the ordinal of the item to replace the token.
+ - `bb-template` The tokenized string that represents the template. Tokens use the {n} notation where n is the ordinal of the item to replace the token.
+  - `bb-template-item` 
  */
 
 (function () {
@@ -7553,19 +7577,19 @@ The string template is specified with the `bb-template` attribute, and child ele
 
 /*global angular */
 
-/** @module Textexpand
+/** @module Text Expand
 @icon text-height
-@summary The Text Expand directive truncates long text with an ellipsis and a "Read more" link that allows the user to fully expand the text.
- @description The Text Expand directive truncates long text with an ellipsis and a "Read more" link that allows the user to fully expand the text.  If the text length falls below the specified threshold then no action is taken.
+@summary The text expand component truncates long text with an ellipsis and a link that users can click to expand the text.
+ @description The texteExpand directive truncates long text with an ellipsis and a link that allows the user to fully expand the text. If the text length falls below the specified threshold then no action is taken.
 
-Note that collapsed text will have newlines removed.  Also, if one or more newlines are detected, the text is automatically collapsed regardless of the total length of the text.
+Note that collapsed text will have newlines removed. Also, if one or more newlines are detected, the text is automatically collapsed regardless of the total length of the text.
 
 ### Text Expand Settings ###
 
  - `bb-text-expand` The text to truncate.
- - `bb-text-expand-max-length` *(Default: 200)* The number of characters to show before truncating the text.  The directive will attempt to look back up to 10 characters for a space and truncate there in order to avoid truncating in the middle of a word.
+ - `bb-text-expand-max-length` *(Default: 200)* The number of characters to show before truncating the text. The directive will attempt to look back up to 10 characters for a space and truncate there in order to avoid truncating in the middle of a word.
 
-The Text Expand Repeater directive truncates a list of repeater items and will initially display a set number of items.  Any items over the set maximum limit are hidden until the user elects to expand the list.
+The Text Expand Repeater directive truncates a list of repeater items and will initially display a set number of items. Any items over the set maximum limit are hidden until the user elects to expand the list.
 
 ### Text Expand Repeater Settings ###
 
@@ -7765,10 +7789,10 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
 /*jslint browser: true, plusplus: true */
 /*global angular */
 
-/** @module Tiles
+/** @module Tile
 @icon th-large
-@summary The bb-tile directive creates a collapsible container and is the bulding block for pages and forms in a Sky application.
- @description The `bb-tile` directive creates a collapsible container and is the bulding block for pages and forms in a Sky application.  The `bb-tile-section` directive is used to create padded sections inside a `bb-tile` element. Additionally, the `bb-tile-header-content` directive may be placed inside the `bb-tile` directive to add summary information to the tile.  If you simply need to show a check mark indicating the tile has data, you can add a `bb-tile-header-check` element to the `bb-tile-header-content` element.
+@summary The tile provides a collapsible container that is the building block for pages and forms in Sky UX applications.
+ @description The `bb-tile` directive creates a collapsible container and is the bulding block for pages and forms in a Sky UX application. The `bb-tile-section` directive is used to create padded sections inside a `bb-tile` element. Additionally, the `bb-tile-header-content` directive may be placed inside the `bb-tile` directive to add summary information to the tile. If you simply need to show a check mark indicating the tile has data, you can add a `bb-tile-header-check` element to the `bb-tile-header-content` element.
 
 When used on forms, it automatically adjusts the background color on the form and shrinks the tile header.
 
@@ -7778,14 +7802,14 @@ When used on forms, it automatically adjusts the background color on the form an
  - `bb-tile-settings-click` A function to call when the user clicks the settings button (indicated by a wrench icon) in the tile header.  If not specified, the settings button is not displayed.
  - `bb-tile-collapsed` (optional) binds to the collapsed state of the tile so that the tile can respond to user setting collapsed state.
 
- ### Tile Dashboard Directive ###
+### Tile Dashboard Directive ###
 
 The `bb-tile-dashboard` directive allows you to have a set of tiles within a page which have controllable layouts and collapsed states. It depends on [angular-ui router](https://github.com/angular-ui/ui-router/wiki) to define states that map to tile controllers and templates.
 
 ### Tile Dashboard Settings ###
 
 - `bb-tiles` An array of tile objects to be contained in the dashboard. Contains the following object:
-    - `id` Unique id for the tile.
+    - `id` Unique ID for the tile.
     - `view_name` The name of the view for the tile defined in the ui-router `$stateProvider`.
     - `collapsed` True if the tile should be collapsed, false otherwise.
     - `collapsed_small` True if the tile should be collapsed in small screen state, false otherwise.
@@ -8185,24 +8209,21 @@ The `bb-tile-dashboard` directive allows you to have a set of tiles within a pag
 
 /** @module Toast
 @icon envelop-o
-@summary The Toast service can be used to launch toats in a consistent way in a Sky application.
- @description ### Additional Dependencies ###
+@summary The toast service launches toast messages basic string messages or complex toast messages that use HTML templates.
+ @description The toast service can be used to launch toast in a consistent way in a Sky UX application. The service has a single method, `bbToast.open` used to launch a toast. Optionally include the `ngAnimate` module in the application for toasts to fade in and out.
+
+### Dependencies ###
 
  - **[angular-toastr](https://github.com/Foxandxss/angular-toastr) (1.0.0-beta.2 or higher)**
  - **[ng-animate](https://docs.angularjs.org/api/ngAnimate) (optional, 1.3 or higher)**
 
 ---
 
-The Toast service can be used to launch toats in a consistent way in a Sky application.  The service has a single method, `bbToast.open` used to launch a toast.  Optionally include the `ngAnimate` module in the application for toasts to fade in and out.
-
-### Open Configuration Options ##
+### Toast Settings ##
 
  - `message` Used to provide a basic string message for simple toasts.
-
- - `templateUrl` Url for a template in the `$templateCache`.  Used to provide an HTML template when displaying complex toasts.  Cannot be combined with the `message` option.
-
- - `controller` Used in conjunction with `templateUrl`.  Specifies the name of a controller to apply to the template's scope.
-
+ - `templateUrl` Url for a template in the `$templateCache`. Used to provide an HTML template when displaying complex toasts.  Cannot be combined with the `message` option.
+ - `controller` Used in conjunction with `templateUrl`. Specifies the name of a controller to apply to the template's scope.
  - `resolve` Items that will be resolved and passed to the controller as locals.
  */
 
@@ -8327,17 +8348,16 @@ The Toast service can be used to launch toats in a consistent way in a Sky appli
 
 /** @module Tooltip
 @icon info
-@summary The Tooltip directive enables an HTML-formatted tooltip to be displayed via a trigger element.
- @description The Tooltip directive enables an HTML-formatted tooltip to be displayed via a trigger element.  This directive wraps up the Angular UI Bootstrap Tooltip directive while making it easier
-to define markup in a template rather than directly in the view's controller.
+@summary The tooltip creates an HTML-formatted tooltip that is displayed by a trigger element.
+ @description The tooltip directive enables an HTML-formatted tooltip to be displayed by a trigger element. This directive wraps up the Angular UI Bootstrap Tooltip directive while making it easier to define markup in a template rather than directly in the view's controller.
 
 ### Tooltip Settings ##
 
 In addition to all the properties from the [Angular UI Bootstrap Tooltip](http://angular-ui.github.io/bootstrap/) directive, these properties may also be specified:
 
- - `bb-tooltip` URL for a template in the `$templateCache`.  The template HTML may contain bindings to properties in the current scope.
+ - `bb-tooltip` URL for a template in the `$templateCache`. The template HTML may contain bindings to properties in the current scope.
 
- - `tooltip-updater` Optional.  A property on the scope that can be watched by the directive so that when this property's value changes, the contents of the tooltip are refreshed.
+ - `tooltip-updater` Optional. A property on the scope that can be watched by the directive so that when this property's value changes, the contents of the tooltip are refreshed.
  */
 
 (function () {
@@ -8405,11 +8425,11 @@ In addition to all the properties from the [Angular UI Bootstrap Tooltip](http:/
 
 /** @module Utilities
 @icon gear
-@summary The utilities module provides two methods for encoding URI components and formatting arguments.
-@description The sky utilities module gives you the following angular filters:
+@summary The utilities module provides methods to encode URI components and format arguments.
+@description The Sky UX utilities module gives you the following angular filters:
 
-  - `encodeURIComponent` Uses the $window.encodeURIComponent function on your string
-  - `format` Formats the args with a given format string
+  - `encodeURIComponent` Uses the $window.encodeURIComponent function on your string.
+  - `format` Formats the args with a given format string.
 
 */
 
@@ -8431,10 +8451,10 @@ In addition to all the properties from the [Angular UI Bootstrap Tooltip](http:/
 
 /*global angular */
 
-/** @module Validation
+/** @module Email Validation
 @icon check
 @summary The email validation directive allows you to validate email strings in input fields.
- @description The email validation directive allows you to validate email strings in input fields.
+ @description The email validation provides the ability to validate email strings in input fields.
 
 ### Email Validation Settings ###
 
@@ -8945,25 +8965,25 @@ In addition to all the properties from the [Angular UI Bootstrap Tooltip](http:/
 
 /** @module Wait
 @icon spinner
-@summary The Wait directive allows you to disable and visually indicate that an element is in a waiting state.
- @description ### Additional Dependencies ###
+@summary The wait component disables an element in a waiting state and visually indicates that it is in a waiting state.
+ @description The wait directive allows you to disable and visually indicate that an element is in a waiting state.
+When `bb-wait` is set to true, the element will initially be blocked with a clear mask, but after 300ms a visual indicator will cover the element as well.
+This will allow for the element to immediately be disabled but not cause visual disturbances for very brief waits.
+
+### Dependencies ###
 
  - **[jquery.blockUI.js](http://malsup.com/jquery/block/) (2.66.0-2013.10.09 or higher)**
 
 ---
 
-The Wait directive allows you to disable and visually indicate that an element is in a waiting state.
 If the value bound to `bb-wait` is truthy, then the element will begin waiting until the value becomes falsey.
-
-When `bb-wait` is set to true, the element will initially be blocked with a clear mask, but after 300ms a visual indicator will cover the element as well.
-This will allow for the element to immediately be disabled but not cause visual disturbances for very brief waits.
 
 ### Multiple Waits ###
 You can set the value of `bb-wait` to a numeric value to track a count of simultaneous waits.
 When waits are added, increment the wait count and when they are removed then decrement the count.
 This will cause the wait UI to only clear once all waits are removed.
 
-### Full Page Waits ###
+### Full-page Waits ###
 If bb-wait is added to the `<body>` tag, then a full-page version of the wait UI will be created.
 
 ### Raising Wait Events ###
@@ -9262,7 +9282,7 @@ This service supports the following functions
 
 /** @module Window
 @icon desktop
-@summary The windows services provides two helper methods, used for obtaining scrollbar width and setting the page title.
+@summary The window services provides helper methods to edit the browser’s window title and to obtain the browser’s scrollbar width.
 @description An angular service with the following functions:
 
   - `setWindowTitle(title)` Changes the browser window's title. If a product name is specified in `bbWindowConfig`, then the product name will be appended to the passed title.
@@ -9356,30 +9376,30 @@ This service supports the following functions
 
 /** @module Wizard
 @icon magic
-@summary Wizards are used on a modal form when the user needs to perform a set of pre-defined steps in a particular order.
- @description Wizards are used on a modal form when the user needs to perform a set of pre-defined steps in a particular order.  The Sky Wizard works in conjunction with the [Angular UI Bootstrap](http://angular-ui.github.io/bootstrap/) tabs component.  Placing the `bb-wizard` directive on a UI Bootstrap `tabset` element will cause the tabs to look and behave like a Sky wizard.
+@summary The wizard adjusts a modal form to guide users through a set of pre-defined steps in a particular order.
+ @description Wizards are used on a modal form when the user needs to perform a set of pre-defined steps in a particular order. The Sky UX Wizard works in conjunction with the [Angular UI Bootstrap](http://angular-ui.github.io/bootstrap/) tabs component.  Placing the `bb-wizard` directive on a UI Bootstrap `tabset` element will cause the tabs to look and behave like a Sky wizard.
 
-Sky Wizards also have the concept of a completed step which is denoted by the `bb-wizard-step-complete` directive.  When present on a `tab` and bound to a truthy value, the step's tab will be displayed as completed.
+Sky Wizards also have the concept of a completed step which is denoted by the `bb-wizard-step-complete` directive. When present on a `tab` and bound to a truthy value, the step's tab will be displayed as completed.
 
-Finally there is a `bbWizardNavigator` service that provides some convenience methods for navigating through the wizard's steps.  This will typically be used by wiring the navigator up to your modal's previous and next buttons.
+Finally there is a `bbWizardNavigator` service that provides some convenience methods for navigating through the wizard's steps. This will typically be used by wiring the navigator up to your modal's previous and next buttons.
 
 The `bbWizardNavigator` service has an `init()` function that takes an `options` object with the following properties:
 
 - `steps` An array of steps. Each step should have the following properties:
 
 
- - `active` Indicates whether the step is the currently active step.  This should be the same property that is bound to the UI Bootstrap `tab` directive's `active` property.
- - `disabled()` A function that returns a boolean indicating whether the tab is disabled.  This should be the same function that is bound to the UI Bootstrap `tab` directive's `disabled` property.
- - `complete()` A function that returns a boolean indicating whether the tab is complete.  This should be the same function that is bound to the tab's `bb-wizard-step-complete` property.
+ - `active` Indicates whether the step is the currently active step. This should be the same property that is bound to the UI Bootstrap `tab` directive's `active` property.
+ - `disabled()` A function that returns a boolean indicating whether the tab is disabled. This should be the same function that is bound to the UI Bootstrap `tab` directive's `disabled` property.
+ - `complete()` A function that returns a boolean indicating whether the tab is complete. This should be the same function that is bound to the tab's `bb-wizard-step-complete` property.
 
 The `bbWizardNavigator` also exposes the following methods:
 
-- `previousText()` Returns the text for the modal's Previous button.  This usually doesn't change while the user interacts with the widget.
-- `nextText()` Returns the text for the modal's Next button.  This changes to "Finish" when the user is on the last step.
+- `previousText()` Returns the text for the modal's Previous button. This usually doesn't change while the user interacts with the widget.
+- `nextText()` Returns the text for the modal's Next button. This changes to "Finish" when the user is on the last step.
 - `goToPrevious()` Navigates the user to the previous step.
 - `goToNext()` Navigates the user to the next step.
-- `previousDisabled()` Indicates whether the previous step is disabled.  This should be bound to the `ng-disabled` property of the modal's Previous button.
-- `nextDisabled()` Indicates whether the next step is disabled.  This should be bound to the `ng-disabled` property of the modal's Next button.
+- `previousDisabled()` Indicates whether the previous step is disabled. This should be bound to the `ng-disabled` property of the modal's Previous button.
+- `nextDisabled()` Indicates whether the next step is disabled. This should be bound to the `ng-disabled` property of the modal's Next button.
  */
 
 (function () {
@@ -9702,7 +9722,8 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
     $templateCache.put('sky/templates/actionbar/actionbar.html',
         '<div class="bb-action-bar">\n' +
         '    <ng-transclude></ng-transclude>\n' +
-        '</div>');
+        '</div>\n' +
+        '');
     $templateCache.put('sky/templates/actionbar/actionbaritem.html',
         '<button class="btn bb-btn-secondary bb-action-bar-item-button" type="button">\n' +
         '    <ng-transclude></ng-transclude>\n' +
@@ -9713,13 +9734,14 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '    <div class="bb-action-bar-buttons hidden-xs">\n' +
         '        <ng-transclude />\n' +
         '    </div>\n' +
-        '    <div class="hidden-sm hidden-md hidden-lg">\n' +
-        '\n' +
+        '    <div class="bb-action-bar-dropdown hidden-sm hidden-md hidden-lg">\n' +
         '        <div class="dropdown">\n' +
         '             <button class="btn bb-btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" href="javascript:void(0)">\n' +
         '            {{title}}<span class="caret"/>\n' +
         '            </button>\n' +
-        '            <ul class="dropdown-menu" role="menu">\n' +
+        '\n' +
+        '            <ul class="dropdown-menu">\n' +
+        '\n' +
         '            </ul>\n' +
         '        </div>\n' +
         '    </div>\n' +
@@ -9803,6 +9825,33 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '        <ng-transclude/>\n' +
         '    </ul>\n' +
         '</div>');
+    $templateCache.put('sky/templates/contextmenu/submenu.html',
+        '<div class="bb-submenu">\n' +
+        '    <accordion>\n' +
+        '        <accordion-group is-open="accordionLocals.accordionOpen">\n' +
+        '\n' +
+        '            <accordion-heading ng-if="accordionLocals.staticHeader">\n' +
+        '                <div ng-click="toggleAccordion($event)">\n' +
+        '                    <span>\n' +
+        '                        {{heading}}\n' +
+        '                    <span>\n' +
+        '                    <i ng-class="\'fa-chevron-\' + (accordionLocals.accordionOpen ? \'up\' : \'down\')" class="fa bb-submenu-chevron"></i>\n' +
+        '                </div>\n' +
+        '            </accordion-heading>\n' +
+        '            <ng-transclude></ng-transclude>\n' +
+        '        </accordion-group>\n' +
+        '    </accordion>\n' +
+        '</div>\n' +
+        '');
+    $templateCache.put('sky/templates/contextmenu/submenuheading.html',
+        '<accordion-heading>\n' +
+        '    <div ng-click="toggleAccordion($event)">\n' +
+        '        <ng-transclude></ng-transclude>\n' +
+        '        <i ng-class="\'fa-chevron-\' + (accordionLocals.accordionOpen ? \'up\' : \'down\')" class="fa bb-submenu-chevron"></i>\n' +
+        '    </div>\n' +
+        '    \n' +
+        '</accordion-heading>\n' +
+        '');
     $templateCache.put('sky/templates/datefield/datefield.html',
         '<span class="add-on input-group-btn">\n' +
         '    <button type="button" class="btn btn-default bb-date-field-calendar-button">\n' +
@@ -10117,7 +10166,7 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '</section>\n' +
         '<section class="container-fluid bb-page-content-column-container" ng-show="bbPageStatus === locals.pageStatuses.NOT_AUTHORIZED">\n' +
         '    <div class="row">\n' +
-        '        <section class="bb-page-content-column col-xs-12 m-t-xl text-center">\n' +
+        '        <section class="bb-page-content-column col-xs-12 text-center">\n' +
         '            <div class="m">\n' +
         '                <h3>\n' +
         '                    {{resources.page_noaccess_header}}\n' +
@@ -10131,7 +10180,8 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '            </div>\n' +
         '        </section>\n' +
         '    </div>\n' +
-        '</section>');
+        '</section>\n' +
+        '');
     $templateCache.put('sky/templates/popover/popup.html',
         '<div class="popover {{placement}} fade" ng-class="{ in: isOpen()}">\n' +
         '  <div class="arrow"></div>\n' +
