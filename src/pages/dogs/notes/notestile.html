@@ -1,5 +1,8 @@
 <bb-tile bb-tile-header="'Notes'">
   <div>
+    <div class="toolbar bb-tile-toolbar">
+      <button type="button" class="btn bb-btn-secondary" ng-click="dogNotesTile.addNote()"><i class="fa fa-plus-circle"></i> Add Note</button>
+    </div>
     <div ng-show="dogNotesTile.notes">
       <div ng-switch="dogNotesTile.notes.length || 0">
         <div bb-tile-section ng-switch-when="0" class="bb-no-records">

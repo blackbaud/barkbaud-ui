@@ -46,9 +46,44 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <bb-tile-dashboard bb-layout="dogPage.layout" bb-tiles="dogPage.tiles"></bb-tile-dashboard>\n' +
         '</div>\n' +
         '');
+    $templateCache.put('pages/dogs/notes/noteadd.html',
+        '<bb-modal>\n' +
+        '  <div class="modal-form">\n' +
+        '    <bb-modal-header>Add note</bb-modal-header>\n' +
+        '    <div bb-modal-body>\n' +
+        '      <form>\n' +
+        '        <div class="form-group">\n' +
+        '          <label class="control-label">Date</label>\n' +
+        '          <bb-datepicker type="text" ng-model="noteAdd.date"></bb-date-picker>\n' +
+        '        </div>\n' +
+        '        <div class="form-group">\n' +
+        '          <label class="control-label">Note</label>\n' +
+        '          <input type="text" class="form-control" ng-model="noteAdd.title" />\n' +
+        '        </div>\n' +
+        '        <div class="form-group">\n' +
+        '          <textarea class="form-control" ng-model="noteAdd.description"></textarea>\n' +
+        '        </div>\n' +
+        '        <div class="form-group">\n' +
+        '          <label class="control-label">\n' +
+        '            <input type="checkbox" bb-check ng-model="noteAdd.addConstituentNote" />\n' +
+        '            Also add this note to the dog\'s current owner\n' +
+        '          </label>\n' +
+        '        </div>\n' +
+        '      </form>\n' +
+        '    </div>\n' +
+        '    <bb-modal-footer>\n' +
+        '      <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
+        '      <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '    </bb-modal-footer>\n' +
+        '  </div>\n' +
+        '</bb-modal>\n' +
+        '');
     $templateCache.put('pages/dogs/notes/notestile.html',
         '<bb-tile bb-tile-header="\'Notes\'">\n' +
         '  <div>\n' +
+        '    <div class="toolbar bb-tile-toolbar">\n' +
+        '      <button type="button" class="btn bb-btn-secondary" ng-click="dogNotesTile.addNote()"><i class="fa fa-plus-circle"></i> Add Note</button>\n' +
+        '    </div>\n' +
         '    <div ng-show="dogNotesTile.notes">\n' +
         '      <div ng-switch="dogNotesTile.notes.length || 0">\n' +
         '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
