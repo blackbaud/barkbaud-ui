@@ -16,7 +16,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '              <h2>\n' +
         '                <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
         '              </h2>\n' +
-        '              <p class="bark-dog-bio">{{dog.bio}}</p>\n' +
+        '              <p class="bb-text-block bark-dog-bio">{{dog.bio}}</p>\n' +
         '          </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
@@ -33,7 +33,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>{{dogPage.dog.name}}</h1>\n' +
         '                <p></p>\n' +
-        '                <p class="bark-dog-bio">{{dogPage.dog.bio}}</p>\n' +
+        '                <p class="bb-text-block bark-dog-bio">{{dogPage.dog.bio}}</p>\n' +
         '            </div>\n' +
         '        </div>\n' +
         '    </div>\n' +
@@ -45,9 +45,16 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
     $templateCache.put('pages/dogs/notes/notestile.html',
         '<bb-tile bb-tile-header="\'Notes\'">\n' +
         '  <div bb-tile-section>\n' +
-        '    <div ng-repeat="note in dogNotesTile.notes">\n' +
-        '      <h4>{{ note.title }}</h4>\n' +
-        '      <p>{{ note.description }}</p>\n' +
+        '    <div ng-show="dogNotesTile.notes">\n' +
+        '      <div ng-switch="dogNotesTile.length || 0">\n' +
+        '        <div ng-switch-when="0" class="bb-no-records">\n' +
+        '          This dog has no notes.\n' +
+        '        </div>\n' +
+        '        <div ng-switch-default ng-repeat="note in dogNotesTile.notes">\n' +
+        '          <h4>{{ note.title }}</h4>\n' +
+        '          <p>{{ note.description }}</p>\n' +
+        '        </div>\n' +
+        '      </div>\n' +
         '    </div>\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
