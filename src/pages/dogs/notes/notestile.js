@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogNotesTileController($timeout, bbData, dogId) {
+    function DogNotesTileController($timeout, bbData, bbMoment, dogId) {
         var self = this;
 
         bbData.load({
@@ -11,9 +11,15 @@
         }).then(function (result) {
             self.notes = result.data.data;
         });
+
+        self.getNoteDate = function (date) {
+            if (date && date.iso) {
+                return bbMoment(date.iso).calendar();
+            }
+        };
     }
 
-    DogNotesTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+    DogNotesTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'dogId'];
 
     angular.module('barkbaud')
         .controller('DogNotesTileController', DogNotesTileController);

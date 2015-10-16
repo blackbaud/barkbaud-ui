@@ -48,15 +48,18 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/notes/notestile.html',
         '<bb-tile bb-tile-header="\'Notes\'">\n' +
-        '  <div bb-tile-section>\n' +
+        '  <div>\n' +
         '    <div ng-show="dogNotesTile.notes">\n' +
-        '      <div ng-switch="dogNotesTile.length || 0">\n' +
-        '        <div ng-switch-when="0" class="bb-no-records">\n' +
+        '      <div ng-switch="dogNotesTile.notes.length || 0">\n' +
+        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
         '          This dog has no notes.\n' +
         '        </div>\n' +
-        '        <div ng-switch-default ng-repeat="note in dogNotesTile.notes">\n' +
-        '          <h4>{{ note.title }}</h4>\n' +
-        '          <p>{{ note.description }}</p>\n' +
+        '        <div ng-switch-default class="bb-repeater">\n' +
+        '          <div ng-repeat="note in dogNotesTile.notes" class="bb-repeater-item">\n' +
+        '            <h4 class="bb-repeater-item-title">{{ note.title }}</h4>\n' +
+        '            <h5>{{ dogNotesTile.getNoteDate(note.date) }}</h5>\n' +
+        '            <p>{{ note.description }}</p>\n' +
+        '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
