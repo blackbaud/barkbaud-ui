@@ -6,21 +6,22 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
     $templateCache.put('pages/dashboard/dashboardpage.html',
         '<div class="container-fluid">\n' +
         '  <h1>Dashboard</h1>\n' +
-        '  <div class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
+        '  <section class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
         '    <div class="panel-body">\n' +
         '      <div class="row">\n' +
         '          <div class="col-md-3 col-lg-2">\n' +
         '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
         '          </div>\n' +
         '          <div class="col-md-9 col-lg-10">\n' +
-        '              <h2>\n' +
+        '              <h1>\n' +
         '                <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
-        '              </h2>\n' +
+        '              </h1>\n' +
+        '              <h4>{{dog.breed}} &middot; {{dog.gender}}</h4>\n' +
         '              <p class="bb-text-block bark-dog-bio">{{dog.bio}}</p>\n' +
         '          </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
-        '  </div>\n' +
+        '  </section>\n' +
         '</div>\n' +
         '');
     $templateCache.put('pages/dogs/dogpage.html',
@@ -31,7 +32,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                <bark-photo bark-photo-url="dogPage.dog.image.url"></bark-photo>\n' +
         '            </div>\n' +
         '            <div class="col-md-9 col-lg-10">\n' +
-        '                <h1>{{dogPage.dog.name}}</h1>\n' +
+        '                <h1>\n' +
+        '                  {{dogPage.dog.name}}\n' +
+        '                </h1>\n' +
+        '                <h4>{{dogPage.dog.breed}} &middot; {{dogPage.dog.gender}}</h4>\n' +
         '                <p></p>\n' +
         '                <p class="bb-text-block bark-dog-bio">{{dogPage.dog.bio}}</p>\n' +
         '            </div>\n' +
