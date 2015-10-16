@@ -1,9 +1,16 @@
 @import "../../bower_components/sky/scss/mixins";
 
-.bark-dog-photo {
-    height: 150px;
-}
-
 .bark-dog-bio {
     white-space: pre-wrap;
 }
+
+.bark-dog-photo {
+    height: 150px;
+    width: 150px;
+    background-position: 50%;
+}
+
+.bark-dog-photo {
+    background-size: cover;
+}
+ 

@@ -99,7 +99,7 @@ module.exports = function (grunt) {
                 singleModule: true
             },
             main: {
-                src: ['src/pages/**/*.html'],
+                src: ['src/components/**/*.html', 'src/pages/**/*.html'],
                 dest: 'tmp/templates.js'
             }
         },
@@ -117,7 +117,7 @@ module.exports = function (grunt) {
                 tasks: ['copy:html']
             },
             templates: {
-                files: ['src/pages/**/*.html'],
+                files: ['src/components/**/*.html', 'src/pages/**/*.html'],
                 tasks: ['html2js', 'compileappscripts']
             }
         },

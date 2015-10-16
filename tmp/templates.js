@@ -1,15 +1,24 @@
 angular.module('barkbaud.templates', []).run(['$templateCache', function($templateCache) {
+    $templateCache.put('components/photo.html',
+        '<div class="bark-dog-photo img-circle center-block">\n' +
+        '</div>\n' +
+        '');
     $templateCache.put('pages/dashboard/dashboardpage.html',
         '<div class="container-fluid">\n' +
         '  <h1>Dashboard</h1>\n' +
         '  <div class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
         '    <div class="panel-body">\n' +
-        '      <h2>\n' +
-        '        <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
-        '      </h2>\n' +
-        '      <p>\n' +
-        '        {{dog.bio}}\n' +
-        '      </p>\n' +
+        '      <div class="row">\n' +
+        '          <div class="col-md-3 col-lg-2">\n' +
+        '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
+        '          </div>\n' +
+        '          <div class="col-md-9 col-lg-10">\n' +
+        '              <h2>\n' +
+        '                <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
+        '              </h2>\n' +
+        '              <p class="bark-dog-bio">{{dog.bio}}</p>\n' +
+        '          </div>\n' +
+        '      </div>\n' +
         '    </div>\n' +
         '  </div>\n' +
         '</div>\n' +
@@ -19,7 +28,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <div class="container-fluid">\n' +
         '        <div class="row">\n' +
         '            <div class="col-md-3 col-lg-2">\n' +
-        '                <img ng-src="{{ dogPage.dog.image.url }}" class="bark-dog-photo img-circle center-block" />\n' +
+        '                <bark-photo bark-photo-url="dogPage.dog.image.url"></bark-photo>\n' +
         '            </div>\n' +
         '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>{{dogPage.dog.name}}</h1>\n' +
