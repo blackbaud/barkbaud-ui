@@ -59,4 +59,23 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '</bb-tile>\n' +
         '');
+    $templateCache.put('pages/login/loginpage.html',
+        '<div class="container-fluid">\n' +
+        '  <h1>Login</h1>\n' +
+        '  <div class="panel">\n' +
+        '    <div class="panel-body">\n' +
+        '      <div ng-switch="loginPage.isAuthenticated">\n' +
+        '        <div ng-switch-when="\'true\'">\n' +
+        '          Welcome\n' +
+        '        </div>\n' +
+        '        <div ng-switch-default>\n' +
+        '          <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
+        '            Login with Blackbaud\n' +
+        '          </button>\n' +
+        '        <div>\n' +
+        '      </div>\n' +
+        '    </div>\n' +
+        '  </div>\n' +
+        '</div>\n' +
+        '');
 }]);

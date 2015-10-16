@@ -7,10 +7,17 @@
         apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
     };
 
+    barkbaudConfig.apiUrl = 'http://localhost:5000/';
+
     function config($locationProvider, $stateProvider, bbWindowConfig) {
         $locationProvider.html5Mode(false);
 
         $stateProvider
+            .state('login', {
+                controller: 'LoginPageController as loginPage',
+                templateUrl: 'pages/login/loginpage.html',
+                url: '/login'
+            })
             .state('home', {
                 controller: 'DashboardPageController as dashboardPage',
                 templateUrl: 'pages/dashboard/dashboardpage.html',
