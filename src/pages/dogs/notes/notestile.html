@@ -1,8 +1,15 @@
 <bb-tile bb-tile-header="'Notes'">
   <div bb-tile-section>
-    <div ng-repeat="note in dogNotesTile.notes">
-      <h4>{{ note.title }}</h4>
-      <p>{{ note.description }}</p>
+    <div ng-show="dogNotesTile.notes">
+      <div ng-switch="dogNotesTile.length || 0">
+        <div ng-switch-when="0" class="bb-no-records">
+          This dog has no notes.
+        </div>
+        <div ng-switch-default ng-repeat="note in dogNotesTile.notes">
+          <h4>{{ note.title }}</h4>
+          <p>{{ note.description }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </bb-tile>
