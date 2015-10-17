@@ -103,9 +103,26 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/summary/summarytile.html',
         '<bb-tile bb-tile-header="\'Summary\'">\n' +
-        '    <div bb-tile-section>\n' +
-        '        \n' +
+        '  <div>\n' +
+        '    <div ng-show="dogSummaryTile.summary">\n' +
+        '      <div ng-switch="dogSummaryTile.summary.length || 0">\n' +
+        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
+        '          This dog has no summary.\n' +
+        '        </div>\n' +
+        '        <div ng-switch-default class="bb-repeater">\n' +
+        '          <div ng-repeat="summary in dogSummaryTile.summary" class="bb-repeater-item">\n' +
+        '            <h4 class="bb-repeater-item-title">{{ summary.constituent.name }}</h4>\n' +
+        '            <h5>\n' +
+        '              {{ dogSummaryTile.getSummaryDate(summary.fromDate) }}\n' +
+        '              <span ng-show="summary.toDate">\n' +
+        '                to {{ dogSummaryTile.getSummaryDate(summary.toDate) }}\n' +
+        '              </span>\n' +
+        '            </h5>\n' +
+        '          </div>\n' +
+        '        </div>\n' +
+        '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
         '</bb-tile>\n' +
         '');
     $templateCache.put('pages/login/loginpage.html',
