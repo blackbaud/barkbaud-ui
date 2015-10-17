@@ -130,16 +130,16 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  <h1>Login</h1>\n' +
         '  <div class="panel">\n' +
         '    <div class="panel-body">\n' +
-        '      <div ng-switch="loginPage.isAuthenticated">\n' +
-        '        <div ng-switch-when="\'true\'">\n' +
-        '          Welcome\n' +
-        '        </div>\n' +
-        '        <div ng-switch-default>\n' +
-        '          <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
-        '            Login with Blackbaud\n' +
-        '          </button>\n' +
-        '        <div>\n' +
+        '      <div ng-if="loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">\n' +
+        '          Logout\n' +
+        '        </button>\n' +
         '      </div>\n' +
+        '      <div ng-if="!loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
+        '          Login with Blackbaud\n' +
+        '        </button>\n' +
+        '      <div>\n' +
         '    </div>\n' +
         '  </div>\n' +
         '</div>\n' +

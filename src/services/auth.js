@@ -11,6 +11,7 @@
             bbData.load({
                 data: 'auth/authenticated'
             }).then(function (result) {
+                service.authenticated = result.data.authenticated;
                 deferred.resolve(result.data.authenticated);
             });
             return deferred.promise;
@@ -24,6 +25,7 @@
             $window.location.href = barkbaudConfig.apiUrl + 'auth/logout';
         };
 
+        service.isAuthenticated();
         return service;
     }
 

@@ -2,16 +2,16 @@
   <h1>Login</h1>
   <div class="panel">
     <div class="panel-body">
-      <div ng-switch="loginPage.isAuthenticated">
-        <div ng-switch-when="'true'">
-          Welcome
-        </div>
-        <div ng-switch-default>
-          <button type="button" class="btn btn-primary" ng-click="loginPage.login()">
-            Login with Blackbaud
-          </button>
-        <div>
+      <div ng-if="loginPage.isAuthenticated">
+        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">
+          Logout
+        </button>
       </div>
+      <div ng-if="!loginPage.isAuthenticated">
+        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">
+          Login with Blackbaud
+        </button>
+      <div>
     </div>
   </div>
 </div>
