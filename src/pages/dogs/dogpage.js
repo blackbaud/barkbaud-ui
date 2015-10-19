@@ -3,13 +3,53 @@
 (function () {
     'use strict';
 
+    function dogPageConfig($stateProvider) {
+        $stateProvider
+            .state('dog', {
+                abstract: true,
+                controller: 'DogPageController as dogPage',
+                templateUrl: 'pages/dogs/dogpage.html',
+                url: '/dogs/:dogId',
+                resolve: {
+                    dogId: ['$stateParams', function ($stateParams) {
+                        return $stateParams.dogId;
+                    }]
+                }
+            })
+            .state('dog.views', {
+                url: '',
+                views: {
+                    'currenthome': {
+                        controller: 'DogCurrentHomeTileController as dogCurrentHomeTile',
+                        templateUrl: 'pages/dogs/currenthome/currenthometile.html'
+                    },
+                    'previoushomes': {
+                        controller: 'DogPreviousHomesTileController as dogPreviousHomesTile',
+                        templateUrl: 'pages/dogs/previoushomes/previoushomestile.html'
+                    },
+                    'notes': {
+                        controller: 'DogNotesTileController as dogNotesTile',
+                        templateUrl: 'pages/dogs/notes/notestile.html'
+                    }
+                }
+            });
+    }
+
+    dogPageConfig.$inject = ['$stateProvider'];
+
     function DogPageController($stateParams, bbData, bbWindow, dogId) {
         var self = this;
 
         self.tiles = [
             {
-                id: 'DogSummaryTile',
-                view_name: 'summary',
+                id: 'DogCurrentHomeTile',
+                view_name: 'currenthome',
+                collapsed: false,
+                collapsed_small: false
+            },
+            {
+                id: 'DogPreviousHomesTile',
+                view_name: 'previoushomes',
                 collapsed: false,
                 collapsed_small: false
             },
@@ -23,12 +63,14 @@
 
         self.layout = {
             one_column_layout: [
-                'DogSummaryTile',
+                'DogCurrentHomeTile',
+                'DogPreviousHomesTile',
                 'DogNotesTile'
             ],
             two_column_layout: [
                 [
-                    'DogSummaryTile'
+                    'DogCurrentHomeTile',
+                    'DogPreviousHomesTile'
                 ],
                 [
                     'DogNotesTile'
@@ -47,5 +89,6 @@
     DogPageController.$inject = ['$stateParams', 'bbData', 'bbWindow', 'dogId'];
 
     angular.module('barkbaud')
+        .config(dogPageConfig)
         .controller('DogPageController', DogPageController);
 }());

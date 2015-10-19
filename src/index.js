@@ -11,39 +11,10 @@
         $locationProvider.html5Mode(false);
 
         $stateProvider
-            .state('login', {
-                controller: 'LoginPageController as loginPage',
-                templateUrl: 'pages/login/loginpage.html',
-                url: '/login'
-            })
             .state('home', {
                 controller: 'DashboardPageController as dashboardPage',
                 templateUrl: 'pages/dashboard/dashboardpage.html',
                 url: ''
-            })
-            .state('dog', {
-                abstract: true,
-                controller: 'DogPageController as dogPage',
-                templateUrl: 'pages/dogs/dogpage.html',
-                url: '/dogs/:dogId',
-                resolve: {
-                    dogId: ['$stateParams', function ($stateParams) {
-                        return $stateParams.dogId;
-                    }]
-                }
-            })
-            .state('dog.views', {
-                url: '',
-                views: {
-                    'summary': {
-                        controller: 'DogSummaryTileController as dogSummaryTile',
-                        templateUrl: 'pages/dogs/summary/summarytile.html'
-                    },
-                    'notes': {
-                        controller: 'DogNotesTileController as dogNotesTile',
-                        templateUrl: 'pages/dogs/notes/notestile.html'
-                    }
-                }
             });
 
         bbWindowConfig.productName = 'Barkbaud';

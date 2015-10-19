@@ -11,39 +11,10 @@
         $locationProvider.html5Mode(false);
 
         $stateProvider
-            .state('login', {
-                controller: 'LoginPageController as loginPage',
-                templateUrl: 'pages/login/loginpage.html',
-                url: '/login'
-            })
             .state('home', {
                 controller: 'DashboardPageController as dashboardPage',
                 templateUrl: 'pages/dashboard/dashboardpage.html',
                 url: ''
-            })
-            .state('dog', {
-                abstract: true,
-                controller: 'DogPageController as dogPage',
-                templateUrl: 'pages/dogs/dogpage.html',
-                url: '/dogs/:dogId',
-                resolve: {
-                    dogId: ['$stateParams', function ($stateParams) {
-                        return $stateParams.dogId;
-                    }]
-                }
-            })
-            .state('dog.views', {
-                url: '',
-                views: {
-                    'summary': {
-                        controller: 'DogSummaryTileController as dogSummaryTile',
-                        templateUrl: 'pages/dogs/summary/summarytile.html'
-                    },
-                    'notes': {
-                        controller: 'DogNotesTileController as dogNotesTile',
-                        templateUrl: 'pages/dogs/notes/notestile.html'
-                    }
-                }
             });
 
         bbWindowConfig.productName = 'Barkbaud';
@@ -123,13 +94,74 @@
 (function () {
     'use strict';
 
+    function DogCurrentHomeTileController($timeout, bbData, dogId) {
+        var self = this;
+
+        bbData.load({
+            data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
+        }).then(function (result) {
+            self.currentHome = result.data;
+        });
+    }
+
+    DogCurrentHomeTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+
+    angular.module('barkbaud')
+        .controller('DogCurrentHomeTileController', DogCurrentHomeTileController);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function dogPageConfig($stateProvider) {
+        $stateProvider
+            .state('dog', {
+                abstract: true,
+                controller: 'DogPageController as dogPage',
+                templateUrl: 'pages/dogs/dogpage.html',
+                url: '/dogs/:dogId',
+                resolve: {
+                    dogId: ['$stateParams', function ($stateParams) {
+                        return $stateParams.dogId;
+                    }]
+                }
+            })
+            .state('dog.views', {
+                url: '',
+                views: {
+                    'currenthome': {
+                        controller: 'DogCurrentHomeTileController as dogCurrentHomeTile',
+                        templateUrl: 'pages/dogs/currenthome/currenthometile.html'
+                    },
+                    'previoushomes': {
+                        controller: 'DogPreviousHomesTileController as dogPreviousHomesTile',
+                        templateUrl: 'pages/dogs/previoushomes/previoushomestile.html'
+                    },
+                    'notes': {
+                        controller: 'DogNotesTileController as dogNotesTile',
+                        templateUrl: 'pages/dogs/notes/notestile.html'
+                    }
+                }
+            });
+    }
+
+    dogPageConfig.$inject = ['$stateProvider'];
+
     function DogPageController($stateParams, bbData, bbWindow, dogId) {
         var self = this;
 
         self.tiles = [
             {
-                id: 'DogSummaryTile',
-                view_name: 'summary',
+                id: 'DogCurrentHomeTile',
+                view_name: 'currenthome',
+                collapsed: false,
+                collapsed_small: false
+            },
+            {
+                id: 'DogPreviousHomesTile',
+                view_name: 'previoushomes',
                 collapsed: false,
                 collapsed_small: false
             },
@@ -143,12 +175,14 @@
 
         self.layout = {
             one_column_layout: [
-                'DogSummaryTile',
+                'DogCurrentHomeTile',
+                'DogPreviousHomesTile',
                 'DogNotesTile'
             ],
             two_column_layout: [
                 [
-                    'DogSummaryTile'
+                    'DogCurrentHomeTile',
+                    'DogPreviousHomesTile'
                 ],
                 [
                     'DogNotesTile'
@@ -167,6 +201,7 @@
     DogPageController.$inject = ['$stateParams', 'bbData', 'bbWindow', 'dogId'];
 
     angular.module('barkbaud')
+        .config(dogPageConfig)
         .controller('DogPageController', DogPageController);
 }());
 
@@ -232,26 +267,37 @@
 (function () {
     'use strict';
 
-    function DogSummaryTileController($timeout, bbData, dogId) {
+    function DogPreviousHomesTileController($timeout, bbData, dogId) {
         var self = this;
 
         bbData.load({
-            data: 'api/dogs/' + encodeURIComponent(dogId) + '/summary'
+            data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
         }).then(function (result) {
-            self.summary = result.data;
+            self.previousHomes = result.data;
         });
     }
 
-    DogSummaryTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+    DogPreviousHomesTileController.$inject = ['$timeout', 'bbData', 'dogId'];
 
     angular.module('barkbaud')
-        .controller('DogSummaryTileController', DogSummaryTileController);
+        .controller('DogPreviousHomesTileController', DogPreviousHomesTileController);
 }());
 
 /*global angular */
 
 (function () {
     'use strict';
+
+    function loginPageConfig($stateProvider) {
+        $stateProvider
+            .state('login', {
+                controller: 'LoginPageController as loginPage',
+                templateUrl: 'pages/login/loginpage.html',
+                url: '/login'
+            });
+    }
+
+    loginPageConfig.$inject = ['$stateProvider'];
 
     function LoginPageController(bbWindow, barkbaudAuthService) {
         var self = this;
@@ -273,6 +319,7 @@
     ];
 
     angular.module('barkbaud')
+        .config(loginPageConfig)
         .controller('LoginPageController', LoginPageController);
 }());
 
@@ -341,6 +388,13 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </section>\n' +
         '</div>\n' +
+        '');
+    $templateCache.put('pages/dogs/currenthome/currenthometile.html',
+        '<bb-tile bb-tile-header="\'Current home\'">\n' +
+        '    <div bb-tile-section>\n' +
+        '        {{dogCurrentHomeTile.currentHome.constituent.name}}\n' +
+        '    </div>\n' +
+        '</bb-tile>\n' +
         '');
     $templateCache.put('pages/dogs/dogpage.html',
         '<div class="bb-page-header">\n' +
@@ -419,10 +473,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
-    $templateCache.put('pages/dogs/summary/summarytile.html',
-        '<bb-tile bb-tile-header="\'Summary\'">\n' +
+    $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
+        '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
         '    <div bb-tile-section>\n' +
-        '        \n' +
         '    </div>\n' +
         '</bb-tile>\n' +
         '');

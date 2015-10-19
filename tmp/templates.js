@@ -24,6 +24,13 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </section>\n' +
         '</div>\n' +
         '');
+    $templateCache.put('pages/dogs/currenthome/currenthometile.html',
+        '<bb-tile bb-tile-header="\'Current home\'">\n' +
+        '    <div bb-tile-section>\n' +
+        '        {{dogCurrentHomeTile.currentHome.constituent.name}}\n' +
+        '    </div>\n' +
+        '</bb-tile>\n' +
+        '');
     $templateCache.put('pages/dogs/dogpage.html',
         '<div class="bb-page-header">\n' +
         '    <div class="container-fluid">\n' +
@@ -101,10 +108,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
-    $templateCache.put('pages/dogs/summary/summarytile.html',
-        '<bb-tile bb-tile-header="\'Summary\'">\n' +
+    $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
+        '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
         '    <div bb-tile-section>\n' +
-        '        \n' +
         '    </div>\n' +
         '</bb-tile>\n' +
         '');
