@@ -7,20 +7,15 @@
         apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
     };
 
-    function config($locationProvider, $urlRouterProvider, $stateProvider, bbWindowConfig) {
+    function config($locationProvider, $urlRouterProvider, bbWindowConfig) {
         $locationProvider.html5Mode(false);
+
         $urlRouterProvider.otherwise('/dashboard');
-        $stateProvider
-            .state('home', {
-                controller: 'DashboardPageController as dashboardPage',
-                templateUrl: 'pages/dashboard/dashboardpage.html',
-                url: ''
-            });
 
         bbWindowConfig.productName = 'Barkbaud';
     }
 
-    config.$inject = ['$locationProvider', '$urlRouterProvider', '$stateProvider', 'bbWindowConfig'];
+    config.$inject = ['$locationProvider', '$urlRouterProvider', 'bbWindowConfig'];
 
     function run(bbDataConfig, barkbaudAuthService, $rootScope, $state) {
 

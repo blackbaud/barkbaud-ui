@@ -3,6 +3,17 @@
 (function () {
     'use strict';
 
+    function dashboardPageConfig($stateProvider) {
+        $stateProvider
+            .state('dashboard', {
+                controller: 'DashboardPageController as dashboardPage',
+                templateUrl: 'pages/dashboard/dashboardpage.html',
+                url: 'dashboard'
+            });
+    }
+
+    dashboardPageConfig.$inject = ['$stateProvider'];
+
     function DashboardPageController($stateParams, bbData, bbWindow) {
         var self = this;
 
@@ -18,5 +29,6 @@
     DashboardPageController.$inject = ['$stateParams', 'bbData', 'bbWindow'];
 
     angular.module('barkbaud')
+        .config(dashboardPageConfig)
         .controller('DashboardPageController', DashboardPageController);
 }());
