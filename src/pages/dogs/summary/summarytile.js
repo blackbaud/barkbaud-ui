@@ -3,13 +3,13 @@
 (function () {
     'use strict';
 
-    function DogPreviousHomesTileController($timeout, bbData, dogId) {
+    function DogSummaryTileController($timeout, bbData, bbMoment, dogId) {
         var self = this;
 
         bbData.load({
-            data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
+            data: 'api/dogs/' + encodeURIComponent(dogId) + '/summary'
         }).then(function (result) {
-            self.previousHomes = result.data.data;
+            self.summary = result.data.data;
         });
 
         self.getSummaryDate = function (date) {
@@ -19,8 +19,8 @@
         };
     }
 
-    DogPreviousHomesTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+    DogSummaryTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'dogId'];
 
     angular.module('barkbaud')
-        .controller('DogPreviousHomesTileController', DogPreviousHomesTileController);
+        .controller('DogSummaryTileController', DogSummaryTileController);
 }());

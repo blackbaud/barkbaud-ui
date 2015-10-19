@@ -7,9 +7,9 @@
         apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
     };
 
-    function config($locationProvider, $stateProvider, bbWindowConfig) {
+    function config($locationProvider, $urlRouterProvider, $stateProvider, bbWindowConfig) {
         $locationProvider.html5Mode(false);
-
+        $urlRouterProvider.otherwise('/dashboard');
         $stateProvider
             .state('home', {
                 controller: 'DashboardPageController as dashboardPage',
@@ -20,9 +20,17 @@
         bbWindowConfig.productName = 'Barkbaud';
     }
 
-    config.$inject = ['$locationProvider', '$stateProvider', 'bbWindowConfig'];
+    config.$inject = ['$locationProvider', '$urlRouterProvider', '$stateProvider', 'bbWindowConfig'];
 
-    function run(bbDataConfig) {
+    function run(bbDataConfig, barkbaudAuthService, $rootScope, $state) {
+
+        $rootScope.$on('$stateChangeStart', function (event, toState) {
+            if (!barkbaudAuthService.authenticated && toState.name !== 'login') {
+                event.preventDefault();
+                $state.go('login');
+            }
+        });
+
         function addBaseUrl(url) {
             return barkbaudConfig.apiUrl + url;
         }
@@ -31,7 +39,7 @@
         bbDataConfig.resourceUrlFilter = addBaseUrl;
     }
 
-    run.$inject = ['bbDataConfig'];
+    run.$inject = ['bbDataConfig', 'barkbaudAuthService', '$rootScope', '$state'];
 
     angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates'])
         .constant('barkbaudConfig', barkbaudConfig)
@@ -273,14 +281,47 @@
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
         }).then(function (result) {
-            self.previousHomes = result.data;
+            self.previousHomes = result.data.data;
         });
+
+        self.getSummaryDate = function (date) {
+            if (date && date.iso) {
+                return bbMoment(date.iso).format('MMM Do YY');
+            }
+        };
     }
 
     DogPreviousHomesTileController.$inject = ['$timeout', 'bbData', 'dogId'];
 
     angular.module('barkbaud')
         .controller('DogPreviousHomesTileController', DogPreviousHomesTileController);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function DogSummaryTileController($timeout, bbData, bbMoment, dogId) {
+        var self = this;
+
+        bbData.load({
+            data: 'api/dogs/' + encodeURIComponent(dogId) + '/summary'
+        }).then(function (result) {
+            self.summary = result.data.data;
+        });
+
+        self.getSummaryDate = function (date) {
+            if (date && date.iso) {
+                return bbMoment(date.iso).format('MMM Do YY');
+            }
+        };
+    }
+
+    DogSummaryTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'dogId'];
+
+    angular.module('barkbaud')
+        .controller('DogSummaryTileController', DogSummaryTileController);
 }());
 
 /*global angular */
@@ -336,6 +377,7 @@
             bbData.load({
                 data: 'auth/authenticated'
             }).then(function (result) {
+                service.authenticated = result.data.authenticated;
                 deferred.resolve(result.data.authenticated);
             });
             return deferred.promise;
@@ -349,6 +391,7 @@
             $window.location.href = barkbaudConfig.apiUrl + 'auth/logout';
         };
 
+        service.isAuthenticated();
         return service;
     }
 
@@ -475,8 +518,26 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
         '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
-        '    <div bb-tile-section>\n' +
+        '  <div>\n' +
+        '    <div ng-show="dogSummaryTile.previousHomes">\n' +
+        '      <div ng-switch="dogSummaryTile.previousHomes.length || 0">\n' +
+        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
+        '          This dog has no previous homes.\n' +
+        '        </div>\n' +
+        '        <div ng-switch-default class="bb-repeater">\n' +
+        '          <div ng-repeat="previousHome in dogSummaryTile.previousHomes" class="bb-repeater-item">\n' +
+        '            <h4 class="bb-repeater-item-title">{{ previousHome.constituent.name }}</h4>\n' +
+        '            <h5>\n' +
+        '              {{ dogSummaryTile.getSummaryDate(previousHome.fromDate) }}\n' +
+        '              <span ng-show="previousHome.toDate">\n' +
+        '                to {{ dogSummaryTile.getSummaryDate(previousHome.toDate) }}\n' +
+        '              </span>\n' +
+        '            </h5>\n' +
+        '          </div>\n' +
+        '        </div>\n' +
+        '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
         '</bb-tile>\n' +
         '');
     $templateCache.put('pages/login/loginpage.html',
@@ -484,16 +545,16 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  <h1>Login</h1>\n' +
         '  <div class="panel">\n' +
         '    <div class="panel-body">\n' +
-        '      <div ng-switch="loginPage.isAuthenticated">\n' +
-        '        <div ng-switch-when="\'true\'">\n' +
-        '          Welcome\n' +
-        '        </div>\n' +
-        '        <div ng-switch-default>\n' +
-        '          <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
-        '            Login with Blackbaud\n' +
-        '          </button>\n' +
-        '        <div>\n' +
+        '      <div ng-if="loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">\n' +
+        '          Logout\n' +
+        '        </button>\n' +
         '      </div>\n' +
+        '      <div ng-if="!loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
+        '          Login with Blackbaud\n' +
+        '        </button>\n' +
+        '      <div>\n' +
         '    </div>\n' +
         '  </div>\n' +
         '</div>\n' +

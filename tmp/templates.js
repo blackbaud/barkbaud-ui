@@ -110,8 +110,26 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
         '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
-        '    <div bb-tile-section>\n' +
+        '  <div>\n' +
+        '    <div ng-show="dogSummaryTile.previousHomes">\n' +
+        '      <div ng-switch="dogSummaryTile.previousHomes.length || 0">\n' +
+        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
+        '          This dog has no previous homes.\n' +
+        '        </div>\n' +
+        '        <div ng-switch-default class="bb-repeater">\n' +
+        '          <div ng-repeat="previousHome in dogSummaryTile.previousHomes" class="bb-repeater-item">\n' +
+        '            <h4 class="bb-repeater-item-title">{{ previousHome.constituent.name }}</h4>\n' +
+        '            <h5>\n' +
+        '              {{ dogSummaryTile.getSummaryDate(previousHome.fromDate) }}\n' +
+        '              <span ng-show="previousHome.toDate">\n' +
+        '                to {{ dogSummaryTile.getSummaryDate(previousHome.toDate) }}\n' +
+        '              </span>\n' +
+        '            </h5>\n' +
+        '          </div>\n' +
+        '        </div>\n' +
+        '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
         '</bb-tile>\n' +
         '');
     $templateCache.put('pages/login/loginpage.html',
@@ -119,16 +137,16 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  <h1>Login</h1>\n' +
         '  <div class="panel">\n' +
         '    <div class="panel-body">\n' +
-        '      <div ng-switch="loginPage.isAuthenticated">\n' +
-        '        <div ng-switch-when="\'true\'">\n' +
-        '          Welcome\n' +
-        '        </div>\n' +
-        '        <div ng-switch-default>\n' +
-        '          <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
-        '            Login with Blackbaud\n' +
-        '          </button>\n' +
-        '        <div>\n' +
+        '      <div ng-if="loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">\n' +
+        '          Logout\n' +
+        '        </button>\n' +
         '      </div>\n' +
+        '      <div ng-if="!loginPage.isAuthenticated">\n' +
+        '        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
+        '          Login with Blackbaud\n' +
+        '        </button>\n' +
+        '      <div>\n' +
         '    </div>\n' +
         '  </div>\n' +
         '</div>\n' +
