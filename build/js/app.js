@@ -4,7 +4,8 @@
     'use strict';
 
     var barkbaudConfig = {
-        apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
+        //apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
+        apiUrl: 'https://localhost:5000/'
     };
 
     function config($locationProvider, $urlRouterProvider, bbWindowConfig) {
@@ -70,7 +71,7 @@
             link: function (scope, el) {
                 scope.$watch('barkPhotoUrl', function (newValue) {
                     if (newValue) {
-                        el.css('background-image', 'url(\'' + newValue + '\')');
+                        el.css('background-image', 'url(\'' + newValue.replace('http://', 'https://') + '\')');
                     }
                 });
             },
