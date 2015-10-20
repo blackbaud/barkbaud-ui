@@ -1,8 +1,8 @@
 <bb-modal>
-  <div class="modal-form">
-    <bb-modal-header>Add note</bb-modal-header>
-    <div bb-modal-body>
-      <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">
+  <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">
+    <div class="modal-form">
+      <bb-modal-header>Add note</bb-modal-header>
+      <div bb-modal-body>
         <div class="form-group">
           <label class="control-label">Title</label>
           <input type="text" class="form-control" ng-model="noteAdd.note.title" />
@@ -17,11 +17,11 @@
             Also add this note to the dog's current owner
           </label>
         </div>
-      </form>
+      </div>
+      <bb-modal-footer>
+        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>
+        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
+      </bb-modal-footer>
     </div>
-    <bb-modal-footer>
-      <bb-modal-footer-button-primary ng-click="noteAdd.save()"></bb-modal-footer-button-primary>
-      <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
-    </bb-modal-footer>
-  </div>
+  </form>
 </bb-modal>

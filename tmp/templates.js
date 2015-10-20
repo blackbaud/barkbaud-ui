@@ -91,10 +91,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/notes/noteadd.html',
         '<bb-modal>\n' +
-        '  <div class="modal-form">\n' +
-        '    <bb-modal-header>Add note</bb-modal-header>\n' +
-        '    <div bb-modal-body>\n' +
-        '      <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">\n' +
+        '  <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">\n' +
+        '    <div class="modal-form">\n' +
+        '      <bb-modal-header>Add note</bb-modal-header>\n' +
+        '      <div bb-modal-body>\n' +
         '        <div class="form-group">\n' +
         '          <label class="control-label">Title</label>\n' +
         '          <input type="text" class="form-control" ng-model="noteAdd.note.title" />\n' +
@@ -109,13 +109,13 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            Also add this note to the dog\'s current owner\n' +
         '          </label>\n' +
         '        </div>\n' +
-        '      </form>\n' +
+        '      </div>\n' +
+        '      <bb-modal-footer>\n' +
+        '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '      </bb-modal-footer>\n' +
         '    </div>\n' +
-        '    <bb-modal-footer>\n' +
-        '      <bb-modal-footer-button-primary ng-click="noteAdd.save()"></bb-modal-footer-button-primary>\n' +
-        '      <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
-        '    </bb-modal-footer>\n' +
-        '  </div>\n' +
+        '  </form>\n' +
         '</bb-modal>\n' +
         '');
     $templateCache.put('pages/dogs/notes/notestile.html',
