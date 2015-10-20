@@ -10,10 +10,27 @@
             Error reading current home.
           </div>
           <div bb-tile-section ng-switch-default>
-            <h4>
-              {{:: dogCurrentHomeTile.currentHome.constituent.first }}
-              {{:: dogCurrentHomeTile.currentHome.constituent.last }}
-            </h4>
+            <div class="row">
+              <div class="col-sm-3 col-xs-4">
+                <bark-photo class="bark-photo-small" bark-photo-gravatar-email="dogCurrentHomeTile.currentHome.constituent.email.address"></bark-photo>
+              </div>
+              <div class="col-sm-9 col-xs-8">
+                <h4>
+                  <a ng-href="{{dogCurrentHomeTile.currentHome.constituentId | barkConstituentUrl}}">
+                    {{:: dogCurrentHomeTile.currentHome.constituent.first }}
+                    {{:: dogCurrentHomeTile.currentHome.constituent.last }}
+                  </a>
+                </h4>
+                <h5>{{:: dogCurrentHomeTile.getTimeInHome(dogCurrentHomeTile.currentHome.fromDate) }}</h5>
+                <p class="bark-home-address" ng-show="dogCurrentHomeTile.currentHome.constituent.address.address">{{:: dogCurrentHomeTile.currentHome.constituent.address.address }}</p>
+                <p ng-show="dogCurrentHomeTile.currentHome.constituent.phone.number">
+                  {{:: dogCurrentHomeTile.currentHome.constituent.phone.number }}
+                </p>
+                <p ng-show="dogCurrentHomeTile.currentHome.constituent.email.address">
+                  <a ng-href="mailto:{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}">{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}</a>
+                </p>
+              <div>
+            </div>
           </div>
         </div>
       </div>

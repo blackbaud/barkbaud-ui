@@ -69,7 +69,7 @@
 
     MainController.$inject = ['barkbaudAuthService'];
 
-    angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates'])
+    angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates', 'ui.gravatar'])
         .constant('barkbaudConfig', barkbaudConfig)
         .config(config)
         .run(run)
@@ -81,15 +81,42 @@
 (function () {
     'use strict';
 
-    function barkPhoto() {
+    function constituentUrlFilter() {
+        return function (constituentId) {
+            return 'https://renxt.blackbaud.com/constituents/' + encodeURIComponent(constituentId);
+        };
+    }
+
+    angular.module('barkbaud')
+        .filter('barkConstituentUrl', constituentUrlFilter);
+
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function barkPhoto(gravatarService) {
         return {
             scope: {
-                barkPhotoUrl: '='
+                barkPhotoUrl: '=',
+                barkPhotoGravatarEmail: '='
             },
             link: function (scope, el) {
+                function setImageUrl(url) {
+                    el.css('background-image', 'url(\'' + url + '\')');
+                }
+
                 scope.$watch('barkPhotoUrl', function (newValue) {
                     if (newValue) {
-                        el.css('background-image', 'url(\'' + newValue.replace('http://', '//') + '\')');
+                        setImageUrl(newValue.replace('http://', '//'));
+                    }
+                });
+
+                scope.$watch('barkPhotoGravatarEmail', function (newValue) {
+                    if (newValue) {
+                        setImageUrl(gravatarService.url(newValue, {default: 'mm'}));
                     }
                 });
             },
@@ -97,6 +124,8 @@
             templateUrl: 'components/photo.html'
         };
     }
+
+    barkPhoto.$inject = ['gravatarService'];
 
     angular.module('barkbaud')
         .directive('barkPhoto', barkPhoto);
@@ -148,18 +177,23 @@
 (function () {
     'use strict';
 
-    function DogCurrentHomeTileController($timeout, bbData, dogId) {
+    function DogCurrentHomeTileController($timeout, bbData, bbMoment, dogId) {
         var self = this;
+
+        self.getTimeInHome = function (fromDate) {
+            var fromDateMoment = bbMoment(fromDate.iso);
+
+            return 'since ' + fromDateMoment.format('L') + ' (' + fromDateMoment.startOf('month').fromNow(true) + ')';
+        };
 
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
         }).then(function (result) {
-            console.log(result.data);
             self.currentHome = result.data.data;
         });
     }
 
-    DogCurrentHomeTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+    DogCurrentHomeTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'dogId'];
 
     angular.module('barkbaud')
         .controller('DogCurrentHomeTileController', DogCurrentHomeTileController);
@@ -517,7 +551,7 @@
 
 angular.module('barkbaud.templates', []).run(['$templateCache', function($templateCache) {
     $templateCache.put('components/photo.html',
-        '<div class="bark-dog-photo img-circle center-block">\n' +
+        '<div class="bark-photo img-circle center-block">\n' +
         '</div>\n' +
         '');
     $templateCache.put('pages/dashboard/dashboardpage.html',
@@ -556,10 +590,27 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            Error reading current home.\n' +
         '          </div>\n' +
         '          <div bb-tile-section ng-switch-default>\n' +
-        '            <h4>\n' +
-        '              {{:: dogCurrentHomeTile.currentHome.constituent.first }}\n' +
-        '              {{:: dogCurrentHomeTile.currentHome.constituent.last }}\n' +
-        '            </h4>\n' +
+        '            <div class="row">\n' +
+        '              <div class="col-sm-3 col-xs-4">\n' +
+        '                <bark-photo class="bark-photo-small" bark-photo-gravatar-email="dogCurrentHomeTile.currentHome.constituent.email.address"></bark-photo>\n' +
+        '              </div>\n' +
+        '              <div class="col-sm-9 col-xs-8">\n' +
+        '                <h4>\n' +
+        '                  <a ng-href="{{dogCurrentHomeTile.currentHome.constituentId | barkConstituentUrl}}">\n' +
+        '                    {{:: dogCurrentHomeTile.currentHome.constituent.first }}\n' +
+        '                    {{:: dogCurrentHomeTile.currentHome.constituent.last }}\n' +
+        '                  </a>\n' +
+        '                </h4>\n' +
+        '                <h5>{{:: dogCurrentHomeTile.getTimeInHome(dogCurrentHomeTile.currentHome.fromDate) }}</h5>\n' +
+        '                <p class="bark-home-address" ng-show="dogCurrentHomeTile.currentHome.constituent.address.address">{{:: dogCurrentHomeTile.currentHome.constituent.address.address }}</p>\n' +
+        '                <p ng-show="dogCurrentHomeTile.currentHome.constituent.phone.number">\n' +
+        '                  {{:: dogCurrentHomeTile.currentHome.constituent.phone.number }}\n' +
+        '                </p>\n' +
+        '                <p ng-show="dogCurrentHomeTile.currentHome.constituent.email.address">\n' +
+        '                  <a ng-href="mailto:{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}">{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}</a>\n' +
+        '                </p>\n' +
+        '              <div>\n' +
+        '            </div>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +

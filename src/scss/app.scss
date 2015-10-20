@@ -4,15 +4,21 @@
     white-space: pre-wrap;
 }
 
-.bark-dog-photo {
+.bark-photo {
     height: 150px;
     width: 150px;
     background-position: 50%;
+    background-size: cover;
     margin-top: $margin;
+
+    &.bark-photo-small {
+        height: 100px;
+        width: 100px;
+    }
 }
 
-.bark-dog-photo {
-    background-size: cover;
+.bark-home-address {
+    white-space: pre-wrap;
 }
 
 a:hover .bark-dog-photo,

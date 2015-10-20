@@ -33,6 +33,7 @@ module.exports = function (grunt) {
             app: {
                 files: {
                     '<%= buildPath %>/js/app.js': [
+                        'bower_components/angular-gravatar/build/angular-gravatar.js',
                         'src/index.js',
                         'src/**/*.js',
                         'tmp/templates.js'

@@ -69,7 +69,7 @@
 
     MainController.$inject = ['barkbaudAuthService'];
 
-    angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates'])
+    angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates', 'ui.gravatar'])
         .constant('barkbaudConfig', barkbaudConfig)
         .config(config)
         .run(run)
