@@ -9,7 +9,8 @@
     "tests"
   ],
   "devDependencies": {
-    "sky": "git+https://github.com/blackbaud/sky#c72165bb70c8a1d3e7eec2a405a7fbe82df2c7b7"
+    "sky": "git+https://github.com/blackbaud/sky#c72165bb70c8a1d3e7eec2a405a7fbe82df2c7b7",
+    "angular-gravatar": "~0.4.1"
   },
   "resolutions": {
     "angular": "1.3.18"
