@@ -3,10 +3,13 @@
 (function () {
     'use strict';
 
-    function LoginPageController(bbWait, bbWindow, barkbaudAuthService, barkbaudRedirect) {
+    function LoginPageController($location, bbWait, bbWindow, barkbaudAuthService, barkbaudRedirect) {
         var self = this;
 
+        self.error = $location.search().error;
+
         self.logout = barkbaudAuthService.logout;
+
         self.login = function () {
             barkbaudAuthService.login(barkbaudRedirect);
         };
@@ -24,6 +27,7 @@
     }
 
     LoginPageController.$inject = [
+        '$location',
         'bbWait',
         'bbWindow',
         'barkbaudAuthService',

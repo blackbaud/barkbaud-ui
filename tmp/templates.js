@@ -137,6 +137,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  <div class="modal-form">\n' +
         '    <bb-modal-header>Barkbaud</bb-modal-header>\n' +
         '    <div bb-modal-body>\n' +
+        '      <p class="alert alert-danger" ng-if="loginPage.error">\n' +
+        '        {{:: loginPage.error }}\n' +
+        '      </p>\n' +
         '      <p>Welcome to the Barkbaud Sample App.  This demo was built to showcase the Blackbaud NXT API and Blackbaud Sky UX.</p>\n' +
         '      <p>Click the Login button below to view the demo, or click the Learn More button below to visit the GitHub repo.</p>\n' +
         '    </div>\n' +
