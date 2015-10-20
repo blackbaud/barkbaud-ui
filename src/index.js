@@ -41,9 +41,16 @@
 
     run.$inject = ['bbDataConfig', 'barkbaudAuthService', '$rootScope', '$state'];
 
+    function MainController(barkbaudAuthService) {
+        var self = this;
+        self.logout = barkbaudAuthService.logout;
+    }
+
+    MainController.$inject = ['barkbaudAuthService'];
+
     angular.module('barkbaud', ['sky', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'barkbaud.templates'])
         .constant('barkbaudConfig', barkbaudConfig)
         .config(config)
         .run(run)
-        .controller('MainController', angular.noop);
+        .controller('MainController', MainController);
 }());
