@@ -20,3 +20,7 @@ a:hover .bark-dog-photo {
   border: solid 4px $bb-color-blue;
   transition: border-width 0.2s ease-in-out;
 }
+
+.modal-authorize .close {
+  display: none;
+}

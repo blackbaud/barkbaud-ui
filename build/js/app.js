@@ -629,7 +629,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/login/loginpage.html',
         '<bb-modal>\n' +
-        '  <div class="modal-form">\n' +
+        '  <div class="modal-form modal-authorize">\n' +
         '    <bb-modal-header>Barkbaud</bb-modal-header>\n' +
         '    <div bb-modal-body>\n' +
         '      <p class="alert alert-danger" ng-if="loginPage.error" ng-switch="loginPage.error">\n' +
