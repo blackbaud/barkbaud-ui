@@ -9,7 +9,8 @@
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
         }).then(function (result) {
-            self.currentHome = result.data;
+            console.log(result.data);
+            self.currentHome = result.data.data;
         });
     }
 

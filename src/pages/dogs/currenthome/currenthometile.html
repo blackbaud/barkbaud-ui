@@ -1,5 +1,22 @@
 <bb-tile bb-tile-header="'Current home'">
-    <div bb-tile-section>
-        {{dogCurrentHomeTile.currentHome.constituent.name}}
+  <div ng-show="dogCurrentHomeTile.currentHome">
+    <div ng-switch="dogCurrentHomeTile.currentHome.constituentId || 0">
+      <div bb-tile-section ng-switch-when="0" class="bb-no-records">
+        This dog has no current home.
+      </div>
+      <div ng-switch-default>
+        <div ng-switch="dogCurrentHomeTile.currentHome.constituent.error || ''">
+          <div bb-tile-section ng-switch-when="''" class="bb-no-records">
+            Error reading current home.
+          </div>
+          <div bb-tile-section ng-switch-default>
+            <h4>
+              {{:: dogCurrentHomeTile.currentHome.constituent.first }}
+              {{:: dogCurrentHomeTile.currentHome.constituent.last }}
+            </h4>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </bb-tile>

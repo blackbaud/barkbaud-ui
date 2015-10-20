@@ -11,7 +11,7 @@
             link: function (scope, el) {
                 scope.$watch('barkPhotoUrl', function (newValue) {
                     if (newValue) {
-                        el.css('background-image', 'url(\'' + newValue.replace('http://', 'https://') + '\')');
+                        el.css('background-image', 'url(\'' + newValue.replace('http://', '//') + '\')');
                     }
                 });
             },
