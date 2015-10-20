@@ -2,28 +2,25 @@
   <div class="modal-form">
     <bb-modal-header>Add note</bb-modal-header>
     <div bb-modal-body>
-      <form>
+      <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">
         <div class="form-group">
-          <label class="control-label">Date</label>
-          <bb-datepicker type="text" ng-model="noteAdd.date"></bb-date-picker>
+          <label class="control-label">Title</label>
+          <input type="text" class="form-control" ng-model="noteAdd.note.title" />
         </div>
         <div class="form-group">
-          <label class="control-label">Note</label>
-          <input type="text" class="form-control" ng-model="noteAdd.title" />
-        </div>
-        <div class="form-group">
-          <textarea class="form-control" ng-model="noteAdd.description"></textarea>
+          <label class="control-label">Description</label>
+          <textarea class="form-control" ng-model="noteAdd.note.description"></textarea>
         </div>
         <div class="form-group">
           <label class="control-label">
-            <input type="checkbox" bb-check ng-model="noteAdd.addConstituentNote" />
+            <input type="checkbox" bb-check ng-model="noteAdd.note.addConstituentNote" />
             Also add this note to the dog's current owner
           </label>
         </div>
       </form>
     </div>
     <bb-modal-footer>
-      <bb-modal-footer-button-primary></bb-modal-footer-button-primary>
+      <bb-modal-footer-button-primary ng-click="noteAdd.save()"></bb-modal-footer-button-primary>
       <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
     </bb-modal-footer>
   </div>
