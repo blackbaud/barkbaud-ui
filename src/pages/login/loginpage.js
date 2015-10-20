@@ -3,11 +3,13 @@
 (function () {
     'use strict';
 
-    function LoginPageController(bbWait, bbWindow, barkbaudAuthService) {
+    function LoginPageController(bbWait, bbWindow, barkbaudAuthService, barkbaudRedirect) {
         var self = this;
 
-        self.login = barkbaudAuthService.login;
         self.logout = barkbaudAuthService.logout;
+        self.login = function () {
+            barkbaudAuthService.login(barkbaudRedirect);
+        };
 
         bbWindow.setWindowTitle('Login');
 
@@ -24,7 +26,8 @@
     LoginPageController.$inject = [
         'bbWait',
         'bbWindow',
-        'barkbaudAuthService'
+        'barkbaudAuthService',
+        'barkbaudRedirect'
     ];
 
     angular.module('barkbaud')

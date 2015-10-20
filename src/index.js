@@ -25,7 +25,7 @@
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
             if (!barkbaudAuthService.authenticated) {
                 event.preventDefault();
-                barkbaudAuthService.modal().then(function () {
+                barkbaudAuthService.modal($state.href(toState, toParams)).then(function () {
                     return $state.go(toState.name, toParams);
                 });
             }

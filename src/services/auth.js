@@ -20,23 +20,38 @@
             return deferred.promise;
         };
 
-        service.login = function () {
-            $window.location.href = barkbaudConfig.apiUrl + 'auth/login';
+        service.login = function (redirect) {
+            $window.location.href = [
+                barkbaudConfig.apiUrl,
+                'auth/login',
+                '?redirect=',
+                redirect
+            ].join('');
         };
 
-        service.logout = function () {
-            $window.location.href = barkbaudConfig.apiUrl + 'auth/logout';
+        service.logout = function (redirect) {
+            $window.location.href = [
+                barkbaudConfig.apiUrl,
+                'auth/logout',
+                '?redirect=',
+                redirect
+            ].join('');
         };
 
         service.update = function () {
             modal.close(service.authenticated);
         };
 
-        service.modal = function () {
+        service.modal = function (redirect) {
             if (!modal) {
                 modal = bbModal.open({
                     controller: 'LoginPageController as loginPage',
-                    templateUrl: 'pages/login/loginpage.html'
+                    templateUrl: 'pages/login/loginpage.html',
+                    resolve: {
+                        barkbaudRedirect: function () {
+                            return redirect;
+                        }
+                    }
                 });
             }
 
