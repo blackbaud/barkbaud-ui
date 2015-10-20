@@ -23,9 +23,11 @@
     function run(bbDataConfig, barkbaudAuthService, $rootScope, $state) {
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
+            var redirect;
             if (!barkbaudAuthService.authenticated) {
                 event.preventDefault();
-                barkbaudAuthService.modal($state.href(toState, toParams)).then(function () {
+                redirect = $state.href(toState, toParams, { absolute: true });
+                barkbaudAuthService.modal(redirect).then(function () {
                     return $state.go(toState.name, toParams);
                 });
             }
