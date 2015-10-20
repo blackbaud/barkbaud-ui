@@ -19,7 +19,7 @@
         };
 
         self.addNote = function () {
-            barkNoteAdd.open();
+            barkNoteAdd.open(dogId);
         };
     }
 
