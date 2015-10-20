@@ -8,7 +8,7 @@
             .state('dashboard', {
                 controller: 'DashboardPageController as dashboardPage',
                 templateUrl: 'pages/dashboard/dashboardpage.html',
-                url: 'dashboard'
+                url: '/dashboard'
             });
     }
 

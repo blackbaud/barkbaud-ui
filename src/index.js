@@ -10,7 +10,10 @@
     function config($locationProvider, $urlRouterProvider, bbWindowConfig) {
         $locationProvider.html5Mode(false);
 
-        $urlRouterProvider.otherwise('/dashboard');
+        $urlRouterProvider.otherwise(function ($injector) {
+            var $state = $injector.get('$state');
+            $state.go('dashboard');
+        });
 
         bbWindowConfig.productName = 'Barkbaud';
     }
@@ -19,10 +22,12 @@
 
     function run(bbDataConfig, barkbaudAuthService, $rootScope, $state) {
 
-        $rootScope.$on('$stateChangeStart', function (event, toState) {
-            if (!barkbaudAuthService.authenticated && toState.name !== 'login') {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
+            if (!barkbaudAuthService.authenticated) {
                 event.preventDefault();
-                $state.go('login');
+                barkbaudAuthService.modal().then(function () {
+                    return $state.go(toState.name, toParams);
+                });
             }
         });
 

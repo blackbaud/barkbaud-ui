@@ -133,22 +133,25 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</bb-tile>\n' +
         '');
     $templateCache.put('pages/login/loginpage.html',
-        '<div class="container-fluid">\n' +
-        '  <h1>Login</h1>\n' +
-        '  <div class="panel">\n' +
-        '    <div class="panel-body">\n' +
-        '      <div ng-if="loginPage.isAuthenticated">\n' +
-        '        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">\n' +
-        '          Logout\n' +
-        '        </button>\n' +
-        '      </div>\n' +
-        '      <div ng-if="!loginPage.isAuthenticated">\n' +
-        '        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">\n' +
-        '          Login with Blackbaud\n' +
-        '        </button>\n' +
-        '      <div>\n' +
+        '<bb-modal>\n' +
+        '  <div class="modal-form">\n' +
+        '    <bb-modal-header>Barkbaud</bb-modal-header>\n' +
+        '    <div bb-modal-body>\n' +
+        '      <p>Welcome to the Barkbaud Sample App.  This demo was built to showcase the Blackbaud NXT API and Blackbaud Sky UX.</p>\n' +
+        '      <p>Click the Login button below to view the demo, or click the Learn More button below to visit the GitHub repo.</p>\n' +
         '    </div>\n' +
+        '    <bb-modal-footer>\n' +
+        '      <div ng-show="loginPage.waitingForAuth">\n' +
+        '        <i class="fa fa-2x fa-spin fa-spinner" ></i> Checking authentication...\n' +
+        '      </div>\n' +
+        '      <div ng-hide="loginPage.waitingForAuth">\n' +
+        '        <bb-modal-footer-button-primary  ng-click="loginPage.login()">\n' +
+        '          Login with Blackbaud\n' +
+        '        </bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button>Learn More</bb-modal-footer-button>\n' +
+        '      </div>\n' +
+        '    </bb-modal-footer>\n' +
         '  </div>\n' +
-        '</div>\n' +
+        '</bb-modal>\n' +
         '');
 }]);

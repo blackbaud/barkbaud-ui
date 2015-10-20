@@ -3,8 +3,11 @@
 (function () {
     'use strict';
 
-    function barkbaudAuthService(barkbaudConfig, bbData, $q, $window) {
-        var service = {};
+    function barkbaudAuthService(barkbaudConfig, bbData, bbModal, $q, $window) {
+        var modal,
+            service = {};
+
+        service.authenticated = false;
 
         service.isAuthenticated = function () {
             var deferred = $q.defer();
@@ -25,13 +28,28 @@
             $window.location.href = barkbaudConfig.apiUrl + 'auth/logout';
         };
 
-        service.isAuthenticated();
+        service.update = function () {
+            modal.close(service.authenticated);
+        };
+
+        service.modal = function () {
+            if (!modal) {
+                modal = bbModal.open({
+                    controller: 'LoginPageController as loginPage',
+                    templateUrl: 'pages/login/loginpage.html'
+                });
+            }
+
+            return modal.result;
+        };
+
         return service;
     }
 
     barkbaudAuthService.$inject = [
         'barkbaudConfig',
         'bbData',
+        'bbModal',
         '$q',
         '$window'
     ];

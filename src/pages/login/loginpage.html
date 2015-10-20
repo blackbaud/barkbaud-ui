@@ -1,17 +1,20 @@
-<div class="container-fluid">
-  <h1>Login</h1>
-  <div class="panel">
-    <div class="panel-body">
-      <div ng-if="loginPage.isAuthenticated">
-        <button type="button" class="btn btn-primary" ng-click="loginPage.logout()">
-          Logout
-        </button>
-      </div>
-      <div ng-if="!loginPage.isAuthenticated">
-        <button type="button" class="btn btn-primary" ng-click="loginPage.login()">
-          Login with Blackbaud
-        </button>
-      <div>
+<bb-modal>
+  <div class="modal-form">
+    <bb-modal-header>Barkbaud</bb-modal-header>
+    <div bb-modal-body>
+      <p>Welcome to the Barkbaud Sample App.  This demo was built to showcase the Blackbaud NXT API and Blackbaud Sky UX.</p>
+      <p>Click the Login button below to view the demo, or click the Learn More button below to visit the GitHub repo.</p>
     </div>
+    <bb-modal-footer>
+      <div ng-show="loginPage.waitingForAuth">
+        <i class="fa fa-2x fa-spin fa-spinner" ></i> Checking authentication...
+      </div>
+      <div ng-hide="loginPage.waitingForAuth">
+        <bb-modal-footer-button-primary  ng-click="loginPage.login()">
+          Login with Blackbaud
+        </bb-modal-footer-button-primary>
+        <bb-modal-footer-button>Learn More</bb-modal-footer-button>
+      </div>
+    </bb-modal-footer>
   </div>
-</div>
+</bb-modal>
