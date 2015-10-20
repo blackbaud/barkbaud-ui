@@ -9,7 +9,7 @@
         self.note = {};
         self.saveData = function () {
             bbData.save({
-                url: '/api/dogs/' + dogId + '/notes',
+                url: 'api/dogs/' + dogId + '/notes',
                 data: self.note,
                 type: 'POST'
             }).then(function (result) {

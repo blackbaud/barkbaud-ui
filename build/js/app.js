@@ -798,7 +798,7 @@ angular.module('md5', []).constant('md5', (function() {
         self.note = {};
         self.saveData = function () {
             bbData.save({
-                url: '/api/dogs/' + dogId + '/notes',
+                url: 'api/dogs/' + dogId + '/notes',
                 data: self.note,
                 type: 'POST'
             }).then(function (result) {
