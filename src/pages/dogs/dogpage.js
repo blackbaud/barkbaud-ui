@@ -37,7 +37,7 @@
 
     dogPageConfig.$inject = ['$stateProvider'];
 
-    function DogPageController($stateParams, bbData, bbWindow, dogId) {
+    function DogPageController($scope, $stateParams, bbData, bbWindow, dogId) {
         var self = this;
 
         self.tiles = [
@@ -78,15 +78,23 @@
             ]
         };
 
+        $scope.$emit('bbBeginWait');
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId)
         }).then(function (result) {
             self.dog = result.data.data;
             bbWindow.setWindowTitle(self.dog.name);
+            $scope.$emit('bbEndWait');
         });
     }
 
-    DogPageController.$inject = ['$stateParams', 'bbData', 'bbWindow', 'dogId'];
+    DogPageController.$inject = [
+        '$scope',
+        '$stateParams',
+        'bbData',
+        'bbWindow',
+        'dogId'
+    ];
 
     angular.module('barkbaud')
         .config(dogPageConfig)

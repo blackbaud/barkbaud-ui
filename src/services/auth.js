@@ -17,8 +17,6 @@
             ].join('');
         }
 
-        service.authenticated = false;
-
         service.isAuthenticated = function () {
             var deferred = $q.defer();
             bbData.load({

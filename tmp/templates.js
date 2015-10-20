@@ -10,7 +10,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <div class="panel-body">\n' +
         '      <div class="row">\n' +
         '          <div class="col-md-3 col-lg-2">\n' +
+        '            <a ui-sref="dog.views({dogId: dog.objectId})">\n' +
         '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
+        '            </a>\n' +
         '          </div>\n' +
         '          <div class="col-md-9 col-lg-10">\n' +
         '              <h1>\n' +

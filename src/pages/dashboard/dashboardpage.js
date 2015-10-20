@@ -14,19 +14,25 @@
 
     dashboardPageConfig.$inject = ['$stateProvider'];
 
-    function DashboardPageController($stateParams, bbData, bbWindow) {
+    function DashboardPageController($scope, $stateParams, bbData, bbWindow) {
         var self = this;
 
+        $scope.$emit('bbBeginWait');
         bbWindow.setWindowTitle('Dashboard');
-
         bbData.load({
             data: 'api/dogs'
         }).then(function (result) {
             self.dogs = result.data.data;
+            $scope.$emit('bbEndWait');
         });
     }
 
-    DashboardPageController.$inject = ['$stateParams', 'bbData', 'bbWindow'];
+    DashboardPageController.$inject = [
+        '$scope',
+        '$stateParams',
+        'bbData',
+        'bbWindow'
+    ];
 
     angular.module('barkbaud')
         .config(dashboardPageConfig)

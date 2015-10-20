@@ -4,7 +4,9 @@
     <div class="panel-body">
       <div class="row">
           <div class="col-md-3 col-lg-2">
+            <a ui-sref="dog.views({dogId: dog.objectId})">
               <bark-photo bark-photo-url="dog.image.url"></bark-photo>
+            </a>
           </div>
           <div class="col-md-9 col-lg-10">
               <h1>
