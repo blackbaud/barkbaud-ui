@@ -3,15 +3,26 @@
 (function () {
     'use strict';
 
-    function barkPhoto() {
+    function barkPhoto(gravatarService) {
         return {
             scope: {
-                barkPhotoUrl: '='
+                barkPhotoUrl: '=',
+                barkPhotoGravatarEmail: '='
             },
             link: function (scope, el) {
+                function setImageUrl(url) {
+                    el.css('background-image', 'url(\'' + url + '\')');
+                }
+
                 scope.$watch('barkPhotoUrl', function (newValue) {
                     if (newValue) {
-                        el.css('background-image', 'url(\'' + newValue.replace('http://', '//') + '\')');
+                        setImageUrl(newValue.replace('http://', '//'));
+                    }
+                });
+
+                scope.$watch('barkPhotoGravatarEmail', function (newValue) {
+                    if (newValue) {
+                        setImageUrl(gravatarService.url(newValue, {default: 'mm'}));
                     }
                 });
             },
@@ -19,6 +30,8 @@
             templateUrl: 'components/photo.html'
         };
     }
+
+    barkPhoto.$inject = ['gravatarService'];
 
     angular.module('barkbaud')
         .directive('barkPhoto', barkPhoto);
