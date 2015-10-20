@@ -388,6 +388,16 @@
         var modal,
             service = {};
 
+        function go(action, redirect) {
+            $window.location.href = [
+                barkbaudConfig.apiUrl,
+                'auth/',
+                action,
+                '?redirect=',
+                encodeURIComponent(redirect)
+            ].join('');
+        }
+
         service.authenticated = false;
 
         service.isAuthenticated = function () {
@@ -402,21 +412,11 @@
         };
 
         service.login = function (redirect) {
-            $window.location.href = [
-                barkbaudConfig.apiUrl,
-                'auth/login',
-                '?redirect=',
-                redirect
-            ].join('');
+            go('login', redirect);
         };
 
         service.logout = function (redirect) {
-            $window.location.href = [
-                barkbaudConfig.apiUrl,
-                'auth/logout',
-                '?redirect=',
-                redirect
-            ].join('');
+            go('logout', redirect);
         };
 
         service.update = function () {
