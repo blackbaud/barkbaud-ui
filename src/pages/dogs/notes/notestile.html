@@ -1,4 +1,7 @@
 <bb-tile bb-tile-header="'Medical History'">
+  <bb-tile-header-content ng-show="dogNotesTile.notes.length">
+      {{ dogNotesTile.notes.length }}
+  </bb-tile-header-content>
   <div>
     <div class="toolbar bb-tile-toolbar">
       <button type="button" class="btn bb-btn-secondary" ng-click="dogNotesTile.addNote()"><i class="fa fa-plus-circle"></i> Add History</button>
