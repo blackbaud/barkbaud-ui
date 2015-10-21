@@ -6,11 +6,13 @@
     function DogNotesTileController($timeout, bbData, bbMoment, barkNoteAdd, dogId) {
         var self = this;
 
-        bbData.load({
-            data: 'api/dogs/' + encodeURIComponent(dogId) + '/notes'
-        }).then(function (result) {
-            self.notes = result.data.data;
-        });
+        self.load = function () {
+            bbData.load({
+                data: 'api/dogs/' + encodeURIComponent(dogId) + '/notes'
+            }).then(function (result) {
+                self.notes = result.data.data;
+            });
+        };
 
         self.getNoteDate = function (date) {
             if (date && date.iso) {
@@ -19,8 +21,10 @@
         };
 
         self.addNote = function () {
-            barkNoteAdd.open(dogId);
+            barkNoteAdd.open(dogId).result.then(self.load);
         };
+
+        self.load();
     }
 
     DogNotesTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'barkNoteAdd', 'dogId'];

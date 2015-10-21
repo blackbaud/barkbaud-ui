@@ -1,20 +1,19 @@
 <bb-modal>
   <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">
     <div class="modal-form">
-      <bb-modal-header>Add note</bb-modal-header>
+      <bb-modal-header>Add medical history</bb-modal-header>
       <div bb-modal-body>
         <div class="form-group">
-          <label class="control-label">Title</label>
+          <label class="control-label">History</label>
           <input type="text" class="form-control" ng-model="noteAdd.note.title" />
         </div>
         <div class="form-group">
-          <label class="control-label">Description</label>
           <textarea class="form-control" ng-model="noteAdd.note.description"></textarea>
         </div>
         <div class="form-group">
           <label class="control-label">
             <input type="checkbox" bb-check ng-model="noteAdd.note.addConstituentNote" />
-            Also add this note to the dog's current owner
+            Add as note on current owner's Raisers Edge NXT record.
           </label>
         </div>
       </div>
