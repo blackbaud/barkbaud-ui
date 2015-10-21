@@ -35,11 +35,14 @@
                 <p ng-show="dogCurrentHomeTile.currentHome.constituent.email.address">
                   <a ng-href="mailto:{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}">{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}</a>
                 </p>
-              <div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div bb-tile-section class="text-danger" ng-show="dogCurrentHomeTile.error">
+    Error loading current home.
   </div>
 </bb-tile>

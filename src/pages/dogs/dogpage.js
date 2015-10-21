@@ -78,13 +78,11 @@
             ]
         };
 
-        $scope.$emit('bbBeginWait');
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId)
         }).then(function (result) {
             self.dog = result.data.data;
             bbWindow.setWindowTitle(self.dog.name);
-            $scope.$emit('bbEndWait');
         });
     }
 

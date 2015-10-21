@@ -3,24 +3,33 @@
 (function () {
     'use strict';
 
-    function DogPreviousHomesTileController($timeout, bbData, bbMoment, dogId) {
+    function DogPreviousHomesTileController($scope, bbData, bbMoment, dogId) {
         var self = this;
 
-        bbData.load({
-            data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
-        }).then(function (result) {
-            self.previousHomes = result.data.data;
-        });
+        self.load = function () {
+            $scope.$emit('bbBeginWait', { nonblocking: true });
+            bbData.load({
+                data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
+            }).then(function (result) {
+                self.previousHomes = result.data.data;
+                $scope.$emit('bbEndWait', { nonblocking: true });
+            }).catch(function () {
+                self.error = true;
+                $scope.$emit('bbEndWait', { nonblocking: true });
+            });
+        };
 
         self.getSummaryDate = function (date) {
             if (date && date.iso) {
                 return bbMoment(date.iso).format('MMM Do YY');
             }
         };
+
+        self.load();
     }
 
     DogPreviousHomesTileController.$inject = [
-        '$timeout',
+        '$scope',
         'bbData',
         'bbMoment',
         'dogId'

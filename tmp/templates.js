@@ -64,12 +64,15 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                <p ng-show="dogCurrentHomeTile.currentHome.constituent.email.address">\n' +
         '                  <a ng-href="mailto:{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}">{{:: dogCurrentHomeTile.currentHome.constituent.email.address }}</a>\n' +
         '                </p>\n' +
-        '              <div>\n' +
+        '              </div>\n' +
         '            </div>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
+        '  <div bb-tile-section class="text-danger" ng-show="dogCurrentHomeTile.error">\n' +
+        '    Error loading current home.\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
@@ -201,6 +204,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
+        '  <div bb-tile-section class="text-danger" ng-show="dogPreviousHomesTile.error">\n' +
+        '    Error loading previous homes.\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');

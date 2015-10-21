@@ -3,14 +3,19 @@
 (function () {
     'use strict';
 
-    function DogCurrentHomeTileController($timeout, bbData, bbMoment, barkFindHome, dogId) {
+    function DogCurrentHomeTileController($scope, bbData, bbMoment, barkFindHome, dogId) {
         var self = this;
 
         self.load = function () {
+            $scope.$emit('bbBeginWait', { nonblocking: true });
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
             }).then(function (result) {
                 self.currentHome = result.data.data;
+            }).catch(function () {
+                self.error = true;
+                console.log('ERROR');
+                $scope.$emit('bbEndWait', { nonblocking: true });
             });
         };
 
@@ -27,7 +32,13 @@
         self.load();
     }
 
-    DogCurrentHomeTileController.$inject = ['$timeout', 'bbData', 'bbMoment', 'barkFindHome', 'dogId'];
+    DogCurrentHomeTileController.$inject = [
+        '$scope',
+        'bbData',
+        'bbMoment',
+        'barkFindHome',
+        'dogId'
+    ];
 
     angular.module('barkbaud')
         .controller('DogCurrentHomeTileController', DogCurrentHomeTileController);

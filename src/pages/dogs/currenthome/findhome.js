@@ -15,8 +15,15 @@
             }
         ];
 
-        self.search = function () {
-            console.log('searching');
+        self.search = function (searchText) {
+            return bbData.query('api/dogs/' + dogId + '/findhome?searchText=', {
+                searchText: searchText
+            }).then(function (results) {
+                console.log(results);
+                self.results = results.data;
+            }).catch(function () {
+                self.error = true;
+            });
         };
 
         self.saveData = function () {
