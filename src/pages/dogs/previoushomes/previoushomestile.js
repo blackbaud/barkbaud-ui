@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogPreviousHomesTileController($timeout, bbData, dogId) {
+    function DogPreviousHomesTileController($timeout, bbData, bbMoment, dogId) {
         var self = this;
 
         bbData.load({
@@ -19,7 +19,12 @@
         };
     }
 
-    DogPreviousHomesTileController.$inject = ['$timeout', 'bbData', 'dogId'];
+    DogPreviousHomesTileController.$inject = [
+        '$timeout',
+        'bbData',
+        'bbMoment',
+        'dogId'
+    ];
 
     angular.module('barkbaud')
         .controller('DogPreviousHomesTileController', DogPreviousHomesTileController);

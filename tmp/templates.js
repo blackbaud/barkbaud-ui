@@ -146,18 +146,22 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
     $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
         '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
         '  <div>\n' +
-        '    <div ng-show="dogSummaryTile.previousHomes">\n' +
-        '      <div ng-switch="dogSummaryTile.previousHomes.length || 0">\n' +
+        '    <div ng-show="dogPreviousHomesTile.previousHomes">\n' +
+        '      <div ng-switch="dogPreviousHomesTile.previousHomes.length || 0">\n' +
         '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
         '          This dog has no previous homes.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="previousHome in dogSummaryTile.previousHomes" class="bb-repeater-item">\n' +
-        '            <h4 class="bb-repeater-item-title">{{ previousHome.constituent.name }}</h4>\n' +
-        '            <h5>\n' +
-        '              {{ dogSummaryTile.getSummaryDate(previousHome.fromDate) }}\n' +
+        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">\n' +
+        '            <h4 class="pull-left">\n' +
+        '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}">\n' +
+        '                {{ previousHome.constituent.name }}\n' +
+        '              </a>\n' +
+        '            </h4>\n' +
+        '            <h5 class="pull-right">\n' +
+        '              {{ dogPreviousHomesTile.getSummaryDate(previousHome.fromDate) }}\n' +
         '              <span ng-show="previousHome.toDate">\n' +
-        '                to {{ dogSummaryTile.getSummaryDate(previousHome.toDate) }}\n' +
+        '                to {{ dogPreviousHomesTile.getSummaryDate(previousHome.toDate) }}\n' +
         '              </span>\n' +
         '            </h5>\n' +
         '          </div>\n' +

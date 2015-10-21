@@ -1,17 +1,21 @@
 <bb-tile bb-tile-header="'Previous homes'">
   <div>
-    <div ng-show="dogSummaryTile.previousHomes">
-      <div ng-switch="dogSummaryTile.previousHomes.length || 0">
+    <div ng-show="dogPreviousHomesTile.previousHomes">
+      <div ng-switch="dogPreviousHomesTile.previousHomes.length || 0">
         <div bb-tile-section ng-switch-when="0" class="bb-no-records">
           This dog has no previous homes.
         </div>
         <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="previousHome in dogSummaryTile.previousHomes" class="bb-repeater-item">
-            <h4 class="bb-repeater-item-title">{{ previousHome.constituent.name }}</h4>
-            <h5>
-              {{ dogSummaryTile.getSummaryDate(previousHome.fromDate) }}
+          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">
+            <h4 class="pull-left">
+              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}">
+                {{ previousHome.constituent.name }}
+              </a>
+            </h4>
+            <h5 class="pull-right">
+              {{ dogPreviousHomesTile.getSummaryDate(previousHome.fromDate) }}
               <span ng-show="previousHome.toDate">
-                to {{ dogSummaryTile.getSummaryDate(previousHome.toDate) }}
+                to {{ dogPreviousHomesTile.getSummaryDate(previousHome.toDate) }}
               </span>
             </h5>
           </div>
