@@ -1,0 +1,22 @@
+<bb-modal>
+  <form name="findHome.formFind" ng-submit="findHome.saveData()">
+    <div class="modal-form">
+      <bb-modal-header>Find a home</bb-modal-header>
+      <div bb-modal-body>
+        <div class="form-group">
+          <label class="control-label">Search By Name</label>
+          <ui-select ng-model="findHome.name">
+            <ui-select-match allow-clear placeholder="Search by Name">{{$select.selected.name}}</ui-select-match>
+            <ui-select-choices repeat="constituent in findHome.results" refresh="findHome.search($select.search, 'single')" refresh-delay="250">
+              <span>{{constituent.name}}</span>
+            </ui-select-choices>
+          </ui-select>
+        </div>
+      </div>
+      <bb-modal-footer>
+        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>
+        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
+      </bb-modal-footer>
+    </div>
+  </form>
+</bb-modal>

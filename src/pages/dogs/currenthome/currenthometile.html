@@ -1,4 +1,10 @@
 <bb-tile bb-tile-header="'Current home'">
+  <bb-tile-header-content ng-show="dogCurrentHomeTile.currentHome.constituentId">
+      <bb-tile-header-check></bb-tile-header-check>
+  </bb-tile-header-content>
+  <div class="toolbar bb-tile-toolbar">
+    <button type="button" class="btn bb-btn-secondary" ng-click="dogCurrentHomeTile.findHome()"><i class="fa fa-plus-circle"></i> Find Home</button>
+  </div>
   <div ng-show="dogCurrentHomeTile.currentHome">
     <div ng-switch="dogCurrentHomeTile.currentHome.constituentId || 0">
       <div bb-tile-section ng-switch-when="0" class="bb-no-records">

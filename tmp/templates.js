@@ -28,6 +28,12 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/currenthome/currenthometile.html',
         '<bb-tile bb-tile-header="\'Current home\'">\n' +
+        '  <bb-tile-header-content ng-show="dogCurrentHomeTile.currentHome.constituentId">\n' +
+        '      <bb-tile-header-check></bb-tile-header-check>\n' +
+        '  </bb-tile-header-content>\n' +
+        '  <div class="toolbar bb-tile-toolbar">\n' +
+        '    <button type="button" class="btn bb-btn-secondary" ng-click="dogCurrentHomeTile.findHome()"><i class="fa fa-plus-circle"></i> Find Home</button>\n' +
+        '  </div>\n' +
         '  <div ng-show="dogCurrentHomeTile.currentHome">\n' +
         '    <div ng-switch="dogCurrentHomeTile.currentHome.constituentId || 0">\n' +
         '      <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
@@ -66,6 +72,30 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
+        '');
+    $templateCache.put('pages/dogs/currenthome/findhome.html',
+        '<bb-modal>\n' +
+        '  <form name="findHome.formFind" ng-submit="findHome.saveData()">\n' +
+        '    <div class="modal-form">\n' +
+        '      <bb-modal-header>Find a home</bb-modal-header>\n' +
+        '      <div bb-modal-body>\n' +
+        '        <div class="form-group">\n' +
+        '          <label class="control-label">Search By Name</label>\n' +
+        '          <ui-select ng-model="findHome.name">\n' +
+        '            <ui-select-match allow-clear placeholder="Search by Name">{{$select.selected.name}}</ui-select-match>\n' +
+        '            <ui-select-choices repeat="constituent in findHome.results" refresh="findHome.search($select.search, \'single\')" refresh-delay="250">\n' +
+        '              <span>{{constituent.name}}</span>\n' +
+        '            </ui-select-choices>\n' +
+        '          </ui-select>\n' +
+        '        </div>\n' +
+        '      </div>\n' +
+        '      <bb-modal-footer>\n' +
+        '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '      </bb-modal-footer>\n' +
+        '    </div>\n' +
+        '  </form>\n' +
+        '</bb-modal>\n' +
         '');
     $templateCache.put('pages/dogs/dogpage.html',
         '<div class="bb-page-header">\n' +
@@ -145,6 +175,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
         '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
+        '  <bb-tile-header-content ng-show="dogPreviousHomesTile.previousHomes.length">\n' +
+        '      {{ dogPreviousHomesTile.previousHomes.length }}\n' +
+        '  </bb-tile-header-content>\n' +
         '  <div>\n' +
         '    <div ng-show="dogPreviousHomesTile.previousHomes">\n' +
         '      <div ng-switch="dogPreviousHomesTile.previousHomes.length || 0">\n' +
