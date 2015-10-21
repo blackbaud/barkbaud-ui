@@ -6,21 +6,12 @@
     function FindHomeController($modalInstance, bbData, uiSelect, dogId) {
         var self = this;
 
-        self.results = [
-            {
-                name: 'Bobby'
-            },
-            {
-                name: 'Ashley'
-            }
-        ];
-
         self.search = function (searchText) {
             return bbData.query('api/dogs/' + dogId + '/findhome?searchText=', {
                 searchText: searchText
             }).then(function (results) {
                 console.log(results);
-                self.results = results.data;
+                self.results = results.data.results;
             }).catch(function () {
                 self.error = true;
             });

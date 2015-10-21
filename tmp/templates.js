@@ -24,6 +24,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      </div>\n' +
         '    </div>\n' +
         '  </section>\n' +
+        '  <div bb-tile-section class="text-danger" ng-show="dashboardPage.error">\n' +
+        '    Error loading dogs.\n' +
+        '  </div>\n' +
         '</div>\n' +
         '');
     $templateCache.put('pages/dogs/currenthome/currenthometile.html',
@@ -173,6 +176,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
+        '  </div>\n' +
+        '  <div bb-tile-section class="text-danger" ng-show="dogNotesTile.error">\n' +
+        '    Error loading notes.\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');

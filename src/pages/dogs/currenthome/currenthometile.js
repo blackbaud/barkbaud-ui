@@ -12,9 +12,9 @@
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
             }).then(function (result) {
                 self.currentHome = result.data.data;
+                $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function () {
                 self.error = true;
-                console.log('ERROR');
                 $scope.$emit('bbEndWait', { nonblocking: true });
             });
         };

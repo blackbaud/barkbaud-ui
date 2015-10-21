@@ -24,6 +24,8 @@
         }).then(function (result) {
             self.dogs = result.data.data;
             $scope.$emit('bbEndWait');
+        }).catch(function () {
+            self.error = true;
         });
     }
 
