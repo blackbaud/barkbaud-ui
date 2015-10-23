@@ -12,10 +12,9 @@
                 return bbData.load({
                     data: 'api/dogs/' + dogId + '/findhome?searchText=' + searchText
                 }).then(function (results) {
-                    console.log(results);
                     self.results = results.data.results;
-                }).catch(function () {
-                    self.error = true;
+                }).catch(function (result) {
+                    self.error = result.data.error;
                 });
             }
         };
@@ -28,6 +27,8 @@
                     type: 'POST'
                 }).then(function (result) {
                     $modalInstance.close(result.data);
+                }).catch(function (result) {
+                    self.error = result.data.error;
                 });
             }
         };

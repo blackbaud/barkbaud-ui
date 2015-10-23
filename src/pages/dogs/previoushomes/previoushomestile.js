@@ -13,8 +13,8 @@
             }).then(function (result) {
                 self.previousHomes = result.data.data;
                 $scope.$emit('bbEndWait', { nonblocking: true });
-            }).catch(function () {
-                self.error = true;
+            }).catch(function (result) {
+                self.error = result.data.error;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             });
         };

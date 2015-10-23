@@ -99,6 +99,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <bb-modal-footer>\n' +
         '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
         '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '        <span ng-show="noteAdd.error" class="text-danger">\n' +
+        '          Error saving home.\n' +
+        '        </span>\n' +
         '      </bb-modal-footer>\n' +
         '    </div>\n' +
         '  </form>\n' +
@@ -149,6 +152,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <bb-modal-footer>\n' +
         '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
         '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '        <span ng-show="noteAdd.error" class="text-danger">\n' +
+        '          <span ng-show="noteAdd.error.message">{{ noteAdd.error.message }}</span>\n' +
+        '          <span ng-hide="noteAdd.error.message">Unknown error occured.</span>\n' +
+        '        </span>\n' +
         '      </bb-modal-footer>\n' +
         '    </div>\n' +
         '  </form>\n' +

@@ -14,6 +14,8 @@
                 type: 'POST'
             }).then(function (result) {
                 $modalInstance.close(result.data);
+            }).catch(function (result) {
+                self.error = result.data.error;
             });
         };
     }
