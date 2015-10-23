@@ -23,6 +23,7 @@
                 data: 'auth/authenticated?' + (new Date().getTime())
             }).then(function (result) {
                 service.authenticated = result.data.authenticated;
+                service.tenantId = result.data.tenant_id;
                 deferred.resolve(result.data.authenticated);
             });
             return deferred.promise;

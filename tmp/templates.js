@@ -100,7 +100,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
         '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
         '        <span ng-show="noteAdd.error" class="text-danger">\n' +
-        '          Error saving home.\n' +
+        '          Error saving home\n' +
         '        </span>\n' +
         '      </bb-modal-footer>\n' +
         '    </div>\n' +
@@ -162,7 +162,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</bb-modal>\n' +
         '');
     $templateCache.put('pages/dogs/notes/notestile.html',
-        '<bb-tile bb-tile-header="\'Medical History\'">\n' +
+        '<bb-tile bb-tile-header="\'Medical history\'">\n' +
         '  <bb-tile-header-content ng-show="dogNotesTile.notes.length">\n' +
         '      {{ dogNotesTile.notes.length }}\n' +
         '  </bb-tile-header-content>\n' +
@@ -186,7 +186,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </div>\n' +
         '  <div bb-tile-section class="text-danger" ng-show="dogNotesTile.error">\n' +
-        '    Error loading notes.\n' +
+        '    Error loading notes\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
