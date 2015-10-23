@@ -54,7 +54,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '              </div>\n' +
         '              <div class="col-sm-9 col-xs-8">\n' +
         '                <h4>\n' +
-        '                  <a ng-href="{{dogCurrentHomeTile.currentHome.constituentId | barkConstituentUrl}}">\n' +
+        '                  <a ng-href="{{dogCurrentHomeTile.currentHome.constituentId | barkConstituentUrl}}" target="_blank">\n' +
         '                    {{:: dogCurrentHomeTile.currentHome.constituent.first }}\n' +
         '                    {{:: dogCurrentHomeTile.currentHome.constituent.last }}\n' +
         '                  </a>\n' +
@@ -87,10 +87,11 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <div bb-modal-body>\n' +
         '        <div class="form-group">\n' +
         '          <label class="control-label">Search By Name</label>\n' +
-        '          <ui-select ng-model="findHome.name">\n' +
+        '          <ui-select ng-model="findHome.constituent" append-to-body="true" bb-autofocus>\n' +
         '            <ui-select-match allow-clear placeholder="Search by Name">{{$select.selected.name}}</ui-select-match>\n' +
         '            <ui-select-choices repeat="constituent in findHome.results" refresh="findHome.search($select.search, \'single\')" refresh-delay="250">\n' +
-        '              <span>{{constituent.name}}</span>\n' +
+        '              <span>{{ constituent.name }} ({{ constituent.id }})</span><br />\n' +
+        '              <small><strong>{{ constituent.address }}</strong></small>\n' +
         '            </ui-select-choices>\n' +
         '          </ui-select>\n' +
         '        </div>\n' +
@@ -194,9 +195,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          This dog has no previous homes.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">\n' +
+        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item" ng-if="$index > 0">\n' +
         '            <h4 class="pull-left">\n' +
-        '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}">\n' +
+        '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}" target="_blank">\n' +
         '                {{ previousHome.constituent.name }}\n' +
         '              </a>\n' +
         '            </h4>\n' +

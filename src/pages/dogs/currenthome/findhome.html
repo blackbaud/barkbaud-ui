@@ -5,10 +5,11 @@
       <div bb-modal-body>
         <div class="form-group">
           <label class="control-label">Search By Name</label>
-          <ui-select ng-model="findHome.name">
+          <ui-select ng-model="findHome.constituent" append-to-body="true" bb-autofocus>
             <ui-select-match allow-clear placeholder="Search by Name">{{$select.selected.name}}</ui-select-match>
             <ui-select-choices repeat="constituent in findHome.results" refresh="findHome.search($select.search, 'single')" refresh-delay="250">
-              <span>{{constituent.name}}</span>
+              <span>{{ constituent.name }} ({{ constituent.id }})</span><br />
+              <small><strong>{{ constituent.address }}</strong></small>
             </ui-select-choices>
           </ui-select>
         </div>

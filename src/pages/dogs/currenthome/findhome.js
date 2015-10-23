@@ -3,28 +3,33 @@
 (function () {
     'use strict';
 
-    function FindHomeController($modalInstance, bbData, uiSelect, dogId) {
+    function FindHomeController($modalInstance, bbData, dogId) {
         var self = this;
 
         self.search = function (searchText) {
-            return bbData.query('api/dogs/' + dogId + '/findhome?searchText=', {
-                searchText: searchText
-            }).then(function (results) {
-                console.log(results);
-                self.results = results.data.results;
-            }).catch(function () {
-                self.error = true;
-            });
+
+            if (searchText && searchText.length > 0) {
+                return bbData.load({
+                    data: 'api/dogs/' + dogId + '/findhome?searchText=' + searchText
+                }).then(function (results) {
+                    console.log(results);
+                    self.results = results.data.results;
+                }).catch(function () {
+                    self.error = true;
+                });
+            }
         };
 
         self.saveData = function () {
-            bbData.save({
-                url: 'api/dogs/' + dogId + '/notes',
-                data: self.note,
-                type: 'POST'
-            }).then(function (result) {
-                $modalInstance.close(result.data);
-            });
+            if (self.constituent) {
+                bbData.save({
+                    url: 'api/dogs/' + dogId + '/currenthome',
+                    data: self.constituent,
+                    type: 'POST'
+                }).then(function (result) {
+                    $modalInstance.close(result.data);
+                });
+            }
         };
     }
 
