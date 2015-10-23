@@ -246,7 +246,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      </div>\n' +
         '      <div ng-hide="loginPage.waitingForAuth">\n' +
         '        <bb-modal-footer-button-primary  ng-click="loginPage.login()">\n' +
-        '          Authorize Barkbaud\n' +
+        '          Login with Blackbaud\n' +
         '        </bb-modal-footer-button-primary>\n' +
         '        <a href="https://github.com/blackbaud/barkbaud" target="_blank" class="btn bb-btn-secondary">\n' +
         '          Learn More\n' +
