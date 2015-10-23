@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogCurrentHomeTileController($scope, bbData, bbMoment, barkFindHome, dogId) {
+    function DogCurrentHomeTileController($rootScope, $scope, bbData, bbMoment, barkFindHome, dogId) {
         var self = this;
 
         self.load = function () {
@@ -26,13 +26,17 @@
         };
 
         self.findHome = function () {
-            barkFindHome.open(dogId).result.then(self.load);
-        }
+            barkFindHome.open(dogId).result.then(function () {
+                self.load();
+                $rootScope.$broadcast('bbNewCurrentOwner');
+            });
+        };
 
         self.load();
     }
 
     DogCurrentHomeTileController.$inject = [
+        '$rootScope',
         '$scope',
         'bbData',
         'bbMoment',

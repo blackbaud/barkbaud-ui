@@ -665,7 +665,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogCurrentHomeTileController($scope, bbData, bbMoment, barkFindHome, dogId) {
+    function DogCurrentHomeTileController($rootScope, $scope, bbData, bbMoment, barkFindHome, dogId) {
         var self = this;
 
         self.load = function () {
@@ -688,13 +688,17 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.findHome = function () {
-            barkFindHome.open(dogId).result.then(self.load);
-        }
+            barkFindHome.open(dogId).result.then(function () {
+                self.load();
+                $rootScope.$broadcast('bbNewCurrentOwner');
+            });
+        };
 
         self.load();
     }
 
     DogCurrentHomeTileController.$inject = [
+        '$rootScope',
         '$scope',
         'bbData',
         'bbMoment',
@@ -992,6 +996,10 @@ angular.module('md5', []).constant('md5', (function() {
                 return bbMoment(date.iso).format('MMM Do YY');
             }
         };
+
+        $scope.$on('bbNewCurrentOwner', function () {
+            self.load();
+        });
 
         self.load();
     }
@@ -1344,7 +1352,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          This dog has no previous homes.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item" ng-if="$index > 0">\n' +
+        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">\n' +
         '            <h4 class="pull-left">\n' +
         '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}" target="_blank">\n' +
         '                {{ previousHome.constituent.name }}\n' +

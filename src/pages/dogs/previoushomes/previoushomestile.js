@@ -25,6 +25,10 @@
             }
         };
 
+        $scope.$on('bbNewCurrentOwner', function () {
+            self.load();
+        });
+
         self.load();
     }
 

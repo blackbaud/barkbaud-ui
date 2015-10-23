@@ -9,7 +9,7 @@
           This dog has no previous homes.
         </div>
         <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item" ng-if="$index > 0">
+          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">
             <h4 class="pull-left">
               <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}" target="_blank">
                 {{ previousHome.constituent.name }}

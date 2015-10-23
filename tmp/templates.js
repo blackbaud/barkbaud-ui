@@ -195,7 +195,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          This dog has no previous homes.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item" ng-if="$index > 0">\n' +
+        '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">\n' +
         '            <h4 class="pull-left">\n' +
         '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}" target="_blank">\n' +
         '                {{ previousHome.constituent.name }}\n' +
