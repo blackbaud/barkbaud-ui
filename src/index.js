@@ -4,7 +4,7 @@
     'use strict';
 
     var barkbaudConfig = {
-        apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
+        apiUrl: 'https://barkbaud.herokuapp.com/'
     };
 
     function config($locationProvider, $urlRouterProvider, bbWindowConfig) {
