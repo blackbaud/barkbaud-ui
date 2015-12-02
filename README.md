@@ -1,7 +1,7 @@
 # sky-sample
 Sample Angular application built with Sky.
 
-## Installation instructions
+## Build instructions
 
 These instructions assume you know how to use Git, NPM and Bower.
 
