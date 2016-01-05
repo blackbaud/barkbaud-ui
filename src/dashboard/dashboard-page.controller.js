@@ -7,7 +7,7 @@
         $stateProvider
             .state('dashboard', {
                 controller: 'DashboardPageController as dashboardPage',
-                templateUrl: 'pages/dashboard/dashboardpage.html',
+                templateUrl: 'dashboard/dashboard-page.html',
                 url: '/dashboard'
             });
     }

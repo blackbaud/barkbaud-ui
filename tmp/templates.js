@@ -1,9 +1,9 @@
 angular.module('barkbaud.templates', []).run(['$templateCache', function($templateCache) {
-    $templateCache.put('components/photo.html',
+    $templateCache.put('components/photo.directive.html',
         '<div class="bark-photo img-circle center-block">\n' +
         '</div>\n' +
         '');
-    $templateCache.put('pages/dashboard/dashboardpage.html',
+    $templateCache.put('dashboard/dashboard-page.html',
         '<div class="container-fluid">\n' +
         '  <h1>Dashboard</h1>\n' +
         '  <section class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
@@ -29,7 +29,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</div>\n' +
         '');
-    $templateCache.put('pages/dogs/currenthome/currenthometile.html',
+    $templateCache.put('dogs/currenthome/currenthometile.html',
         '<bb-tile bb-tile-header="\'Current home\'">\n' +
         '  <bb-tile-header-content ng-show="dogCurrentHomeTile.currentHome.constituentId">\n' +
         '      <bb-tile-header-check></bb-tile-header-check>\n' +
@@ -79,7 +79,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
-    $templateCache.put('pages/dogs/currenthome/findhome.html',
+    $templateCache.put('dogs/currenthome/findhome.html',
         '<bb-modal>\n' +
         '  <form name="findHome.formFind" ng-submit="findHome.saveData()">\n' +
         '    <div class="modal-form">\n' +
@@ -107,7 +107,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </form>\n' +
         '</bb-modal>\n' +
         '');
-    $templateCache.put('pages/dogs/dogpage.html',
+    $templateCache.put('dogs/dogpage.html',
         '<div class="bb-page-header">\n' +
         '    <div class="container-fluid">\n' +
         '        <div class="row">\n' +
@@ -129,7 +129,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <bb-tile-dashboard bb-layout="dogPage.layout" bb-tiles="dogPage.tiles"></bb-tile-dashboard>\n' +
         '</div>\n' +
         '');
-    $templateCache.put('pages/dogs/notes/noteadd.html',
+    $templateCache.put('dogs/notes/noteadd.html',
         '<bb-modal>\n' +
         '  <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">\n' +
         '    <div class="modal-form">\n' +
@@ -161,7 +161,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </form>\n' +
         '</bb-modal>\n' +
         '');
-    $templateCache.put('pages/dogs/notes/notestile.html',
+    $templateCache.put('dogs/notes/notestile.html',
         '<bb-tile bb-tile-header="\'Medical history\'">\n' +
         '  <bb-tile-header-content ng-show="dogNotesTile.notes.length">\n' +
         '      {{ dogNotesTile.notes.length }}\n' +
@@ -190,7 +190,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
-    $templateCache.put('pages/dogs/previoushomes/previoushomestile.html',
+    $templateCache.put('dogs/previoushomes/previoushomestile.html',
         '<bb-tile bb-tile-header="\'Previous homes\'">\n' +
         '  <bb-tile-header-content ng-show="dogPreviousHomesTile.previousHomes.length">\n' +
         '      {{ dogPreviousHomesTile.previousHomes.length }}\n' +
@@ -224,7 +224,42 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
-    $templateCache.put('pages/login/loginpage.html',
+    $templateCache.put('index.html',
+        '<!DOCTYPE html>\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml" ng-app="barkbaud">\n' +
+        '\n' +
+        '<head>\n' +
+        '  <title>Barkbaud</title>\n' +
+        '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
+        '  <link rel="stylesheet" type="text/css" href="css/sky/libs.css" />\n' +
+        '  <link rel="stylesheet" type="text/css" href="css/sky/sky.css" />\n' +
+        '  <link rel="stylesheet" type="text/css" href="css/app.css" />\n' +
+        '</head>\n' +
+        '\n' +
+        '<body ng-controller="MainController as mainController">\n' +
+        '  <bb-navbar>\n' +
+        '    <div class="container-fluid">\n' +
+        '      <ul class="nav navbar-nav navbar-left">\n' +
+        '        <li ui-sref-active="bb-navbar-active">\n' +
+        '          <a ui-sref="dashboard">Dashboard</a>\n' +
+        '        </li>\n' +
+        '      </ul>\n' +
+        '      <ul class="nav navbar-nav navbar-right">\n' +
+        '        <li>\n' +
+        '          <a ng-click="mainController.logout()">Logout</a>\n' +
+        '        </li>\n' +
+        '      </ul>\n' +
+        '    </div>\n' +
+        '  </bb-navbar>\n' +
+        '  <div ui-view></div>\n' +
+        '  <script src="js/sky/libs.min.js"></script>\n' +
+        '  <script src="js/sky/sky.min.js"></script>\n' +
+        '  <script src="js/app.min.js"></script>\n' +
+        '</body>\n' +
+        '\n' +
+        '</html>\n' +
+        '');
+    $templateCache.put('login/loginpage.html',
         '<bb-modal>\n' +
         '  <div class="modal-form modal-authorize">\n' +
         '    <bb-modal-header>Barkbaud</bb-modal-header>\n' +

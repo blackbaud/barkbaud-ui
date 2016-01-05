@@ -26,25 +26,6 @@
         'dogId'
     ];
 
-    function barkNoteAdd(bbModal) {
-        return {
-            open: function (dogId) {
-                return bbModal.open({
-                    controller: 'NoteAddController as noteAdd',
-                    templateUrl: 'pages/dogs/notes/noteadd.html',
-                    resolve: {
-                        dogId: function () {
-                            return dogId;
-                        }
-                    }
-                });
-            }
-        };
-    }
-
-    barkNoteAdd.$inject = ['bbModal'];
-
     angular.module('barkbaud')
-        .controller('NoteAddController', NoteAddController)
-        .factory('barkNoteAdd', barkNoteAdd);
+        .controller('NoteAddController', NoteAddController);
 }());

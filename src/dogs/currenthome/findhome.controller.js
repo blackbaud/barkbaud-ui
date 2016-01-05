@@ -45,7 +45,7 @@
             open: function (dogId) {
                 return bbModal.open({
                     controller: 'FindHomeController as findHome',
-                    templateUrl: 'pages/dogs/currenthome/findhome.html',
+                    templateUrl: 'dogs/currenthome/findhome.html',
                     resolve: {
                         dogId: function () {
                             return dogId;

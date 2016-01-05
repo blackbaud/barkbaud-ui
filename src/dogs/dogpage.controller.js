@@ -8,7 +8,7 @@
             .state('dog', {
                 abstract: true,
                 controller: 'DogPageController as dogPage',
-                templateUrl: 'pages/dogs/dogpage.html',
+                templateUrl: 'dogs/dogpage.html',
                 url: '/dogs/:dogId',
                 resolve: {
                     dogId: ['$stateParams', function ($stateParams) {
@@ -21,15 +21,15 @@
                 views: {
                     'currenthome': {
                         controller: 'DogCurrentHomeTileController as dogCurrentHomeTile',
-                        templateUrl: 'pages/dogs/currenthome/currenthometile.html'
+                        templateUrl: 'dogs/currenthome/currenthometile.html'
                     },
                     'previoushomes': {
                         controller: 'DogPreviousHomesTileController as dogPreviousHomesTile',
-                        templateUrl: 'pages/dogs/previoushomes/previoushomestile.html'
+                        templateUrl: 'dogs/previoushomes/previoushomestile.html'
                     },
                     'notes': {
                         controller: 'DogNotesTileController as dogNotesTile',
-                        templateUrl: 'pages/dogs/notes/notestile.html'
+                        templateUrl: 'dogs/notes/notestile.html'
                     }
                 }
             });

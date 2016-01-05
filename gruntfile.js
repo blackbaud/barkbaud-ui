@@ -100,7 +100,7 @@ module.exports = function (grunt) {
                 singleModule: true
             },
             main: {
-                src: ['src/components/**/*.html', 'src/pages/**/*.html'],
+                src: ['src/**/*.html'],
                 dest: 'tmp/templates.js'
             }
         },
