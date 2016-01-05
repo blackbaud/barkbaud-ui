@@ -489,7 +489,7 @@ angular.module('md5', []).constant('md5', (function() {
     'use strict';
 
     var barkbaudConfig = {
-        apiUrl: 'https://glacial-mountain-6366.herokuapp.com/'
+        apiUrl: 'https://barkbaud.herokuapp.com/'
     };
 
     function config($locationProvider, $urlRouterProvider, bbWindowConfig) {
@@ -613,7 +613,7 @@ angular.module('md5', []).constant('md5', (function() {
                 });
             },
             replace: true,
-            templateUrl: 'components/photo.html'
+            templateUrl: 'components/photo.directive.html'
         };
     }
 
@@ -632,7 +632,7 @@ angular.module('md5', []).constant('md5', (function() {
         $stateProvider
             .state('dashboard', {
                 controller: 'DashboardPageController as dashboardPage',
-                templateUrl: 'pages/dashboard/dashboardpage.html',
+                templateUrl: 'dashboard/dashboard-page.html',
                 url: '/dashboard'
             });
     }
@@ -1166,34 +1166,8 @@ angular.module('md5', []).constant('md5', (function() {
 }());
 
 angular.module('barkbaud.templates', []).run(['$templateCache', function($templateCache) {
-    $templateCache.put('components/photo.html',
+    $templateCache.put('components/photo.directive.html',
         '<div class="bark-photo img-circle center-block">\n' +
-        '</div>\n' +
-        '');
-    $templateCache.put('pages/dashboard/dashboardpage.html',
-        '<div class="container-fluid">\n' +
-        '  <h1>Dashboard</h1>\n' +
-        '  <section class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
-        '    <div class="panel-body">\n' +
-        '      <div class="row">\n' +
-        '          <div class="col-md-3 col-lg-2">\n' +
-        '            <a ui-sref="dog.views({dogId: dog.objectId})">\n' +
-        '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
-        '            </a>\n' +
-        '          </div>\n' +
-        '          <div class="col-md-9 col-lg-10">\n' +
-        '              <h1>\n' +
-        '                <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
-        '              </h1>\n' +
-        '              <h4>{{dog.breed}} &middot; {{dog.gender}}</h4>\n' +
-        '              <p class="bb-text-block bark-dog-bio">{{dog.bio}}</p>\n' +
-        '          </div>\n' +
-        '      </div>\n' +
-        '    </div>\n' +
-        '  </section>\n' +
-        '  <div bb-tile-section class="text-danger" ng-show="dashboardPage.error">\n' +
-        '    Error loading dogs.\n' +
-        '  </div>\n' +
         '</div>\n' +
         '');
     $templateCache.put('pages/dogs/currenthome/currenthometile.html',

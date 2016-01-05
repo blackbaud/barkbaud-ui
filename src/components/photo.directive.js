@@ -27,7 +27,7 @@
                 });
             },
             replace: true,
-            templateUrl: 'components/photo.html'
+            templateUrl: 'components/photo.directive.html'
         };
     }
 
