@@ -3,7 +3,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<div class="bark-photo img-circle center-block">\n' +
         '</div>\n' +
         '');
-    $templateCache.put('dashboard/dashboard-page.html',
+    $templateCache.put('dashboard/dashboardpage.html',
         '<div class="container-fluid">\n' +
         '  <h1>Dashboard</h1>\n' +
         '  <section class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
@@ -226,13 +226,12 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('index.html',
         '<!DOCTYPE html>\n' +
-        '<html xmlns="http://www.w3.org/1999/xhtml" ng-app="barkbaud">\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
         '\n' +
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +
         '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
-        '  <link rel="stylesheet" type="text/css" href="css/sky/libs.css" />\n' +
-        '  <link rel="stylesheet" type="text/css" href="css/sky/sky.css" />\n' +
+        '  <link rel="stylesheet" type="text/css" href="css/sky/sky-bundle.css" />\n' +
         '  <link rel="stylesheet" type="text/css" href="css/app.css" />\n' +
         '</head>\n' +
         '\n' +
@@ -252,8 +251,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </bb-navbar>\n' +
         '  <div ui-view></div>\n' +
-        '  <script src="js/sky/libs.min.js"></script>\n' +
-        '  <script src="js/sky/sky.min.js"></script>\n' +
+        '  <script src="js/sky/sky-bundle.min.js"></script>\n' +
+        '  <script src="js/rxjs/Rx.umd.js"></script>\n' +
+        '  <script src="js/angular2/angular2-polyfills.min.js"></script>\n' +
+        '  <script src="js/angular2/angular2-all.umd.min.js"></script>\n' +
         '  <script src="js/app.min.js"></script>\n' +
         '</body>\n' +
         '\n' +

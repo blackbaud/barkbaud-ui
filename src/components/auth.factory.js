@@ -45,7 +45,7 @@
             if (!modal) {
                 modal = bbModal.open({
                     controller: 'LoginPageController as loginPage',
-                    templateUrl: 'pages/login/loginpage.html',
+                    templateUrl: 'login/loginpage.html',
                     resolve: {
                         barkbaudRedirect: function () {
                             return redirect;
