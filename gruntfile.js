@@ -61,7 +61,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     src: ['**/*.*'],
-                    cwd: 'bower_components/sky/dist/css',
+                    cwd: 'bower_components/blackbaud-skyux/dist/css',
                     dest: '<%= buildPath %>/css/sky'
                 }]
             },
@@ -69,8 +69,18 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     src: ['**/*.*'],
-                    cwd: 'bower_components/sky/dist/js',
+                    cwd: 'bower_components/blackbaud-skyux/dist/js',
                     dest: '<%= buildPath %>/js/sky'
+                }, {
+                    expand: true,
+                    src: ['**/*.*'],
+                    cwd: 'node_modules/angular2/bundles',
+                    dest: '<%= buildPath %>/js/angular2'
+                }, {
+                    expand: true,
+                    src: ['**/*.*'],
+                    cwd: 'node_modules/rxjs/bundles',
+                    dest: '<%= buildPath %>/js/rxjs'
                 }]
             },
             html: {
@@ -118,13 +128,13 @@ module.exports = function (grunt) {
                 tasks: ['copy:html']
             },
             templates: {
-                files: ['src/components/**/*.html', 'src/pages/**/*.html'],
+                files: ['src/**/*.html'],
                 tasks: ['html2js', 'compileappscripts']
             }
         },
         skylint: {
             options: {
-                linterUrl: 'http://localhost:8080/build/js/sky/skylint.min.js'
+                linterUrl: 'http://localhost:8080/build/js/blackbaud-skyux/skylint.min.js'
             },
             files: ['src/**/*.html']
         }

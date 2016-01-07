@@ -127,7 +127,7 @@ The **Open Modal** button below demonstrates a modal form where the `bb-autofocu
                     /*jslint unparam: true */
                     $timeout(function () {
                         $element.focus();
-                    }, 100);
+                    }, 500);
                 }
             };
         }]);
@@ -135,12 +135,11 @@ The **Open Modal** button below demonstrates a modal form where the `bb-autofocu
 
 /*jslint browser: true, plusplus: true */
 /*global angular, jQuery */
-
 /** @module Autonumeric
 @icon calculator
 @summary The autonumeric component wraps up the autoNumeric jQuery plugin to format any type of number, including currency.
  @description The `bb-autonumeric` directive wraps up the autoNumeric jQuery plugin to format any type of number, including currency. You must use this directive in conjunction with the `ngModel` directive where the property bound to `ngModel` is the raw numeric value on your model.
- 
+
  ### Dependencies ###
 
  - **[autoNumeric](http://www.decorplanit.com/plugin/) (1.9.27 or higher)** Used to format money values
@@ -216,6 +215,18 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                         }
                     }
 
+                    function autonumericChange() {
+                        return $scope.$apply(function () {
+
+                            var value = parseFloat(el.autoNumeric('get'));
+
+                            if (isNaN(value)) {
+                                value = null;
+                            }
+                            return ngModel.$setViewValue(value);
+                        });
+                    }
+
                     if (attrs.bbAutonumericSettings) {
                         $scope.$watch(attrs.bbAutonumericSettings, function (newValue) {
                             customSettings = newValue || {};
@@ -226,27 +237,43 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                     el.autoNumeric(getBaseSettings(bbAutoNumericConfig, attrs.bbAutonumeric));
                     applyCssSettings(el);
 
-                    $scope.$watch(attrs.ngModel, function (newValue) {
+                    // If a valid number, update the autoNumeric value.
+                    // Also handles the model being updated, but being in correct (usually a paste).
+                    // In that case, updates the model to what the autoNumeric plugin's value.
+                    $scope.$watch(attrs.ngModel, function (newValue, oldValue) {
+                        var getValue,
+                            selectionStart;
                         if (newValue !== undefined && newValue !== null && !isNaN(newValue)) {
+
+                            if (parseFloat(newValue) !== parseFloat(oldValue)) {
+
+                                selectionStart = el[0].selectionStart;
+                            }
+
                             el.autoNumeric('set', newValue);
-                        } else if (isNaN(newValue)) {
-                            return;
-                        } else {
+                            getValue = el.autoNumeric('get');
+                            if (parseFloat(getValue) !== parseFloat(newValue)) {
+                                $timeout(autonumericChange);
+                            } else if (el[0] && angular.isFunction(el[0].setSelectionRange) && angular.isDefined(selectionStart)) {
+                                $timeout(function () {
+                                    el[0].setSelectionRange(selectionStart, selectionStart);
+                                });
+                            }
+                        } else if (newValue === null) {
                             el.val(null);
+
                         }
                     });
 
-                    //Setup on change handler to update scope value
-                    el.change(function () {
-                        return $scope.$apply(function () {
-                            var value = parseFloat(el.autoNumeric('get'));
+                    el.on('keydown', function (event) {
+                        if (event.which === 13) {
+                            autonumericChange();
+                        }
+                    });
 
-                            if (isNaN(value)) {
-                                value = null;
-                            }
+                    el.on('change paste onpaste', function () {
+                        autonumericChange();
 
-                            return ngModel.$setViewValue(value);
-                        });
                     });
 
                     // When focusing in textbox, select all.  This is to workaround not having placeholder text for autonumeric.
@@ -256,13 +283,16 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                     */
                     el.on('focusin.bbAutonumeric', function () {
                         $timeout(function () {
-                            if (!isIosUserAgent) {
-                                el.select();
-                            } else {
-                                //use setSelectionRange instead of select because select in a timeout does not work with iOS
-                                el[0].setSelectionRange(0, 9999);
+                            // Check to ensure the field still has focus once the $timeout callback is executed.
+                            // https://github.com/blackbaud/skyux/issues/64
+                            if (el.is(':focus')) {
+                                if (!isIosUserAgent) {
+                                    el.select();
+                                } else {
+                                    //use setSelectionRange instead of select because select in a timeout does not work with iOS
+                                    el[0].setSelectionRange(0, 9999);
+                                }
                             }
-
                         });
                     });
 
@@ -341,604 +371,6 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
         }]);
 }(jQuery));
 
-/*jslint browser: true, plusplus: true */
-/*global angular, jQuery */
-
-(function ($) {
-    'use strict';
-
-    angular.module('sky.charts', ['sky.resources', 'sky.moment', 'sky.format'])
-        .directive('bbChartScatterplot', ['$timeout', '$window', 'bbFormat', 'bbMoment', 'bbResources', function ($timeout, $window, bbFormat, bbMoment, bbResources) {
-            /*
-            Custom options:
-                mode: Initialize the chart options to a special configuration
-                    FixedSeriesMonthTimeline: A series with Y values that are fixed and X values that represent months
-
-                clickCallback: Callback for when the chart is clicked on
-                hoverCallback: Callback for when the chart is hovered over
-                moveForward: Callback for when the user moves the series forward
-                moveForwardDisabled: Property for the status of the move forward button
-                moveBack: Callback for when the user moves the series backward
-                moveBackDisabled: Property for the status of the move back button
-            */
-
-            return {
-                restrict: 'EA',
-                transclude: true,
-                templateUrl: 'sky/templates/charts/scatterplot.html',
-                scope: {
-                    bbChartDataset: '=',
-                    bbChartOptions: '='
-                },
-                controller: ['$scope', function ($scope) {
-                    this.enablePopup = function (callback) {
-                        if (angular.isFunction(callback)) {
-                            $scope.popupCallback = callback;
-                            $scope.enableClick = true;
-                        }
-                    };
-                }],
-                link: function (scope, el, attributes, controller, transclude) {
-                    /*jslint unparam: true */
-                    var chartContainer,
-                        dataSetInitialized = false,
-                        firstXAxisLabelEl,
-                        firstYAxisLabelEl,
-                        options,
-                        optionsInitialized = false,
-                        plot,
-                        plotEl,
-                        windowEl = $($window);
-
-                    function getNumericCssProp(el, propName) {
-                        return parseInt(el.css(propName), 10);
-                    }
-
-                    function getXAxisLabelTop() {
-                        if (firstXAxisLabelEl) {
-                            return getNumericCssProp(firstXAxisLabelEl, 'top');
-                        }
-                    }
-
-                    function getYAxisLabelRight() {
-                        if (firstYAxisLabelEl) {
-                            return getNumericCssProp(firstYAxisLabelEl, 'left') + getNumericCssProp(firstYAxisLabelEl, 'width');
-                        }
-                    }
-
-                    scope.moveBackStyle = function () {
-
-                        return {
-                            'left': getYAxisLabelRight() - 15,
-                            'position': 'absolute',
-                            'top': getXAxisLabelTop(),
-                            'z-index': 2
-                        };
-                    };
-
-                    scope.moveForwardStyle = function () {
-
-                        return {
-                            'right': -10,
-                            'position': 'absolute',
-                            'top': getXAxisLabelTop(),
-                            'z-index': 2
-                        };
-                    };
-
-                    function initializePlotElement() {
-                        var height,
-                            width;
-
-                        width = attributes.width || '100%';
-                        height = attributes.height || '100%';
-
-                        chartContainer = el.children('.bb-chart-container');
-                        plotEl = $(chartContainer.children('.bb-chart'));
-
-                        plotEl.css({
-                            width: width,
-                            height: height
-                        });
-                    }
-
-                    function moveDataWindow(xMin, xMax) {
-                        options.xaxis.min = xMin;
-                        options.xaxis.max = xMax;
-                    }
-
-                    function loadMoreData(loadedMin, loadedMax, thresholdMin, thresholdMax, loadMoreCallback) {
-                        var xPanRange = options.xaxis.panRange;
-
-                        if (loadMoreCallback && angular.isFunction(loadMoreCallback)) {
-                            if ((loadedMin > xPanRange[0]) && (options.xaxis.min < thresholdMin)) {
-                                loadMoreCallback('back');
-                            }
-
-                            if ((loadedMax < xPanRange[1]) && (options.xaxis.max > thresholdMax)) {
-                                loadMoreCallback('forward');
-                            }
-                        }
-                    }
-
-                    function handlePanMonthTimeline(plot, args) {
-                        var loadedMin,
-                            loadedMax,
-                            loadThreshold,
-                            thresholdMin,
-                            thresholdMax,
-                            xAxis,
-                            xAxisOptions;
-
-                        if (args) {
-                            xAxis = args.getAxes().xaxis;
-                            xAxisOptions = scope.bbChartOptions.panWindow.xAxis;
-
-                            moveDataWindow(xAxis.min, xAxis.max);
-
-                            loadedMin = xAxisOptions.loadedMin();
-                            loadedMax = xAxisOptions.loadedMax();
-
-                            loadThreshold = xAxisOptions.loadThreshold;
-
-                            thresholdMin = bbMoment(loadedMin).add(loadThreshold, 'month');
-                            thresholdMax = bbMoment(loadedMax).add(-loadThreshold, 'month');
-
-                            loadMoreData(loadedMin, loadedMax, thresholdMin, thresholdMax, xAxisOptions.loadMoreCallback);
-                        }
-                    }
-
-                    function panMonthTimeline(direction) {
-                        var moveTo,
-                            xAxis = plot.getAxes().xaxis,
-                            xAxisOptions = scope.bbChartOptions.panWindow.xAxis,
-                            numToMove = xAxisOptions.numToMove;
-
-                        if (direction === 'back') {
-                            numToMove = -numToMove;
-                        }
-
-                        moveTo = bbMoment(xAxis.min).add(numToMove, 'month').valueOf();
-
-                        plot.pan({ left: xAxis.p2c(moveTo) });
-                    }
-
-                    function getFixedSeriesMonthTimelineOptions(numMonthsShown) {
-                        var modeTypeOptions,
-                            months = [
-                                bbResources.month_short_january,
-                                bbResources.month_short_february,
-                                bbResources.month_short_march,
-                                bbResources.month_short_april,
-                                bbResources.month_short_may,
-                                bbResources.month_short_june,
-                                bbResources.month_short_july,
-                                bbResources.month_short_august,
-                                bbResources.month_short_september,
-                                bbResources.month_short_october,
-                                bbResources.month_short_november,
-                                bbResources.month_short_december
-                            ];
-
-                        modeTypeOptions = {
-                            grid: {
-                                backgroundColor: {
-                                    colors: ['#fff', 'rgb(250, 250, 250)']
-                                },
-                                borderColor: '#ccc',
-                                borderWidth: {
-                                    'top': 0,
-                                    'right': 0,
-                                    'bottom': 1,
-                                    'left': 1
-                                },
-                                clickable: (scope && (scope.enableClick || (scope.bbChartOptions && scope.bbChartOptions.clickCallback))),
-                                hoverable: (scope && (scope.enableHover || (scope.bbChartOptions && (scope.bbChartOptions.hoverCallback || scope.bbChartOptions.clickCallback))))
-                            },
-                            series: {
-                                points: {
-                                    fill: 1,
-                                    fillColor: null,
-                                    show: true
-                                }
-                            },
-                            moveBack: function () {
-                                panMonthTimeline('back');
-                            },
-                            moveForward: function () {
-                                panMonthTimeline('forward');
-                            },
-                            pan: {
-                                cursor: '-webkit-grab',
-                                interactive: true
-                            },
-                            plotPanCallback: handlePanMonthTimeline,
-                            xaxis: {
-                                mode: 'time',
-                                panRange: [null, null],
-                                show: true,
-                                tickFormatter: function (val) {
-                                    var utcDate = bbMoment.utc(val),
-                                        monthNum = utcDate.month(),
-                                        month = months[monthNum];
-
-                                    if (monthNum === 0) {
-                                        return bbFormat.escape(month) + '<br />' + bbFormat.escape(utcDate.year());
-                                    }
-
-                                    if (numMonthsShown && numMonthsShown < 12 && numMonthsShown > 0) {
-                                        if (monthNum % numMonthsShown === 0) {
-                                            return bbFormat.escape(month) + '<br />' + bbFormat.escape(utcDate.year());
-                                        }
-                                    }
-
-                                    return month;
-                                },
-                                tickLength: 0,
-                                tickSize: [1, 'month']
-                            },
-                            yaxis: {
-                                min: 0, //Stop the y-axis from jumping when moving to a location with no datapoints
-                                panRange: false,
-                                show: true,
-                                tickLength: 0,
-                                tickSize: 1
-                            }
-                        };
-
-                        return modeTypeOptions;
-                    }
-
-                    function getDefaultOptions() {
-                        var chartOptions = scope.bbChartOptions,
-                            defaultOptions;
-
-                        if (chartOptions && chartOptions.mode) {
-                            /*jslint white: true */
-                            switch (chartOptions.mode) {
-                                case 'FixedSeriesMonthTimeline':
-                                    defaultOptions = getFixedSeriesMonthTimelineOptions(chartOptions.numMonthsShown);
-                                    break;
-                            }
-                            /*jslint white: false */
-                        }
-
-                        return defaultOptions || {};
-                    }
-
-                    function initializePanWindow() {
-                        var xAxisOptions;
-
-                        if (scope.bbChartOptions && scope.bbChartOptions.panWindow) {
-                            plotEl.addClass('bb-chart-pan');
-                            xAxisOptions = scope.bbChartOptions.panWindow.xAxis;
-
-                            if (xAxisOptions.initialWindow) {
-                                moveDataWindow(xAxisOptions.initialWindow.min, xAxisOptions.initialWindow.max);
-                            }
-                        }
-                    }
-
-                    function initializeMoveButton(direction) {
-                        var moveDisabledPropName,
-                            moveProp,
-                            movePropName,
-                            moveVisiblePropName;
-
-                        movePropName = 'move' + direction;
-                        moveDisabledPropName = movePropName + 'Disabled';
-                        moveVisiblePropName = movePropName + 'Visible';
-
-                        if (scope.bbChartOptions) {
-                            moveProp = scope.bbChartOptions[movePropName];
-                            scope[moveVisiblePropName] = true;
-
-                            if (moveProp) {
-                                if (angular.isFunction(moveProp)) {
-                                    scope[moveDisabledPropName] = function () {
-                                        return false;
-                                    };
-                                    scope[movePropName] = moveProp;
-                                }
-
-                                if (angular.isFunction(scope.bbChartOptions[moveDisabledPropName])) {
-                                    scope[moveDisabledPropName] = scope.bbChartOptions[moveDisabledPropName];
-                                }
-                            } else if (options[movePropName]) {
-                                scope[movePropName] = options[movePropName];
-                            } else {
-                                scope[moveVisiblePropName] = false;
-                            }
-                        }
-                    }
-
-                    function initializeOptions() {
-                        options = getDefaultOptions();
-
-                        if (scope.bbChartOptions) {
-                            angular.extend(options.xaxis, scope.bbChartOptions.xaxis);
-                            angular.extend(options.yaxis, scope.bbChartOptions.yaxis);
-                        }
-
-                        initializeMoveButton('Forward');
-                        initializeMoveButton('Back');
-                        initializePanWindow();
-                    }
-
-                    function setFixedLocations() {
-                        firstXAxisLabelEl = el.find('.flot-text .xAxis .tickLabel:first');
-                        firstYAxisLabelEl = el.find('.flot-text .yAxis .tickLabel:first');
-                    }
-
-                    function bindPopup() {
-                        if (angular.isFunction(scope.popupCallback)) {
-                            plotEl.on('plotclick', function (event, pos, item) {
-                                scope.popupCallback(event, pos, item);
-                            });
-                        }
-                    }
-
-                    function bindPan() {
-                        if (options && angular.isFunction(options.plotPanCallback)) {
-                            plotEl.on('plotpan', function (plot, args) {
-                                options.plotPanCallback(plot, args);
-                            });
-                        }
-                    }
-
-                    function initializePlot(plotEl) {
-                        function bindPlotEvent(event, binding) {
-                            var callbackProp,
-                                callbackPropName = event + 'Callback',
-                                eventName = 'plot' + event;
-
-                            plotEl.off(eventName);
-
-                            if (scope.bbChartOptions) {
-                                callbackProp = scope.bbChartOptions[callbackPropName];
-
-                                if (callbackProp && angular.isFunction(callbackProp)) {
-                                    binding(eventName, callbackProp);
-                                }
-                            }
-                        }
-
-                        function bindFlotEvent(eventName, callback) {
-                            plotEl.on(eventName, function (event, pos, item) {
-                                callback(event, pos, item);
-                            });
-                        }
-
-                        function bindNavigateEvent(eventName, callback) {
-                            plotEl.on(eventName, function (plot, args) {
-                                callback(plot, args);
-                            });
-                        }
-
-                        plot = $.plot(plotEl, (scope.bbChartDataset || []), options);
-
-                        bindPlotEvent('click', bindFlotEvent);
-                        bindPlotEvent('hover', bindFlotEvent);
-                        bindPlotEvent('pan', bindNavigateEvent);
-                        bindPopup();
-                        bindPan();
-
-                        setFixedLocations();
-
-                        if (dataSetInitialized && optionsInitialized) {
-                            el.removeClass('bb-chart-rendering');
-                        }
-                    }
-
-                    function initialize() {
-                        var tries;
-
-                        function renderChart() {
-                            var plotHeight = plotEl[0].clientHeight,
-                                plotWidth = plotEl[0].clientWidth;
-
-                            if ((!plotHeight || plotHeight === 0) && (!plotWidth || plotWidth === 0)) {
-                                if (tries <= 100) {
-                                    tries = tries + 1;
-                                    renderChart.timeoutPromise = $timeout(renderChart, 20);
-                                }
-                                return;
-                            }
-
-                            initializePlot(plotEl);
-                        }
-
-                        if (renderChart.timeoutPromise) {
-                            $timeout.cancel(renderChart.timeoutPromise);
-                        }
-
-                        tries = 0;
-                        renderChart();
-                    }
-
-                    function onDatasetChanged() {
-                        dataSetInitialized = true;
-                        initialize();
-                    }
-
-                    function onOptionsChanged() {
-                        if (scope && scope.bbChartOptions) {
-                            optionsInitialized = true;
-                            initializeOptions();
-                            initialize();
-                        }
-                    }
-
-                    function onOrientationChange() {
-                        //When the orientation changes, trigger the plot to pan in no direction.  There is an issue in Safari where
-                        //the plot points are not redrawn properly on orientation change even when the grid is forced to reinitialize and redraw.
-                        plot.pan({});
-                    }
-
-                    el.addClass('bb-chart-rendering');
-
-                    scope.$on('tileRepaint', function () {
-                        initialize();
-                    });
-
-                    initializePlotElement();
-
-                    transclude(function (clone) {
-                        el.append(clone);
-                    });
-
-                    windowEl.on('orientationchange', onOrientationChange);
-
-                    scope.$on('$destroy', function () {
-                        windowEl.off('orientationchange', onOrientationChange);
-                    });
-
-                    scope.$watchCollection('bbChartDataset', onDatasetChanged, true);
-                    scope.$watch('bbChartOptions', onOptionsChanged, true);
-                    scope.$watch('popupCallback', bindPopup, true);
-
-                }
-            };
-        }])
-        .directive('bbChartPopup', ['$timeout', '$window', 'bbMediaBreakpoints', function ($timeout, $window, bbMediaBreakpoints) {
-            return {
-                scope: {
-                    bbPopupToggle: '=?',
-                    bbPopupOffset: '=?'
-                },
-                restrict: 'EA',
-                require: '^bbChartScatterplot',
-                link: function (scope, el, attrs, chart) {
-                    /*jslint unparam: true */
-                    var hidePopupOnScroll,
-                        removeWatch,
-                        topOffset = 30,
-                        windowEl = $($window);
-
-                    function movePopup(pos) {
-
-                        if (removeWatch) {
-                            removeWatch();
-                            removeWatch = null;
-                        }
-
-                        removeWatch = scope.$watch('popup_open', function (value) {
-                            if (value) {
-                                if (bbMediaBreakpoints.getCurrent().xs) {
-                                    el.removeClass('bb-chart-popup');
-                                    el.addClass('bb-chart-popup-mobile');
-                                } else {
-                                    var elWidth = el.outerWidth(),
-                                        elHeight = el.outerHeight(),
-                                        elLeft = pos.pageX - elWidth / 2,
-                                        elTop = pos.pageY - elHeight - topOffset;
-                                    el.removeClass('bb-chart-popup-mobile');
-                                    el.addClass('bb-chart-popup');
-
-                                    if (elLeft + elWidth > windowEl.width()) {
-                                        elLeft = windowEl.width() - elWidth;
-                                    }
-
-                                    if (elLeft < 0) {
-                                        elLeft = 0;
-                                    }
-
-                                    if (elTop - $window.pageYOffset < 0) {
-                                        elTop = $window.pageYOffset;
-                                    }
-
-                                    el.offset({
-                                        left: elLeft,
-                                        top: elTop
-                                    });
-                                }
-                            }
-                        });
-                    }
-
-                    function hidePopup() {
-                        scope.popup_open = false;
-                        el.addClass('ng-hide');
-                    }
-
-                    function showPopup() {
-                        scope.popup_open = true;
-                        el.removeClass('ng-hide');
-                    }
-
-                    function handlePopupEvent(event, pos, item) {
-                        if (item) {
-                            if (scope.lastItem && angular.equals(item, scope.lastItem)) {
-                                return;
-                            }
-                            scope.lastItem = item;
-                            movePopup(item);
-                        }
-                    }
-
-                    function handleMouseEvent(event) {
-                        if (scope.lastItem) {
-                            var eventX = event.clientX,
-                                eventY = event.clientY,
-                                itemX = scope.lastItem.pageX,
-                                itemY = scope.lastItem.pageY;
-
-                            // Give a 10px 'grace zone' for clicking close to the item
-                            if (Math.abs(eventX - itemX) < 10 && Math.abs(eventY - itemY) < 10) {
-                                return;
-                            }
-                        }
-                        windowEl.off('click', handleMouseEvent);
-                        if (bbMediaBreakpoints.getCurrent().xs) {
-                            windowEl.off('scroll', hidePopupOnScroll);
-                        }
-                        scope.bbPopupToggle = false;
-                        scope.$apply();
-                    }
-
-                    hidePopupOnScroll = function () {
-                        windowEl.off('click', handleMouseEvent);
-                        windowEl.off('scroll', hidePopupOnScroll);
-                        scope.bbPopupToggle = false;
-                        scope.$apply();
-                    };
-
-                    scope.$on('$destroy', function () {
-                        windowEl.off('click', handleMouseEvent);
-                        windowEl.off('scroll', hidePopupOnScroll);
-                    });
-
-                    if (scope.bbPopupOffset) {
-                        topOffset = scope.bbPopupOffset;
-                    }
-
-                    if (angular.isDefined(scope.bbPopupToggle)) {
-                        scope.$watch('bbPopupToggle', function (value) {
-                            if (value && !scope.popup_open) {
-                                $timeout(function () {
-                                    windowEl.on('click', handleMouseEvent);
-                                    if (bbMediaBreakpoints.getCurrent().xs) {
-                                        windowEl.on('scroll', hidePopupOnScroll);
-                                    }
-                                    showPopup();
-                                });
-                            } else if (!value && scope.popup_open) {
-                                $timeout(hidePopup);
-                            }
-                        });
-                    }
-
-                    el.addClass('bb-chart-popup');
-
-                    hidePopup();
-
-                    chart.enablePopup(handlePopupEvent);
-                }
-            };
-        }]);
-
-}(jQuery));
-
 /*jshint browser: true */
 
 /*global angular */
@@ -948,10 +380,6 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
 @summary The check applies a commonly styled selector to a checkbox or radio button.
  @description The check directive allows you to change an input element of type checkbox or radio into a commonly-styled selector.  The value that is selected is driven through the `ng-model` attribute specified on the input element and for radio input types the value to set on the `ng-model` can be specified by the value attribute.
 
- ### Dependencies ###
-
- - **[icheck.js](http://fronteed.com/iCheck/) (1.0.2 or higher)**
-
 ---
 
  */
@@ -959,37 +387,32 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
 (function () {
     'use strict';
     angular.module('sky.check', [])
-        .directive('bbCheck', ['$timeout', function ($timeout) {
+        .directive('bbCheck', ['$templateCache', function ($templateCache) {
+            function createEl(name) {
+                return angular.element($templateCache.get('sky/templates/check/' + name + '.html'));
+            }
+
             return {
-                require: 'ngModel',
-                link: function (scope, el, attrs, ngModel) {
-                    return $timeout(function () {
-                        var value;
-                        value = attrs.value;
-                        
-                        function update() {
-                            el.iCheck('update');
-                        }
+                link: function (scope, el, attr) {
+                    var labelEl = el.parent('label'),
+                        styledEl,
+                        typeClass;
 
-                        // These directives affect the value and disabled states of the input element,
-                        // and since they happen outside of iCheck we need to manually update iCheck
-                        // to match the new state.
-                        scope.$watch(attrs.ngModel, update);
-                        
-                        if (angular.isDefined(attrs.ngDisabled)) {
-                            scope.$watch(attrs.ngDisabled, update);
-                        }
+                    if (labelEl.length < 1) {
+                        el.wrap(createEl('wrapper'));
+                    } else {
+                        labelEl.addClass('bb-check-wrapper');
+                    }
+                    if (attr.type === 'radio') {
+                        typeClass = 'bb-check-radio';
+                    } else {
+                        typeClass = 'bb-check-checkbox';
+                    }
 
-                        return el.iCheck({
-                            checkboxClass: 'bb-check-checkbox',
-                            radioClass: 'bb-check-radio'
-                        }).on('ifChanged', function (event) {
-                            scope.$apply(function () {
-                                var viewValue = el.attr('type') === 'checkbox' ? event.target.checked : value;
-                                ngModel.$setViewValue(viewValue);
-                            });
-                        });
-                    });
+                    styledEl = createEl('styled');
+                    styledEl.addClass(typeClass);
+
+                    el.after(styledEl);
                 }
             };
         }]);
@@ -1396,12 +819,21 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
 (function () {
     'use strict';
 
+    function getTemplateUrl(name) {
+        return 'sky/templates/contextmenu/' + name + '.html';
+    }
+
     function bbContextMenu() {
         return {
             replace: true,
             restrict: 'E',
             transclude: true,
-            templateUrl: 'sky/templates/contextmenu/contextmenu.html'
+            templateUrl: getTemplateUrl('contextmenu'),
+            link: function ($scope) {
+                $scope.contextButtonStopPropagation = function ($event) {
+                    $event.stopPropagation();
+                };
+            }
         };
     }
 
@@ -1413,14 +845,15 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
             scope: {
                 clickItem: '&bbContextMenuAction'
             },
-            template: '<li role="presentation"><a role="menuitem" href="javascript:void(0)" ng-click="clickItem()"><ng-transclude/></a></li>'
+            templateUrl: getTemplateUrl('menuitem')
         };
     }
+
     function bbContextMenuButton() {
         return {
             restrict: 'E',
             replace: true,
-            template: '<button type="button" class="btn bb-btn-secondary bb-context-menu-btn"><i class="fa fa-ellipsis-h"></i></button>'
+            templateUrl: getTemplateUrl('menubutton')
         };
     }
 
@@ -1436,7 +869,6 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
         self.toggleAccordion = function ($event) {
             toggleAccordion($event, $scope);
         };
-
     }
 
     BBSubmenuController.$inject = ['$scope'];
@@ -1449,7 +881,6 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                 heading: '=?bbSubmenuHeading'
             },
             link: function ($scope, el, attrs) {
-
                 $scope.accordionLocals = {
                     accordionOpen: false,
                     staticHeader: false
@@ -1462,10 +893,9 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                 $scope.toggleAccordion = function ($event) {
                     toggleAccordion($event, $scope);
                 };
-
             },
             transclude: true,
-            templateUrl: 'sky/templates/contextmenu/submenu.html'
+            templateUrl: getTemplateUrl('submenu')
         };
     }
 
@@ -1480,7 +910,7 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                 };
             },
             transclude: true,
-            templateUrl: 'sky/templates/contextmenu/submenuheading.html'
+            templateUrl: getTemplateUrl('submenuheading')
         };
     }
 
@@ -1503,7 +933,7 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
 
 ### bbData Functions ###
 
-  - `load(loadObj)` Takes an object with `data`, `resources`, and `text` properties and returns a promise that contains the result of an HTTP GET request.
+  - `load(loadObj)` Takes an object with `data`, `resources`, and `text` properties and returns a promise that contains the result of an HTTP GET request.  Note that in addition to the `data`, `resources` and `text` properties on the result object there is also an `httpResults` property containing the results from the underlying calls to [Angular's `$http` service](https://docs.angularjs.org/api/ng/service/$http).  These objects include metadata about the response such as the HTTP status code.
     - `data` Either a URL or an object with multiple URLs to be requested. The promise results will be contained in `result.data`. e.g. `bbData.load({data: '/foo/data'})` or `bbData.load({data: {a: '/foo/data1', b: '/foo/data2'}})`.  The requests to the specified URLs will be made with credentials.
     - `resources` Either a URL or an object with multiple URLs to be requested. The promise results will be contained in `result.resources`. The requests to the specified URLs will be made without credentials.
     - `text` Either a URL or an object with multiple URLs to be requested. The promise results will be contained in `result.text`.  The requests to the specified URLs will be made without credentials and the result will be returned as a string rather than an object.
@@ -1514,9 +944,10 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
     - `url` The URL to which to send the request.
     - `data` The object to be POSTed to the URL.
     - `type` (*default: `POST`) The HTTP verb to use along with the request.
+  - `cancel(promise)` Takes a promise returned by `bbData.load` or `bbData.save` and cancels the underlying HTTP request.  The promise will be rejected after cancelling.
 */
 
-(function (window, $) {
+(function ($) {
     'use strict';
 
     var DEFAULT_PROP = '__DEFAULT__',
@@ -1672,14 +1103,14 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
         return result;
     }
 
-    function bbData($http, $q, $templateCache, bbDataConfig) {
+    function bbData($http, $q, $templateCache, bbDataConfig, $window) {
         function ajaxUrl(url, requestType) {
             var filter,
                 parts;
 
             requestType = requestType || 0;
 
-            if (window.define && window.define.amd && window.require) {
+            if ($window.define && $window.define.amd && $window.require) {
                 parts = url.split('?');
 
                 // Grab the portion before the query string and get the fully-qualified URL.
@@ -1709,7 +1140,7 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
             return url;
         }
 
-        function createAjaxPromise(item, isPost, requestType) {
+        function createAjaxPromise(item, isPost, requestType, timeoutPromise) {
             var data,
                 httpOptions,
                 isGet,
@@ -1751,10 +1182,11 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                 cache: requestType !== 0,
                 data: data ? JSON.stringify(data) : null,
                 dataType: requestType !== 0 ? 'text' : 'json',
-                withCredentials: requestType === 0
+                withCredentials: requestType === 0,
+                timeout: timeoutPromise
             };
 
-            if (data instanceof window.FormData) {
+            if (data instanceof $window.FormData) {
                 // Angular sets the Content-Type to application/json by default, but when posting FormData
                 // it should clear out the Content-Type and let the browser determine it.
                 // https://uncorkedstudios.com/blog/multipartformdata-file-upload-with-angularjs
@@ -1769,7 +1201,7 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
             return $http(httpOptions);
         }
 
-        function addPromises(items, urls, requestType) {
+        function addPromises(items, urls, requestType, timeoutPromise) {
             var i,
                 n,
                 url;
@@ -1777,101 +1209,146 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
             if (urls) {
                 for (i = 0, n = urls.length; i < n; i++) {
                     url = urls[i];
-                    items.push(createAjaxPromise(url, null, requestType));
+                    items.push(createAjaxPromise(url, null, requestType, timeoutPromise));
                 }
             }
         }
 
+        function nextId() {
+            nextId.index = nextId.index || 0;
+            nextId.index++;
+            return nextId.index;
+        }
+
+        function trackHTTPTimeoutForPromise(fn) {
+            var id = nextId(),
+                promise,
+                httpTimeout = $q.defer();
+
+            trackHTTPTimeoutForPromise[id] = httpTimeout;
+
+            promise = fn(httpTimeout.promise);
+            promise._id = id;
+
+            function clearPromiseId() {
+                delete trackHTTPTimeoutForPromise[id];
+            }
+
+            promise.then(clearPromiseId, clearPromiseId);
+
+            return promise;
+        }
+
         function loadData(options) {
-            return $q(function (resolve, reject) {
-                var dataOption,
-                    dataProps,
-                    dataUrls,
-                    resourcesOption,
-                    resourcesProps,
-                    resourcesUrls,
-                    promises = [],
-                    textOption,
-                    textProps,
-                    textUrls;
+            return trackHTTPTimeoutForPromise(function (timeoutPromise) {
+                return $q(function (resolve, reject) {
+                    var dataOption,
+                        dataProps,
+                        dataUrls,
+                        resourcesOption,
+                        resourcesProps,
+                        resourcesUrls,
+                        promises = [],
+                        textOption,
+                        textProps,
+                        textUrls;
 
-                function success(args) {
-                    var argIndex = 0,
-                        result = {};
+                    function success(args) {
+                        var argIndex = 0,
+                            result = {
+                                httpResults: {}
+                            };
 
-                    function addResult(name, props) {
-                        var resultData,
-                            i,
-                            n,
-                            p,
-                            resultItem;
+                        function addResult(name, props) {
+                            var resultData,
+                                httpResult,
+                                i,
+                                n,
+                                p,
+                                resultItem,
+                                resultItemHttpResults;
 
-                        if (props) {
-                            for (i = 0, n = props.length; i < n; i++) {
-                                p = props[i];
-                                resultData = args[argIndex].data;
+                            if (props) {
+                                for (i = 0, n = props.length; i < n; i++) {
+                                    p = props[i];
+                                    httpResult = args[argIndex];
+                                    resultData = httpResult.data;
 
-                                if (p === DEFAULT_PROP) {
-                                    resultItem = resultData;
-                                } else {
-                                    resultItem = resultItem || {};
-                                    resultItem[p] = resultData;
+                                    if (p === DEFAULT_PROP) {
+                                        resultItem = resultData;
+                                        resultItemHttpResults = httpResult;
+                                    } else {
+                                        resultItem = resultItem || {};
+                                        resultItem[p] = resultData;
+
+                                        resultItemHttpResults = resultItemHttpResults || {};
+                                        resultItemHttpResults[p] = httpResult;
+                                    }
+
+                                    argIndex++;
                                 }
+                            }
 
-                                argIndex++;
+                            if (angular.isDefined(resultItem)) {
+                                result[name] = resultItem;
+                            }
+
+                            if (angular.isDefined(resultItemHttpResults)) {
+                                result.httpResults[name] = resultItemHttpResults;
                             }
                         }
 
-                        if (angular.isDefined(resultItem)) {
-                            result[name] = resultItem;
-                        }
+                        addResult('data', dataProps, true);
+                        addResult('resources', resourcesProps);
+                        addResult('text', textProps);
+
+                        resolve(result);
                     }
 
-                    addResult('data', dataProps, true);
-                    addResult('resources', resourcesProps);
-                    addResult('text', textProps);
+                    function failure() {
+                        /*jshint validthis: true */
+                        reject.apply(this, arguments);
+                    }
 
-                    resolve(result);
-                }
+                    dataOption = options.data;
+                    resourcesOption = options.resources;
+                    textOption = options.text;
 
-                function failure() {
-                    /*jshint validthis: true */
-                    reject.apply(this, arguments);
-                }
+                    if (dataOption) {
+                        dataProps = [];
+                        dataUrls = [];
+                        fillUrls(dataOption, dataProps, dataUrls);
+                    }
 
-                dataOption = options.data;
-                resourcesOption = options.resources;
-                textOption = options.text;
+                    if (resourcesOption) {
+                        resourcesProps = [];
+                        resourcesUrls = [];
+                        fillUrls(resourcesOption, resourcesProps, resourcesUrls);
+                    }
 
-                if (dataOption) {
-                    dataProps = [];
-                    dataUrls = [];
-                    fillUrls(dataOption, dataProps, dataUrls);
-                }
+                    if (textOption) {
+                        textProps = [];
+                        textUrls = [];
+                        fillUrls(textOption, textProps, textUrls);
+                    }
 
-                if (resourcesOption) {
-                    resourcesProps = [];
-                    resourcesUrls = [];
-                    fillUrls(resourcesOption, resourcesProps, resourcesUrls);
-                }
+                    addPromises(promises, dataUrls, REQUEST_TYPE_DATA, timeoutPromise);
+                    addPromises(promises, resourcesUrls, REQUEST_TYPE_RESOURCES, timeoutPromise);
+                    addPromises(promises, textUrls, REQUEST_TYPE_TEXT, timeoutPromise);
 
-                if (textOption) {
-                    textProps = [];
-                    textUrls = [];
-                    fillUrls(textOption, textProps, textUrls);
-                }
-
-                addPromises(promises, dataUrls, REQUEST_TYPE_DATA);
-                addPromises(promises, resourcesUrls, REQUEST_TYPE_RESOURCES);
-                addPromises(promises, textUrls, REQUEST_TYPE_TEXT);
-
-                $q.all(promises)
-                    .then(success)
-                    .catch(failure);
+                    $q.all(promises)
+                        .then(success)
+                        .catch(failure);
+                });
             });
         }
 
         return {
+            cancel: function (promise) {
+                if (promise && promise._id && trackHTTPTimeoutForPromise[promise._id]) {
+                    trackHTTPTimeoutForPromise[promise._id].resolve();
+                }
+            },
             load: function (options) {
                 if (options.loadManager) {
                     options.loadManager.load = function () {
@@ -1895,17 +1372,19 @@ numbers over 10,000 will be displayed as 10k, over 1,000,000 as 1m, and 1,000,00
                 };
             },
             save: function (options) {
-                return createAjaxPromise(options, true);
+                return trackHTTPTimeoutForPromise(function (timeoutPromise) {
+                    return createAjaxPromise(options, true, null, timeoutPromise);
+                });
             }
         };
     }
 
-    bbData.$inject = ['$http', '$q', '$templateCache', 'bbDataConfig'];
+    bbData.$inject = ['$http', '$q', '$templateCache', 'bbDataConfig', '$window'];
 
     angular.module('sky.data', [])
         .constant('bbDataConfig', {})
         .factory('bbData', bbData);
-}(this, jQuery));
+}(jQuery));
 
 /*jshint browser: true */
 /*global angular, jQuery */
@@ -2752,9 +2231,14 @@ also optionally display controls for the user to add a hyperlink to a file on th
 The contents of the directive may be left blank to display the default UI for the drop zone, or you may include your
 own custom content to be displayed instead of the default UI.
 
+Also note that upon the initialization of the Sky module, dragging and dropping files will be disabled for the entire window so that
+accidentally dropping a file outside the target zone doesn't result in the file being opened in the browser window.  If you are
+implementing your own file drop functionality outside of the file drop directive, you can place the `bb-file-drop-target` CSS
+class on the element you wish to receive drop events and that element will be exempt from the drop exclusion rule.
+
 ### File Drop Settings ###
 
-- `bb-file-drop-accept` *(Optional)* A comma-delimited list of MIME types that may be dropped or selected.
+- `bb-file-drop-accept` *(Optional)* A comma-delimited string literal of MIME types that may be dropped or selected (e.g. `bb-file-drop-accept="fileAttachmentDemo.validFileTypes"` or `bb-file-drop-accept="'image/png'"`) or a custom validation function (e.g. `bb-file-drop-accept="fileAttachmentDemo.validate($file)"`).
 - `bb-file-drop-multiple` *(Default: `true`)* A flag indicating whether multiple files may be dropped at once.
 - `bb-file-drop-allow-dir` *(Default: `true`)* A flag indicating whether a directory can be selected.
 - `bb-file-drop-min-size` *(Optional)* The minimum size in bytes of a valid file.
@@ -2798,7 +2282,17 @@ to the function.
 
 (function ($) {
     'use strict';
-    
+
+    function run($window) {
+        $($window).on('dragover drop', function (e) {
+            if (!$(e.target).hasClass('bb-file-drop-target')) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    run.$inject = ['$window'];
+
     function bbFileDrop($parse, $templateCache) {
         return {
             link: function (scope, el, attrs) {
@@ -2811,13 +2305,13 @@ to the function.
                                 url: scope.bbFileDrop.url
                             }
                         });
-                        
+
                         scope.bbFileDrop.url = null;
                     },
                     fileChange: function ($files, $event, $rejectedFiles) {
                         scope.bbFileDropChange({
                             files: $files,
-                            rejectedFiles: $rejectedFiles 
+                            rejectedFiles: $rejectedFiles
                         });
                     }
                 };
@@ -2828,11 +2322,11 @@ to the function.
             },
             template: function (el, attrs) {
                 var dropEl;
-                
+
                 el.html($templateCache.get('sky/templates/fileattachments/filedrop.html'));
-                
+
                 dropEl = el.find('.bb-file-drop');
-                
+
                 dropEl.attr({
                     'ngf-allow-dir': attrs.bbFileDropAllowDir,
                     'ngf-accept': attrs.bbFileDropAccept,
@@ -2840,7 +2334,7 @@ to the function.
                     'ngf-min-size': attrs.bbFileDropMinSize || '0',
                     'ngf-max-size': attrs.bbFileDropMaxSize || '500000'
                 });
-                
+
                 if (angular.isDefined(attrs.bbFileDropNoclick)) {
                     dropEl.addClass('bb-file-drop-noclick');
                 } else {
@@ -2850,12 +2344,14 @@ to the function.
             transclude: true
         };
     }
-    
+
     bbFileDrop.$inject = ['$parse', '$templateCache'];
-    
+
     angular.module('sky.fileattachments.filedrop', ['ngFileUpload', 'sky.resources'])
+        .run(run)
         .directive('bbFileDrop', bbFileDrop);
 }(jQuery));
+
 /*global angular */
 
 (function () {
@@ -3502,11 +2998,10 @@ to the function.
 @icon table
 @summary The grid builds a full-featured grid with a search box, column picker, and filter form.
  @description The grid directive allows you to build a full-featured grid with a search box, column picker, and filter form.
- 
+
  ### Dependencies ###
 
-- **[jqGrid](http://www.trirand.com/blog/) (4.6.0 or higher)**
-- **[icheck.js](http://fronteed.com/iCheck/) (1.0.2 or higher)**
+- **[jqGrid](https://github.com/free-jqgrid/jqGrid) (4.7.0 or higher)**
 - **[enquire.js](http://wicky.nillia.ms/enquire.js/) (2.1.2 or later)**
 ---
 
@@ -3791,8 +3286,7 @@ reloading the grid with the current data after the event has fired.
                                 $scope.locals.rowcount = count;
                             }
 
-                            function mediaBreakpointHandler(newBreakpoints) {
-                                breakpoints = newBreakpoints;
+                            function reInitGrid() {
                                 if ($scope.options && $scope.options.selectedColumnIds && $scope.options.selectedColumnIds.length > 0 && tableEl[0].grid) {
 
                                     initGrid();
@@ -3801,6 +3295,11 @@ reloading the grid with the current data after the event has fired.
                                         setRows($scope.options.data);
                                     }
                                 }
+                            }
+
+                            function mediaBreakpointHandler(newBreakpoints) {
+                                breakpoints = newBreakpoints;
+                                reInitGrid();
                             }
 
                             function buildColumnClasses(column) {
@@ -4349,17 +3848,10 @@ reloading the grid with the current data after the event has fired.
                                 $scope.selectedRows = [];
                             }
 
-                            function setAllFancyCheck(status) {
-                                $(element.find('.cbox')).each(function () {
-                                    this.checked = status;
-                                }).iCheck('update');
-                            }
 
                             function resetMultiselect() {
                                 clearSelectedRowsObject();
                                 tableEl.resetSelection();
-
-                                setAllFancyCheck(false);
                             }
 
 
@@ -4378,44 +3870,14 @@ reloading the grid with the current data after the event has fired.
                                         $scope.selectedRows = allRowData.slice();
                                     }
                                 }
-
-                                setAllFancyCheck(status);
-
                                 $scope.$apply();
                             }
 
-                            function updateFancyCheckboxCell(rowIndex, status) {
-                                var checkboxEl;
-
-                                checkboxEl = element.find('td .cbox');
-                                /*istanbul ignore else: sanity check */
-                                if (checkboxEl.length > (rowIndex - 1)) {
-                                    checkboxEl[(rowIndex - 1)].checked = status;
-                                    checkboxEl.eq(rowIndex - 1).iCheck('update');
-                                }
-                            }
-
-                            function updateFancyCheckboxHeader(status) {
-                                var checkboxEl;
-
-                                checkboxEl = header.find('th .cbox');
-
-                                /*istanbul ignore else: sanity check */
-                                if (checkboxEl.length > 0) {
-                                    checkboxEl[0].checked = status;
-                                    checkboxEl.eq(0).iCheck('update');
-                                }
-                            }
 
                             function toggleMultiselectRows(visibleSelectedRows) {
                                 var i,
                                     index,
                                     rowIds;
-
-                                /*istanbul ignore else: sanity check */
-                                if (visibleSelectedRows.length > 0) {
-                                    updateFancyCheckboxHeader(false);
-                                }
 
                                 rowIds = tableEl.getDataIDs();
 
@@ -4435,16 +3897,12 @@ reloading the grid with the current data after the event has fired.
 
                                     localRowSelect = true;
 
-                                    updateFancyCheckboxHeader(false);
-
                                     index = arrayObjectIndexOf($scope.selectedRows, row);
 
                                     if (status === true && index === -1 && row) {
                                         $scope.selectedRows.push(row);
-                                        updateFancyCheckboxCell(rowIndex, true);
                                     } else if (status === false && index > -1) {
                                         $scope.selectedRows.splice(index, 1);
-                                        updateFancyCheckboxCell(rowIndex, false);
                                     }
                                 });
                             }
@@ -4455,7 +3913,6 @@ reloading the grid with the current data after the event has fired.
                                 tableEl.setSelection(rowId, false);
                                 row  = $scope.options.data[(rowIndex - 1)];
                                 $scope.selectedRows.push(row);
-                                updateFancyCheckboxCell(rowIndex, true);
                             }
 
                             function beforeSelectRow(rowId, e) {
@@ -4525,39 +3982,26 @@ reloading the grid with the current data after the event has fired.
                                 }
                             }
 
+                            function fancyCheckOff() {
+                                element.find('td .bb-check-checkbox').off();
+                            }
+
+                            function wrapCheckboxEl(checkboxEl) {
+                                checkboxEl.wrap('<label class="bb-check-wrapper"></label>');
+                                checkboxEl.after('<span class="bb-check-checkbox"></span>');
+                            }
+
                             function setUpFancyCheckHeader() {
                                 var headerCheckEl =  header.find('th .cbox');
-                                headerCheckEl.iCheck({
-                                    checkboxClass: 'bb-check-checkbox'
-                                });
-
-                                headerCheckEl.off('click.i');
-                                element.find('th .bb-check-checkbox').off('click.i');
-                                element.find('th .iCheck-helper').off('mousedown');
-                                element.find('th .iCheck-helper').off('mouseup');
-                                element.find('th .iCheck-helper').off('click');
-
-
-                                element.find('th .iCheck-helper').on('click', function () {
-                                    element.find('th .cbox').trigger('click');
-                                });
-
+                                wrapCheckboxEl(headerCheckEl);
                             }
 
                             function setUpFancyCheckCell() {
-                                element.find('td .cbox').iCheck(
-                                {
-                                    checkboxClass: 'bb-check-checkbox'
+                                var checkCellEl = element.find('td .cbox');
+                                wrapCheckboxEl(checkCellEl);
+                                element.find('td .bb-check-checkbox').on('click', function (event) {
+                                    event.preventDefault();
                                 });
-
-                                element.find('td .cbox').off('click');
-                                element.find('td .bb-check-checkbox').off('click');
-                                element.find('td .iCheck-helper').off('click');
-
-                            }
-
-                            function destroyFancyCheck() {
-                                element.find('td .cbox').iCheck('destroy');
                             }
 
                             function getIdPrefix() {
@@ -4584,7 +4028,7 @@ reloading the grid with the current data after the event has fired.
 
                                 //Unload grid if it already exists.
                                 tableEl.jqGrid('GridUnload');
-                                destroyFancyCheck();
+                                fancyCheckOff();
 
                                 tableEl = element.find('table');
                                 tableDomEl = tableEl[0];
@@ -4785,7 +4229,7 @@ reloading the grid with the current data after the event has fired.
 
                                         tableEl.resetSelection();
 
-                                        destroyFancyCheck();
+                                        fancyCheckOff();
 
                                         destroyCellScopes();
                                         tableDomEl.addJSONData(rows);
@@ -4905,7 +4349,6 @@ reloading the grid with the current data after the event has fired.
                                 if (tableEl[0].grid && $scope.options.data && $scope.options.data.length > 0) {
                                     //blow away existing selections
                                     tableEl.resetSelection();
-                                    setAllFancyCheck(false);
 
                                     rowIds = tableEl.getDataIDs();
 
@@ -4915,7 +4358,6 @@ reloading the grid with the current data after the event has fired.
 
                                         if (index > -1) {
                                             tableEl.setSelection(rowIds[index], false);
-                                            updateFancyCheckboxCell((index + 1), true);
                                         }
 
                                     }
@@ -4973,6 +4415,15 @@ reloading the grid with the current data after the event has fired.
                                 handleTableWrapperResize();
                             });
 
+                            // Reinitialize grid when grid element resizes from 0
+                            $scope.$watch(function () {
+                                return element.width();
+                            }, function (newValue, oldValue) {
+                                if (newValue !== oldValue && oldValue === 0) {
+                                    reInitGrid();
+                                }
+                            });
+
                             $scope.locals.topScrollbarScroll = function () {
                                 var topScrollbar = getTopScrollbar();
                                 tableWrapper.scrollLeft(topScrollbar.scrollLeft());
@@ -4980,6 +4431,11 @@ reloading the grid with the current data after the event has fired.
                                     header.scrollLeft(topScrollbar.scrollLeft());
                                 }
                             };
+
+                            $scope.locals.hasWaitAndEmpty = function () {
+                                return $scope.options && $scope.options.loading && (!$scope.options.data || $scope.options.data.length < 1);
+                            };
+
 
                             element.on('$destroy', function () {
 
@@ -5000,8 +4456,7 @@ reloading the grid with the current data after the event has fired.
 
                                 windowEl.off('resize.' + windowEventId + ', orientationchange.' + windowEventId);
 
-                                destroyFancyCheck();
-                                $(element.find('th .iCheck-helper')).off('click');
+                                fancyCheckOff();
 
                                 bbMediaBreakpoints.unregister(mediaBreakpointHandler);
                             });
@@ -5159,7 +4614,7 @@ reloading the grid with the current data after the event has fired.
 @icon question
 @summary The help service allows Angular components to open and close the help panel programmatically.
  @description The help service allows other Angular components to open or close the help panel programmatically. When the widget opens, it interrogates the page to identify the current help topic and display the relevant help content. Settings for this service are controlled with the `bbHelpConfig` object.
- 
+
  ### Dependencies ###
 
  - **[easyXDM](http://easyxdm.net/wp/) (2.4.19 or higher)** Used to make cross-domain requests to the help server
@@ -5174,9 +4629,32 @@ reloading the grid with the current data after the event has fired.
 
 ### bbHelpConfig Settings ###
 
+ - `caseCentral` Optional. Can customize the Case Central URL if needed, or set to empty string to remove this link.
+ - `clientId` Optional. Used to pass the client / site id to the chat session.
+ - `communityUrl` Optional. Can be provided in order for a link to Community to appear.
+ - `customLocales` Optional.  An array of additional locales for which the product has help content other than the default help content locale.  This array should contain strings like 'en-gb' or 'fr'.
+ - `getChatData` Optional. Function that returns the appropriate chat key and website id to use for the product based on the user's locale. e.g.
+   ```
+   getChatData: function(userLocale) {
+            if (locale === 'en-gb') {
+                return {
+                    key: '3674699029499270000',
+                    websiteId: ' 3506212574036402816'
+                };
+            }
+            return {
+                key: ' 171147028994005462',
+                websiteId: '2766361919244160000'
+            };
+        }
+    ```
+ - `getCurrentHelpKey` A function that returns the page's current help URL. This way, if a user navigates around your app, at any point clicking the help panel can call this to determine the appropriate help file to show. e.g. `function() { return 'myHelpFile.html'}`
+ - `helpBaseUrl` Optional. Provide the base URL to your help files. If omitted, the productId will be inserted into the URL https://www.blackbaud.com/files/support/helpfiles/{ProductId}/content/ to construct the base URL.  This parameter override is available if help content must exist at some other path instead.
+ - `knowledgebaseUrl` Optional. Can customize the knowledgebase URL if needed, or set to empty string to remove this link.
+ - `onHelpLoaded` Optional. An callback function after the help panel is loaded.
  - `productId` The current product identifier used to build the URL to the product's help content.
  - `url` The URL to the Help Widget that will be included.
- - `customLocales` Optional.  An array of additional locales for which the product has help content other than the default help content locale.  This array should contain strings like 'en-gb' or 'fr'.
+ - `userData` Optional. Object used to pass information about the current user to the chat session. e.g `{ emailAddress: '', firstName: '', lastName: ''}`
 
  */
 
@@ -5328,85 +4806,6 @@ reloading the grid with the current data after the event has fired.
 }());
 
 /*jslint browser: true, plusplus: true */
-/*global angular, jQuery */
-
-/** @module Helpwidget
-@deprecated
-@icon archive
-@summary This directive is no longer being maintained. For adding the global help button to a page or showing the help panel from a controller, see the Help service.
- @description ### *Deprecated* ###
-
-This directive is no longer being maintained. For adding the global help button to a page or showing the help panel from a controller, see the Help service.
-
-<s>
-### Additional Dependencies ###
-
- - **[easyXDM](http://easyxdm.net/wp/) (2.4.19 or higher)** Used to make cross-domain requests to the help server
-
----
-
-The Helpwidget directive includes the help widget on the page.  When the widget is opened, it will interrogate the page to identify the current help topic and display the relevant help content.  Settings for this directive are controlled with the `bbHelpwidgetConfig` object.
-
-### bbHelpwidgetConfig Settings ###
-
- - `productId` The current product identifier used to build the URL to the product's help content.
- - `url` The URL to the Help Widget that will be included.
- - `customLocales` Optional.  An array of additional locales for which the product has help content other than the default help content locale.  This array should contain strings like 'en-gb' or 'fr'.
- </s>
- */
-
-(function () {
-    'use strict';
-
-    angular.module('sky.helpwidget', [])
-        .constant('bbHelpwidgetConfig', {
-            onHelpLoaded: null,
-            productId: 'Sky',
-            customLocales: [],
-            url: null
-        })
-        .directive('bbHelpwidget', ['$state', 'bbHelpwidgetConfig', function ($state, bbHelpwidgetConfig) {
-
-            function loadHelpWidget($state) {
-                if (!bbHelpwidgetConfig.url) {
-                    throw "bbHelpwidgetConfig.url is not defined.";
-                }
-
-                jQuery.ajax({
-                    cache: true,
-                    dataType: 'script',
-                    url: bbHelpwidgetConfig.url
-                }).done(function () {
-                    var config = angular.extend({}, bbHelpwidgetConfig);
-
-                    if (!config.getCurrentHelpKey) {
-                        config.getCurrentHelpKey = function () {
-                            // $state.current.helpKeyOverride outranks $state.current.pageData.helpKey
-                            if ($state.current.helpKeyOverride) {
-                                return $state.current.helpKeyOverride;
-                            }
-
-                            if ($state.current.pageData) {
-                                return $state.current.pageData.helpKey;
-                            }
-                            return null;
-                        };
-                    }
-
-                    window.BBHELP.HelpWidget.load(config);
-                });
-            }
-
-            return {
-                link: function () {
-                    loadHelpWidget($state);
-                }
-            };
-        }]);
-
-}());
-
-/*jslint browser: true, plusplus: true */
 /*global angular */
 
 /** @module Highlight
@@ -5542,7 +4941,7 @@ The Helpwidget directive includes the help widget on the page.  When the widget 
  - `getCurrent()` Gets the current media breakpoint object.
  */
 
-(function (window) {
+(function () {
     'use strict';
 
     var mediaBreakpointsConfig = {
@@ -5555,57 +4954,60 @@ The Helpwidget directive includes the help widget on the page.  When the widget 
         },
         bp = {},
         handlers = [],
-        mediaBreakpoints,
-        timeout;
+        mediaBreakpoints;
 
-    function updateStatus(newSize) {
-        var handler,
-            i;
 
-        bp.xs = bp.sm = bp.md = bp.lg = false;
-        bp[newSize] = true;
 
-        for (i = 0; i < handlers.length; i += 1) {
-            handler = handlers[i];
+    function runRegisterEnquire($window, $timeout) {
+        function registerEnquire(enquire) {
+            var mediaQueries = mediaBreakpointsConfig.mediaQueries,
+                p;
 
-            /*istanbul ignore else */
-            if (handler) {
-                handler(bp);
+            function updateStatus(newSize) {
+                var handler,
+                    i;
+                bp.xs = bp.sm = bp.md = bp.lg = false;
+                bp[newSize] = true;
+
+                for (i = 0; i < handlers.length; i += 1) {
+                    handler = handlers[i];
+
+                    /*istanbul ignore else */
+                    if (handler) {
+                        handler(bp);
+                    }
+                }
+                $timeout(angular.noop);
+            }
+
+
+            function registerQuery(name) {
+                if (!angular.isDefined(enquire.queries[mediaQueries[name]])) {
+                    enquire.register(mediaQueries[name], function () {
+                        updateStatus(name);
+                    });
+                }
+            }
+
+            for (p in mediaQueries) {
+                /*istanbul ignore else */
+                if (mediaQueries.hasOwnProperty(p)) {
+                    registerQuery(p);
+                }
             }
         }
 
-        // Trigger a digest cycle if it's available
-        if (timeout) {
-            timeout(angular.noop, 0);
-        }
-    }
-
-    (function (register) {
         /* istanbul ignore next boilerplate RequireJS detection */
         if (typeof define === 'function' && define.amd) {
             // AMD. Register as an anonymous module.
-            require(['enquire'], register);
-        } else if (window.enquire) {
+            require(['enquire'], registerEnquire);
+        } else if ($window.enquire) {
             // Browser globals
-            register(enquire);
+            registerEnquire(enquire);
         }
-    }(function (enquire) {
-        var mediaQueries = mediaBreakpointsConfig.mediaQueries,
-            p;
+    }
 
-        function registerQuery(name) {
-            enquire.register(mediaQueries[name], function () {
-                updateStatus(name);
-            });
-        }
-
-        for (p in mediaQueries) {
-            /*istanbul ignore else */
-            if (mediaQueries.hasOwnProperty(p)) {
-                registerQuery(p);
-            }
-        }
-    }));
+    runRegisterEnquire.$inject = ['$window', '$timeout'];
 
     mediaBreakpoints = {
         register: function (callback) {
@@ -5633,11 +5035,11 @@ The Helpwidget directive includes the help widget on the page.  When the widget 
 
     angular.module('sky.mediabreakpoints', [])
         .constant('bbMediaBreakpointsConfig', mediaBreakpointsConfig)
-        .factory('bbMediaBreakpoints', ['$timeout', function ($timeout) {
-            timeout = $timeout;
+        .run(runRegisterEnquire)
+        .factory('bbMediaBreakpoints', [function () {
             return mediaBreakpoints;
         }]);
-}(this));
+}());
 
 /*jshint browser: true */
 /*global angular, jQuery */
@@ -5872,7 +5274,7 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
         }]);
 }(jQuery));
 
-/*global angular */
+/*global angular, define, require */
 
 /** @module Moment
 @icon clock-o
@@ -5880,30 +5282,41 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
 @description The moment module allows you to use the [moment](http://momentjs.com/) library.
 */
 
-(function (window) {
+(function () {
     'use strict';
 
-    function defineModule(moment) {
-        angular.module('sky.moment', [])
-            .constant('bbMoment', moment);
-    }
-    
-    /*istanbul ignore next boilerplate require gunk */
-    if (typeof window.define === 'function' && window.define.amd) {
-        window.define(['moment'], defineModule);
-    } else if (window.module !== undefined && window.module && window.module.exports) {
-        defineModule(window.require('moment'));
-    } else {
-        defineModule(window.moment);
+    function bbMoment($window) {
+        return $window.moment;
     }
 
-}(this));
+    bbMoment.$inject = ['$window'];
+
+    /*istanbul ignore next boilerplate require gunk */
+    function runRegisterMoment($window) {
+
+        function registerMoment(moment) {
+            $window.moment = moment;
+        }
+
+        if (angular.isUndefined($window.moment) && typeof define === 'function' && define.amd) {
+            require(['moment'], registerMoment);
+        }
+    }
+
+    runRegisterMoment.$inject = ['$window'];
+
+    angular.module('sky.moment', [])
+        .run(runRegisterMoment)
+        .factory('bbMoment', bbMoment);
+
+}());
+
 /*global angular, jQuery */
 
 /** @module Navbar
 @icon compass
 @summary The navbar creates a Bootstrap `nav` element and applies Sky UX classes to it.
- @description The navbar directive creates a Bootstrap `nav` element with the appropriate Sky UX classes applied to it and its children, and also adds behavior such as showing sub-navigation items when the user hovers over the dropdown.
+ @description The navbar directive creates a Bootstrap `nav` element with the appropriate Sky UX classes applied to it and its children, and also adds behavior such as showing sub-navigation items when the user hovers over the dropdown. If you do not wish to use the omnibar for collapsing the navbar into a mobile menu on small screens, then place the `bb-navbar-showmobile` class on the `bb-navbar` directive.
  */
 
 (function ($) {
@@ -5949,7 +5362,7 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
             serviceName: 'Sky',
             signOutUrl: '',
             tenantId: '',
-            url: '//signin.blackbaud.com/omnibar.js'
+            url: 'https://signin.blackbaud.com/omnibar.min.js'
         })
         .directive('bbOmnibar', ['$window', 'bbOmnibarConfig', function ($window, bbOmnibarConfig) {
             return {
@@ -6006,7 +5419,7 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
                         });
 
                         scope.$apply();
-                        
+
                         if (angular.isFunction(bbOmnibarConfig.afterLoad)) {
                             /* jshint validthis: true */
                             bbOmnibarConfig.afterLoad.apply(this, arguments);
@@ -6014,6 +5427,8 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
                     }
 
                     function userLoaded(userData) {
+                        var omnibarIndicatesNullUserTime;
+
                         //If the user ID loaded in the omnibar does not match the user who loaded the page, sign the
                         //user out of the application.  This will result in a redirect back to the auth size to update
                         //the user's claims or ask the user to log back in.
@@ -6033,7 +5448,8 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
                                 //is signed out.  The page is still secure because the Auth claims are evaluated on the server.
                                 //This special case is just about dealing with an edge case issue with client side javascript.
                                 if ($window.localStorage) {
-                                    var omnibarIndicatesNullUserTime = $window.localStorage.omnibarIndicatesNullUserTime;
+                                    omnibarIndicatesNullUserTime = $window.localStorage.omnibarIndicatesNullUserTime;
+                                    
                                     if (omnibarIndicatesNullUserTime && (new Date() - Date.parse(omnibarIndicatesNullUserTime)) / 1000 <= 10) {
                                         // We just looped through Auth within the last 10 seconds, so don't leave again now.
                                         return;
@@ -6055,7 +5471,7 @@ In addition to the `bbModal` service for lauching modals, a `bb-modal` directive
                             // Log out and redirect to auth service.
                             $window.location.href = bbOmnibarConfig.signOutUrl;
                         }
-                        
+
                         if (angular.isFunction(bbOmnibarConfig.userLoaded)) {
                             /* jshint validthis: true */
                             bbOmnibarConfig.userLoaded.apply(this, arguments);
@@ -6955,7 +6371,7 @@ The search field can be used for a local search (i.e. dropdown box where you hav
                 }
             };
         }])
-        .directive('uiSelectChoices', ['bbResources', function (bbResources) {
+        .directive('uiSelectChoices', ['$templateCache', 'bbResources', function ($templateCache, bbResources) {
             return {
                 restrict: 'EA',
                 replace: false,
@@ -6978,7 +6394,10 @@ The search field can be used for a local search (i.e. dropdown box where you hav
                             // Display the "Searching..." or "No results..." message - only when we have empty results because we
                             //don't want the message to popup over a list of results as the user types.
                             msg = showSearchingMsg ? bbResources.searchfield_searching : bbResources.searchfield_no_records;
-                            msgEl = angular.element('<ul class="ui-select-choices ui-select-choices-content dropdown-menu"><li class="bb-searchfield-no-records">' + msg + '</li></ul>');
+
+                            msgEl = angular.element($templateCache.get('sky/templates/searchfield/choices.html'));
+                            msgEl.find('.bb-searchfield-no-records').text(msg);
+
                             selectContainerEl.append(msgEl);
                         }
                     }
@@ -7052,7 +6471,6 @@ The `bb-tab-scroll` directive causes the row of tabs to be horizontally scrollab
     'use strict';
 
     var tabScrollId = 0;
-
     angular.module('sky.tabscroll', ['ui.bootstrap.tabs'])
         .directive('bbTabScroll', ['$timeout', '$window', function ($timeout, $window) {
             return {
@@ -7204,7 +6622,7 @@ The `bb-tab-scroll` directive causes the row of tabs to be horizontally scrollab
 }(jQuery));
 
 /*jslint nomen: true, plusplus: true */
-/*global angular */
+/*global angular, jQuery */
 
 /** @module Tabset
 @icon folder-open-o
@@ -7227,22 +6645,29 @@ You must then use the `bb-tab-collapse-header` attribute on your ui-bootstrap `t
 If you wish to add a close icon to a tab, just add the `bb-tab-close` class to the ui-bootstrap `tab` element, and add an `i` element with the `bb-tab-close-icon` class inside of the ui-bootstrap `tab-heading` directive.
 
  */
-(function () {
+(function ($) {
     'use strict';
 
-    function Tabset($compile) {
+    var DROPDOWN_CARET_WIDTH = 45,
+        TAB_PADDING = 15;
+
+    function getTemplate($templateCache, name) {
+        return $templateCache.get('sky/templates/tabset/' + name + '.html');
+    }
+
+    function tabset($compile, $templateCache) {
         return {
             link: function ($scope, el, attr) {
                 var ulEl,
                     liEl;
+
                 if (angular.isDefined(attr.bbTabsetAdd) || angular.isDefined(attr.bbTabsetOpen)) {
                     ulEl = el.find('ul');
-                    liEl = angular.element('<li class="bb-tab-button"></li>');
+                    liEl = angular.element(getTemplate($templateCache, 'tabbutton'));
                     ulEl.append(liEl);
 
                     if (angular.isDefined(attr.bbTabsetAdd)) {
-
-                        liEl.append($compile('<button ng-click="bbTabAdd()" type="button" class="bb-tab-button-wrap btn bb-tab-button-add bb-btn-secondary"><span class="btn bb-btn-secondary"><i class="fa fa-lg fa-plus-circle"></i></span></button>')($scope));
+                        liEl.append($compile(getTemplate($templateCache, 'addbutton'))($scope));
 
                         $scope.bbTabAdd = function () {
                             $scope.$eval(attr.bbTabsetAdd);
@@ -7250,7 +6675,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                     }
 
                     if (angular.isDefined(attr.bbTabsetOpen)) {
-                        liEl.append($compile('<button ng-click="bbTabOpen()" type="button" class="bb-tab-button-wrap bb-tab-button-open btn bb-btn-secondary"><span class="btn bb-btn-secondary"><i class="fa fa-lg fa-folder-open-o"></i></span></button>')($scope));
+                        liEl.append($compile(getTemplate($templateCache, 'openbutton'))($scope));
 
                         $scope.bbTabOpen = function () {
                             $scope.$eval(attr.bbTabsetOpen);
@@ -7261,7 +6686,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
         };
     }
 
-    Tabset.$inject = ['$compile'];
+    tabset.$inject = ['$compile', '$templateCache'];
 
     function BBTabsetCollapsibleController($scope) {
         var self = this;
@@ -7271,21 +6696,28 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
         };
 
         self.tabAdded = function () {
-            if ($scope.bbTabsetOptions.tabsCollapsed) {
-                $scope.setupCollapsibleTabs($scope.bbTabsetOptions.tabsCollapsed);
+            if ($scope.bbTabsetOptions.isSmallScreen) {
+                $scope.setupCollapsibleTabs($scope.bbTabsetOptions.isSmallScreen && $scope.bbTabsetOptions.tabCount > 1);
             }
+            $scope.bbTabsetOptions.tabCount++;
+        };
+
+        self.tabRemoved = function () {
+            $scope.bbTabsetOptions.tabCount--;
         };
 
     }
 
     BBTabsetCollapsibleController.$inject = ['$scope'];
 
-    function BBTabsetCollapsible($compile, bbMediaBreakpoints) {
+    function bbTabsetCollapsible($compile, $templateCache, $window, bbMediaBreakpoints) {
         return {
             restrict: 'A',
             require: 'tabset',
-            controller: 'bbTabsetCollapsibleController',
+            controller: BBTabsetCollapsibleController,
             link: function ($scope, el) {
+                var lastWindowWidth,
+                    tabCollapseId = $scope.$id;
 
 
                 function getBootstrapTabs() {
@@ -7293,10 +6725,38 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                 }
 
                 function getDropdownEl() {
-                    return angular.element('<div class="bb-tabset-dropdown nav nav-tabs" dropdown ng-show="bbTabsetOptions.tabsCollapsed"><button type="button" class="btn btn-primary bb-tab-dropdown-button" dropdown-toggle>{{bbTabsetOptions.selectedTabHeader}}<i class="fa fa-caret-down"></i></button></div>');
+                    return angular.element(getTemplate($templateCache, 'dropdown'));
                 }
 
-                function setupCollapsibleTabs(isSmallScreen) {
+                function setTabMaxWidth() {
+                    //later this will resize tabs to fit the window
+                    el.find('ul.nav-tabs li a').css('max-width', '');
+                }
+
+                function setDropdownMaxWidth() {
+                    var availableWidth,
+                        addOpenWidth = 0,
+                        addOpenButtonEl,
+                        i,
+                        dropdownTextMaxWidth;
+
+                    availableWidth = el.width();
+
+                    addOpenButtonEl = el.find('.bb-tab-button-wrap');
+
+                    for (i = 0; i < addOpenButtonEl.length; i++) {
+                        addOpenWidth += addOpenButtonEl.eq(i).width();
+                    }
+
+                    dropdownTextMaxWidth = availableWidth - addOpenWidth - DROPDOWN_CARET_WIDTH - TAB_PADDING;
+
+                    el.find('.bb-tab-header-text').css('max-width', (dropdownTextMaxWidth.toString() + 'px'));
+
+                    el.find('.bb-tabset-dropdown ul.dropdown-menu li a').css('max-width', (availableWidth.toString() + 'px'));
+
+                }
+
+                function setupCollapsibleTabs(isCollapsed) {
                     var tabsEl,
                         dropdownContainerEl,
                         ulEl,
@@ -7306,7 +6766,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                     dropdownButtonsEl = el.find('.bb-tab-button-wrap');
 
                     ulEl = el.find('ul:not(.bb-tabset-dropdown)');
-                    if (isSmallScreen) {
+                    if (isCollapsed) {
                         dropdownContainerEl = el.find('.bb-tabset-dropdown');
 
                         ulEl.addClass('dropdown-menu');
@@ -7314,6 +6774,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                         ulEl.removeClass('nav-tabs');
                         dropdownContainerEl.append(ulEl);
                         dropdownContainerEl.append(dropdownButtonsEl);
+                        setDropdownMaxWidth();
                     } else {
                         ulEl.removeClass('dropdown-menu');
                         ulEl.addClass('nav');
@@ -7322,32 +6783,57 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                         el.prepend(ulEl);
 
                         ulEl.find('.bb-tab-button').append(dropdownButtonsEl);
+                        setTabMaxWidth();
                     }
                 }
 
                 $scope.setupCollapsibleTabs = setupCollapsibleTabs;
 
                 function mediaBreakpointHandler(newBreakpoints) {
-                    $scope.bbTabsetOptions.tabsCollapsed = newBreakpoints.xs;
-                    setupCollapsibleTabs(newBreakpoints.xs);
+                    $scope.bbTabsetOptions.isSmallScreen = newBreakpoints.xs;
+                    setupCollapsibleTabs(newBreakpoints.xs && ($scope.bbTabsetOptions.tabCount > 1));
                 }
 
                 $scope.bbTabsetOptions = {
-                    tabsCollapsed: false
+                    isSmallScreen: false,
+                    tabCount: 0
                 };
+
                 el.prepend($compile(getDropdownEl())($scope));
+
+                $scope.$watch('bbTabsetOptions.tabCount', function (newValue) {
+                    if ($scope.bbTabsetOptions.isSmallScreen) {
+                        if (newValue && newValue > 1) {
+                            setupCollapsibleTabs(true);
+                        } else {
+                            setupCollapsibleTabs(false);
+                        }
+                    }
+
+                });
 
                 bbMediaBreakpoints.register(mediaBreakpointHandler);
 
-                $scope.$on('$destroy', function () {
-                    bbMediaBreakpoints.unregister(mediaBreakpointHandler);
+                // Show initial scroll animation whenever the window width changes.
+                $($window).on('resize.tabcollapse' + tabCollapseId, function () {
+                    var windowWidth = $($window).width();
+
+                    if (lastWindowWidth !== windowWidth && $scope.bbTabsetOptions.isSmallScreen && $scope.bbTabsetOptions.tabCount > 1) {
+                        setDropdownMaxWidth();
+                    }
+
+                    lastWindowWidth = windowWidth;
                 });
 
+                $scope.$on('$destroy', function () {
+                    bbMediaBreakpoints.unregister(mediaBreakpointHandler);
+                    $($window).off('.tabcollapse' + tabCollapseId);
+                });
             }
         };
     }
 
-    BBTabsetCollapsible.$inject = ['$compile', 'bbMediaBreakpoints'];
+    bbTabsetCollapsible.$inject = ['$compile', '$templateCache', '$window', 'bbMediaBreakpoints'];
 
     function collapsibleTabTitle($scope, el, bbTabsetCollapsibleCtrl, getTabHeading) {
         //get ui-bootstrap tab scope
@@ -7369,10 +6855,14 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
         });
 
         bbTabsetCollapsibleCtrl.tabAdded();
+
+        $scope.$on('$destroy', function () {
+            bbTabsetCollapsibleCtrl.tabRemoved();
+        });
     }
 
 
-    function BBTabCollapseHeader() {
+    function bbTabCollapseHeader() {
         return {
             require: '^bbTabsetCollapsible',
             link: function ($scope, el, attr, bbTabsetCollapsibleCtrl) {
@@ -7385,7 +6875,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
         };
     }
 
-    function Tab() {
+    function tab() {
         return {
             require: '?^bbTabsetCollapsible',
             link: function ($scope, el, attr, bbTabsetCollapsibleCtrl) {
@@ -7403,12 +6893,11 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
     }
 
     angular.module('sky.tabset', ['ui.bootstrap.tabs', 'sky.mediabreakpoints'])
-        .controller('bbTabsetCollapsibleController', BBTabsetCollapsibleController)
-        .directive('tabset', Tabset)
-        .directive('bbTabsetCollapsible', BBTabsetCollapsible)
-        .directive('bbTabCollapseHeader', BBTabCollapseHeader)
-        .directive('tab', Tab);
-}());
+        .directive('tabset', tabset)
+        .directive('bbTabsetCollapsible', bbTabsetCollapsible)
+        .directive('bbTabCollapseHeader', bbTabCollapseHeader)
+        .directive('tab', tab);
+}(jQuery));
 
 /*global angular */
 
@@ -7440,8 +6929,8 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                         sref = attrs.bbTabSref,
                         stateChangeDeregistration,
                         tabsetCtrl = controllers[0];
-                    
-                    
+
+
                     function checkCurrentState() {
                         if ($state.is(sref)) {
                             tabsetCtrl.select(el.isolateScope());
@@ -7467,7 +6956,7 @@ If you wish to add a close icon to a tab, just add the `bb-tab-close` class to t
                                 });
                             }
                         });
-                        
+
                         scope.$on('$destroy', function () {
                             stateChangeDeregistration();
                         });
@@ -7615,8 +7104,12 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
         return 0;
     }
 
+    function createEl($templateCache, templateName) {
+        return angular.element($templateCache.get('sky/templates/textexpand/' + templateName + '.html'));
+    }
+
     angular.module('sky.textexpand', modules)
-        .directive('bbTextExpandRepeater', ['bbResources', function (bbResources) {
+        .directive('bbTextExpandRepeater', ['$templateCache', 'bbResources', function ($templateCache, bbResources) {
             function link(scope, el, attrs) {
                 scope.$watch(attrs.bbTextExpandRepeaterData, function (data) {
                     var length,
@@ -7628,7 +7121,7 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
                     if (data) {
                         length = data.length;
                         maxToShow = +attrs.bbTextExpandRepeaterMax;
-                        seeMoreEl = angular.element('<a class="bb-text-expand-see-more">' + seeMoreText + '</a>');
+                        seeMoreEl = createEl($templateCache, 'seemore').text(seeMoreText);
 
                         if (length > maxToShow) {
                             el.find('li:gt(' + (maxToShow - 1) + ')').addClass('bb-text-expand-toggle-li').hide().end().append(
@@ -7641,6 +7134,8 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
                                     }
 
                                     seeMoreEl.toggleClass('bb-text-expand-see-more');
+
+                                    return false;
                                 })
                             );
                         }
@@ -7652,7 +7147,7 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
                 link: link
             };
         }])
-        .directive('bbTextExpand', ['bbResources', 'bbScrollIntoView', function (bbResources, bbScrollIntoView) {
+        .directive('bbTextExpand', ['$templateCache', 'bbResources', 'bbScrollIntoView', function ($templateCache, bbResources, bbScrollIntoView) {
             function link(scope, el, attrs) {
                 var isExpanded,
                     maxLength = +attrs.bbTextExpandMaxLength || 200,
@@ -7724,7 +7219,7 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
                             );
                     }
 
-                    containerEl = angular.element('<div></div>');
+                    containerEl = createEl($templateCache, 'container');
 
                     /* istanbul ignore else: nothing happens when there's no value, so there's nothing to test. */
                     if (newValue) {
@@ -7734,15 +7229,10 @@ The Text Expand Repeater directive truncates a list of repeater items and will i
                         if (collapsedText !== newValue) {
                             isExpanded = true;
 
-                            textEl = angular.element('<span class="bb-text-expand-text"></span>');
-                            textEl.text(collapsedText);
-
-                            ellipsisEl = angular.element('<span class="bb-text-expand-ellipsis">...</span>');
-
-                            spaceEl = angular.element('<span class="bb-text-expand-space"> </span>');
-
-                            expandEl = angular.element('<a href="#" class="bb-text-expand-see-more"></a>');
-                            expandEl.text(bbResources.text_expand_see_more);
+                            textEl = createEl($templateCache, 'text').text(collapsedText);
+                            ellipsisEl = createEl($templateCache, 'ellipsis');
+                            spaceEl = createEl($templateCache, 'space');
+                            expandEl = createEl($templateCache, 'seemore').text(bbResources.text_expand_see_more);
 
                             containerEl
                                 .empty()
@@ -9538,7 +9028,6 @@ The `bbWizardNavigator` also exposes the following methods:
         'sky.actionbar',
         'sky.autofocus',
         'sky.autonumeric',
-        'sky.charts',
         'sky.check',
         'sky.checklist',
         'sky.contextmenu',
@@ -9549,7 +9038,6 @@ The `bbWizardNavigator` also exposes the following methods:
         'sky.grids',
         'sky.help',
         'sky.helpbutton',
-        'sky.helpwidget',
         'sky.highlight',
         'sky.mediabreakpoints',
         'sky.modal',
@@ -9761,6 +9249,12 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '    </div>\n' +
         '    <div class="bb-chart"></div>\n' +
         '</div>');
+    $templateCache.put('sky/templates/check/styled.html',
+        '<span></span>\n' +
+        '');
+    $templateCache.put('sky/templates/check/wrapper.html',
+        '<label class="bb-check-wrapper"></label>\n' +
+        '');
     $templateCache.put('sky/templates/checklist/checklist.html',
         '<div>\n' +
         '    <div>\n' +
@@ -9785,7 +9279,7 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '        <div ng-switch-when="list" data-bbauto-repeater="ChecklistItems" data-bbauto-repeater-count="{{locals.filteredItems.length}}">\n' +
         '            <label class="bb-checklist-list-row" ng-repeat="item in locals.filteredItems" data-bbauto-field="{{item.name}}">\n' +
         '                <div class="bb-checklist-list-col bb-checklist-list-col-checkbox">\n' +
-        '                    <input \n' +
+        '                    <input\n' +
         '                           bb-check\n' +
         '                           type="checkbox"\n' +
         '                           checklist-model="bbChecklistSelectedItems"\n' +
@@ -9808,7 +9302,7 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '            <tbody bb-highlight="locals.searchText" bb-highlight-beacon="locals.highlightRefresh" data-bbauto-repeater="ChecklistItems" data-bbauto-repeater-count="{{locals.filteredItems.length}}">\n' +
         '                <tr ng-repeat="item in locals.filteredItems" ng-click="locals.rowClicked(item);" class="bb-checklist-row">\n' +
         '                    <td>\n' +
-        '                        <input bb-check type="checkbox" checklist-model="bbChecklistSelectedItems" checklist-value="item" ng-click="$event.stopPropagation();" data-bbauto-field="{{item[bbChecklistAutomationField]}}" />\n' +
+        '                        <input bb-check type="checkbox" checklist-model="bbChecklistSelectedItems" checklist-value="item" data-bbauto-field="{{item[bbChecklistAutomationField]}}" />\n' +
         '                    </td>\n' +
         '                    <td ng-repeat="column in locals.columns" class="{{column.class}}" data-bbauto-field="{{column.automationId}}" data-bbauto-index="{{$parent.$index}}">{{item[column.field]}}</td>\n' +
         '                </tr>\n' +
@@ -9817,14 +9311,22 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '        <div class="bb-checklist-no-items" ng-if="!locals.filteredItems.length">{{bbChecklistNoItemsMessage || (\'checklist_no_items\' | bbResources)}}</div>\n' +
         '    </div>\n' +
         '    <div ng-transclude></div>\n' +
-        '</div>');
+        '</div>\n' +
+        '');
     $templateCache.put('sky/templates/contextmenu/contextmenu.html',
         '<div class="bb-context-menu" data-bbauto-field="ContextMenuActions" dropdown>\n' +
-        '    <bb-context-menu-button data-bbauto-field="ContextMenuAnchor" dropdown-toggle></bb-context-menu-button>\n' +
+        '    <bb-context-menu-button data-bbauto-field="ContextMenuAnchor" ng-click="contextButtonStopPropagation($event)" dropdown-toggle></bb-context-menu-button>\n' +
         '    <ul class="dropdown-menu" role="menu">\n' +
         '        <ng-transclude/>\n' +
         '    </ul>\n' +
-        '</div>');
+        '</div>\n' +
+        '');
+    $templateCache.put('sky/templates/contextmenu/menubutton.html',
+        '<button type="button" class="btn bb-btn-secondary bb-context-menu-btn"><i class="fa fa-ellipsis-h"></i></button>\n' +
+        '');
+    $templateCache.put('sky/templates/contextmenu/menuitem.html',
+        '<li role="presentation"><a role="menuitem" href="javascript:void(0)" ng-click="clickItem()"><ng-transclude/></a></li>\n' +
+        '');
     $templateCache.put('sky/templates/contextmenu/submenu.html',
         '<div class="bb-submenu">\n' +
         '    <accordion>\n' +
@@ -9879,9 +9381,9 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
     $templateCache.put('sky/templates/fileattachments/filedrop.html',
         '<div class="row bb-file-drop-row">\n' +
         '    <div class="col-xs-12 bb-file-drop-col" ng-class="{\'col-sm-6\': bbFileDrop.allowLinks}">\n' +
-        '        <div \n' +
-        '             class="bb-file-drop"\n' +
-        '             ngf-drop \n' +
+        '        <div\n' +
+        '             class="bb-file-drop bb-file-drop-target"\n' +
+        '             ngf-drop\n' +
         '             ngf-keep="false"\n' +
         '             ngf-drag-over-class="{accept: \'bb-file-drop-accept\', reject: \'bb-file-drop-reject\'}"\n' +
         '             ngf-change="bbFileDrop.fileChange($files, $event, $rejectedFiles)"\n' +
@@ -9909,9 +9411,9 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '            <div class="bb-file-drop-link">\n' +
         '                <h4 class="bb-file-drop-link-header">{{\'file_upload_paste_link\' | bbResources}}</h4>\n' +
         '                <div class="form-group">\n' +
-        '                    <input \n' +
-        '                           type="text" \n' +
-        '                           class="form-control" \n' +
+        '                    <input\n' +
+        '                           type="text"\n' +
+        '                           class="form-control"\n' +
         '                           placeholder="{{\'file_upload_link_placeholder\' | bbResources}}"\n' +
         '                           ng-model="bbFileDrop.url"\n' +
         '                           ng-keypress="$event.keyCode === 13 && bbFileDrop.addLink()"\n' +
@@ -9923,7 +9425,8 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '            </div>\n' +
         '        </div>\n' +
         '    </div>\n' +
-        '</div>');
+        '</div>\n' +
+        '');
     $templateCache.put('sky/templates/fileattachments/fileitem.html',
         '<div class="bb-file-item">\n' +
         '    <div class="row bb-file-item-title">\n' +
@@ -10046,7 +9549,7 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '    </div>\n' +
         '    <div class="bb-applied-filter-content" ng-click="openFilterMenu()">\n' +
         '        <span class="bb-applied-filter-text" data-bbauto-field="FilterSummaryText" ng-transclude></span>\n' +
-        '        <span class="sky-icon-close bb-applied-filter-remove" data-bbauto-field="FilterSummaryRemove" ng-click="clearFilters(); $event.stopPropagation();"></span>\n' +
+        '        <span class="fa fa-times close" data-bbauto-field="FilterSummaryRemove" ng-click="clearFilters(); $event.stopPropagation();"></span>\n' +
         '    </div>\n' +
         '</div>\n' +
         '');
@@ -10075,6 +9578,7 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '    <div class="table-responsive">\n' +
         '\n' +
         '        <table id="{{locals.gridId}}" class="bb-grid-table" bb-wait="options.loading" ng-class="{\'grid-multiselect\' : locals.multiselect}"></table>\n' +
+        '        <div class="bb-grid-empty-wait" ng-if="locals.hasWaitAndEmpty()" bb-wait="locals.hasWaitAndEmpty()"></div>\n' +
         '    </div>\n' +
         '\n' +
         '    <div ng-if="!paginationOptions" class="bb-table-loadmore" data-bbauto-field="LoadMoreButton" ng-show="options.hasMoreRows" ng-click="locals.loadMore()">\n' +
@@ -10191,26 +9695,62 @@ angular.module('sky.templates', []).run(['$templateCache', function($templateCac
         '    <div class="popover-content"></div>\n' +
         '  </div>\n' +
         '</div>');
+    $templateCache.put('sky/templates/searchfield/choices.html',
+        '<ul class="ui-select-choices ui-select-choices-content dropdown-menu">\n' +
+        '  <li class="bb-searchfield-no-records"></li>\n' +
+        '</ul>\n' +
+        '');
     $templateCache.put('sky/templates/tabs/tab.html',
         '<div ng-hide="!tabsInitialized" data-bbauto-field="{{bbTabAutomationId}}" class="responsiveTabControl">\n' +
         '    <ul ng-transclude>\n' +
         '\n' +
         '    </ul>\n' +
         '</div>');
+    $templateCache.put('sky/templates/tabset/addbutton.html',
+        '<button ng-click="bbTabAdd()" type="button" class="bb-tab-button-wrap btn bb-tab-button-add bb-btn-secondary">\n' +
+        '  <span class="btn bb-btn-secondary"><i class="fa fa-lg fa-plus-circle"></i></span>\n' +
+        '</button>\n' +
+        '');
+    $templateCache.put('sky/templates/tabset/dropdown.html',
+        '<div class="bb-tabset-dropdown nav nav-tabs" dropdown ng-show="bbTabsetOptions.isSmallScreen &amp;&amp; bbTabsetOptions.tabCount > 1">\n' +
+        '  <button type="button" class="btn btn-primary bb-tab-dropdown-button" dropdown-toggle><div class="bb-tab-header-text">{{bbTabsetOptions.selectedTabHeader}}</div><i class="fa fa-caret-down"></i></button>\n' +
+        '</div>\n' +
+        '');
+    $templateCache.put('sky/templates/tabset/openbutton.html',
+        '<button ng-click="bbTabOpen()" type="button" class="bb-tab-button-wrap bb-tab-button-open btn bb-btn-secondary">\n' +
+        '  <span class="btn bb-btn-secondary"><i class="fa fa-lg fa-folder-open-o"></i></span>\n' +
+        '</button>\n' +
+        '');
+    $templateCache.put('sky/templates/tabset/tabbutton.html',
+        '<li class="bb-tab-button"></li>\n' +
+        '');
+    $templateCache.put('sky/templates/textexpand/container.html',
+        '<div></div>\n' +
+        '');
+    $templateCache.put('sky/templates/textexpand/ellipsis.html',
+        '<span class="bb-text-expand-ellipsis">...</span>\n' +
+        '');
+    $templateCache.put('sky/templates/textexpand/seemore.html',
+        '<a href="#" class="bb-text-expand-see-more"></a>\n' +
+        '');
+    $templateCache.put('sky/templates/textexpand/space.html',
+        '<span class="bb-text-expand-space"> </span>\n' +
+        '');
+    $templateCache.put('sky/templates/textexpand/text.html',
+        '<span class="bb-text-expand-text"></span>\n' +
+        '');
     $templateCache.put('sky/templates/tiles/tile.html',
         '<section ng-class="isCollapsed ? \'collapsed\' : \'collapsible\'" class="bb-tile">\n' +
         '    <div bb-scroll-into-view="scrollIntoView">\n' +
         '        <div class="bb-tile-title" ng-click="titleClick()">\n' +
-        '            <div class="row">\n' +
-        '                <div class="bb-tile-header-with-content col-xs-8 col-sm-9">\n' +
-        '                    <h2 class="bb-tile-header">{{tileHeader}}</h2>\n' +
-        '                </div>\n' +
-        '                <div class="col-xs-4 col-sm-3 bb-tile-header-column-tools">\n' +
-        '                    <div class="bb-tile-tools">\n' +
-        '                        <i ng-class="\'fa-chevron-\' + (isCollapsed ? \'down\' : \'up\')" class="fa bb-tile-chevron"></i>\n' +
-        '                        <i ng-if="hasSettings" class="bb-tile-settings fa fa-wrench" ng-click="$event.stopPropagation();bbTileSettingsClick();"></i>\n' +
-        '                        <i class="bb-tile-grab-handle glyphicon glyphicon-th" ng-click="$event.stopPropagation()"></i>\n' +
-        '                    </div>\n' +
+        '            <div class="bb-tile-header-with-content">\n' +
+        '                <h2 class="bb-tile-header">{{tileHeader}}</h2>\n' +
+        '            </div>\n' +
+        '            <div class="bb-tile-header-column-tools">\n' +
+        '                <div class="bb-tile-tools">\n' +
+        '                    <i ng-class="\'fa-chevron-\' + (isCollapsed ? \'down\' : \'up\')" class="fa bb-tile-chevron"></i>\n' +
+        '                    <i ng-if="hasSettings" class="bb-tile-settings fa fa-wrench" ng-click="$event.stopPropagation();bbTileSettingsClick();"></i>\n' +
+        '                    <i class="bb-tile-grab-handle glyphicon glyphicon-th" ng-click="$event.stopPropagation()"></i>\n' +
         '                </div>\n' +
         '            </div>\n' +
         '        </div>\n' +

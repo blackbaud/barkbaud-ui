@@ -197,3 +197,4 @@ demo/sky.js*
 demo/sky.min*
 bower_components
 node_modules
+typings
