@@ -128,7 +128,7 @@ module.exports = function (grunt) {
                 tasks: ['copy:html']
             },
             templates: {
-                files: ['src/components/**/*.html', 'src/pages/**/*.html'],
+                files: ['src/**/*.html'],
                 tasks: ['html2js', 'compileappscripts']
             }
         },
