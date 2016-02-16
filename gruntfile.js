@@ -57,21 +57,8 @@ module.exports = function (grunt) {
             }
         },
         copy: {
-            css: {
-                files: [{
-                    expand: true,
-                    src: ['**/*.*'],
-                    cwd: 'bower_components/blackbaud-skyux/dist/css',
-                    dest: '<%= buildPath %>/css/sky'
-                }]
-            },
             js: {
                 files: [{
-                    expand: true,
-                    src: ['**/*.*'],
-                    cwd: 'bower_components/blackbaud-skyux/dist/js',
-                    dest: '<%= buildPath %>/js/sky'
-                }, {
                     expand: true,
                     src: ['**/*.*'],
                     cwd: 'node_modules/angular2/bundles',
@@ -134,7 +121,7 @@ module.exports = function (grunt) {
         },
         skylint: {
             options: {
-                linterUrl: 'http://localhost:8080/build/js/blackbaud-skyux/skylint.min.js'
+                linterUrl: 'https://sky.blackbaudcdn.net/skyux/1.4.2/js/skylint.min.js'
             },
             files: ['src/**/*.html']
         }
