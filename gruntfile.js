@@ -57,19 +57,6 @@ module.exports = function (grunt) {
             }
         },
         copy: {
-            js: {
-                files: [{
-                    expand: true,
-                    src: ['**/*.*'],
-                    cwd: 'node_modules/angular2/bundles',
-                    dest: '<%= buildPath %>/js/angular2'
-                }, {
-                    expand: true,
-                    src: ['**/*.*'],
-                    cwd: 'node_modules/rxjs/bundles',
-                    dest: '<%= buildPath %>/js/rxjs'
-                }]
-            },
             html: {
                 files: [{
                     expand: true,

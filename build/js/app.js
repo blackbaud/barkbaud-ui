@@ -483,7 +483,8 @@ angular.module('md5', []).constant('md5', (function() {
 
 }).call(this);
 
-/*globals angular */
+/*jshint browser: true */
+/*globals angular, ng */
 
 (function () {
     'use strict';
@@ -559,6 +560,10 @@ angular.module('md5', []).constant('md5', (function() {
         .config(config)
         .run(run)
         .controller('MainController', MainController);
+
+    document.addEventListener("DOMContentLoaded", function () {
+        (new ng.upgrade.UpgradeAdapter()).bootstrap(document.documentElement, ['barkbaud']);
+    });
 }());
 
 /*global angular */
@@ -669,18 +674,25 @@ angular.module('md5', []).constant('md5', (function() {
                 barkPhotoUrl: '=',
                 barkPhotoGravatarEmail: '='
             },
-            link: function (scope, el) {
+            bindToController: true,
+            controller: angular.noop,
+            controllerAs: 'barkPhoto',
+            link: function (scope, el, attr, barkPhoto) {
                 function setImageUrl(url) {
                     el.css('background-image', 'url(\'' + url + '\')');
                 }
 
-                scope.$watch('barkPhotoUrl', function (newValue) {
+                scope.$watch(function () {
+                    return barkPhoto.barkPhotoUrl;
+                }, function (newValue) {
                     if (newValue) {
                         setImageUrl(newValue.replace('http://', '//'));
                     }
                 });
 
-                scope.$watch('barkPhotoGravatarEmail', function (newValue) {
+                scope.$watch(function () {
+                    return barkPhoto.barkPhotoGravatarEmail;
+                }, function (newValue) {
                     if (newValue) {
                         setImageUrl(gravatarService.url(newValue, {default: 'mm'}));
                     }
@@ -706,12 +718,21 @@ angular.module('md5', []).constant('md5', (function() {
         $stateProvider
             .state('dashboard', {
                 controller: 'DashboardPageController as dashboardPage',
-                templateUrl: 'dashboard/dashboard-page.html',
+                templateUrl: 'dashboard/dashboardpage.html',
                 url: '/dashboard'
             });
     }
 
     dashboardPageConfig.$inject = ['$stateProvider'];
+
+    angular.module('barkbaud')
+        .config(dashboardPageConfig);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
 
     function DashboardPageController($scope, $stateParams, bbData, bbWindow) {
         var self = this;
@@ -736,7 +757,6 @@ angular.module('md5', []).constant('md5', (function() {
     ];
 
     angular.module('barkbaud')
-        .config(dashboardPageConfig)
         .controller('DashboardPageController', DashboardPageController);
 }());
 
@@ -831,6 +851,15 @@ angular.module('md5', []).constant('md5', (function() {
         'bbData',
         'dogId'
     ];
+    
+    angular.module('barkbaud')
+        .controller('FindHomeController', FindHomeController);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
 
     function barkFindHome(bbModal) {
         return {
@@ -851,7 +880,6 @@ angular.module('md5', []).constant('md5', (function() {
     barkFindHome.$inject = ['bbModal'];
 
     angular.module('barkbaud')
-        .controller('FindHomeController', FindHomeController)
         .factory('barkFindHome', barkFindHome);
 }());
 
@@ -893,6 +921,15 @@ angular.module('md5', []).constant('md5', (function() {
     }
 
     dogPageConfig.$inject = ['$stateProvider'];
+
+    angular.module('barkbaud')
+        .config(dogPageConfig);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
 
     function DogPageController($scope, $stateParams, bbData, bbWindow, dogId) {
         var self = this;
@@ -952,7 +989,6 @@ angular.module('md5', []).constant('md5', (function() {
     ];
 
     angular.module('barkbaud')
-        .config(dogPageConfig)
         .controller('DogPageController', DogPageController);
 }());
 
@@ -1106,6 +1142,7 @@ angular.module('md5', []).constant('md5', (function() {
         .controller('DogPreviousHomesTileController', DogPreviousHomesTileController);
 }());
 
+
 /*global angular */
 
 (function () {
@@ -1178,7 +1215,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<div class="bark-photo img-circle center-block">\n' +
         '</div>\n' +
         '');
-    $templateCache.put('dashboard/dashboard-page.html',
+    $templateCache.put('dashboard/dashboardpage.html',
         '<div class="container-fluid">\n' +
         '  <h1>Dashboard</h1>\n' +
         '  <section class="panel" ng-repeat="dog in dashboardPage.dogs">\n' +
@@ -1401,12 +1438,12 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('index.html',
         '<!DOCTYPE html>\n' +
-        '<html xmlns="http://www.w3.org/1999/xhtml" ng-app="barkbaud">\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
         '\n' +
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +
         '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
-        '  <link rel="stylesheet" type="text/css" href="css/sky/sky-bundle.css" />\n' +
+        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.4.2/css/sky-bundle.css" />\n' +
         '  <link rel="stylesheet" type="text/css" href="css/app.css" />\n' +
         '</head>\n' +
         '\n' +
@@ -1426,8 +1463,18 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </bb-navbar>\n' +
         '  <div ui-view></div>\n' +
-        '  <script src="js/sky/sky-bundle.min.js"></script>\n' +
+        '  <script src="https://sky.blackbaudcdn.net/skyux/1.4.2/js/sky-bundle.min.js"></script>\n' +
         '  <script src="js/app.min.js"></script>\n' +
+        '  <script>\n' +
+        '  (function (angular) {\n' +
+        '      \'use strict\';\n' +
+        '      function config(barkbaudConfig) {\n' +
+        '          barkbaudConfig.apiUrl = \'/\';\n' +
+        '      }\n' +
+        '      config.$inject = [\'barkbaudConfig\'];\n' +
+        '      angular.module(\'barkbaud\').config(config);\n' +
+        '  }(window.angular));\n' +
+        '  </script>\n' +
         '</body>\n' +
         '\n' +
         '</html>\n' +

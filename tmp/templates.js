@@ -231,7 +231,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +
         '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
-        '  <link rel="stylesheet" type="text/css" href="css/sky/sky-bundle.css" />\n' +
+        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.4.2/css/sky-bundle.css" />\n' +
         '  <link rel="stylesheet" type="text/css" href="css/app.css" />\n' +
         '</head>\n' +
         '\n' +
@@ -251,11 +251,18 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </bb-navbar>\n' +
         '  <div ui-view></div>\n' +
-        '  <script src="js/sky/sky-bundle.min.js"></script>\n' +
-        '  <script src="js/rxjs/Rx.umd.js"></script>\n' +
-        '  <script src="js/angular2/angular2-polyfills.min.js"></script>\n' +
-        '  <script src="js/angular2/angular2-all.umd.min.js"></script>\n' +
+        '  <script src="https://sky.blackbaudcdn.net/skyux/1.4.2/js/sky-bundle.min.js"></script>\n' +
         '  <script src="js/app.min.js"></script>\n' +
+        '  <script>\n' +
+        '  (function (angular) {\n' +
+        '      \'use strict\';\n' +
+        '      function config(barkbaudConfig) {\n' +
+        '          barkbaudConfig.apiUrl = \'/\';\n' +
+        '      }\n' +
+        '      config.$inject = [\'barkbaudConfig\'];\n' +
+        '      angular.module(\'barkbaud\').config(config);\n' +
+        '  }(window.angular));\n' +
+        '  </script>\n' +
         '</body>\n' +
         '\n' +
         '</html>\n' +
