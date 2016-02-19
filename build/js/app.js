@@ -560,10 +560,6 @@ angular.module('md5', []).constant('md5', (function() {
         .config(config)
         .run(run)
         .controller('MainController', MainController);
-
-    document.addEventListener("DOMContentLoaded", function () {
-        (new ng.upgrade.UpgradeAdapter()).bootstrap(document.documentElement, ['barkbaud']);
-    });
 }());
 
 /*global angular */
@@ -1438,7 +1434,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('index.html',
         '<!DOCTYPE html>\n' +
-        '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml" ng-app="barkbaud">\n' +
         '\n' +
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +

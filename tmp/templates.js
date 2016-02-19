@@ -226,7 +226,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('index.html',
         '<!DOCTYPE html>\n' +
-        '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml" ng-app="barkbaud">\n' +
         '\n' +
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +
