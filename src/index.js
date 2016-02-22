@@ -75,8 +75,4 @@
         .config(config)
         .run(run)
         .controller('MainController', MainController);
-
-    document.addEventListener("DOMContentLoaded", function () {
-        (new ng.upgrade.UpgradeAdapter()).bootstrap(document.documentElement, ['barkbaud']);
-    });
 }());
