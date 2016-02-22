@@ -1461,18 +1461,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  <div ui-view></div>\n' +
         '  <script src="https://sky.blackbaudcdn.net/skyux/1.4.2/js/sky-bundle.min.js"></script>\n' +
         '  <script src="js/app.min.js"></script>\n' +
-        '  <script>\n' +
-        '  (function (angular) {\n' +
-        '      \'use strict\';\n' +
-        '      function config(barkbaudConfig) {\n' +
-        '          barkbaudConfig.apiUrl = \'/\';\n' +
-        '      }\n' +
-        '      config.$inject = [\'barkbaudConfig\'];\n' +
-        '      angular.module(\'barkbaud\').config(config);\n' +
-        '  }(window.angular));\n' +
-        '  </script>\n' +
         '</body>\n' +
-        '\n' +
         '</html>\n' +
         '');
     $templateCache.put('login/loginpage.html',
