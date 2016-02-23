@@ -7,12 +7,18 @@
         return {
             scope: {
                 barkPhotoUrl: '=',
+                barkPhotoBase64: '=',
                 barkPhotoGravatarEmail: '='
             },
             bindToController: true,
             controller: angular.noop,
             controllerAs: 'barkPhoto',
             link: function (scope, el, attr, barkPhoto) {
+
+                function setImageData(data) {
+                    el.css('background-image', 'url("data:image/png;base64,' + data + '")');
+                }
+
                 function setImageUrl(url) {
                     el.css('background-image', 'url(\'' + url + '\')');
                 }
@@ -22,6 +28,14 @@
                 }, function (newValue) {
                     if (newValue) {
                         setImageUrl(newValue.replace('http://', '//'));
+                    }
+                });
+
+                scope.$watch(function () {
+                    return barkPhoto.barkPhotoBase64;
+                }, function (newValue) {
+                    if (newValue) {
+                        setImageData(newValue);
                     }
                 });
 

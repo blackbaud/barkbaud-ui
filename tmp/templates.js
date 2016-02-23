@@ -11,7 +11,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <div class="row">\n' +
         '          <div class="col-md-3 col-lg-2">\n' +
         '            <a ui-sref="dog.views({dogId: dog.objectId})">\n' +
-        '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
+        '              <bark-photo bark-photo-base64="dog.image.data"></bark-photo>\n' +
         '            </a>\n' +
         '          </div>\n' +
         '          <div class="col-md-9 col-lg-10">\n' +
@@ -112,7 +112,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <div class="container-fluid">\n' +
         '        <div class="row">\n' +
         '            <div class="col-md-3 col-lg-2">\n' +
-        '                <bark-photo bark-photo-url="dogPage.dog.image.url"></bark-photo>\n' +
+        '                <bark-photo bark-photo-base64="dogPage.dog.image.data"></bark-photo>\n' +
         '            </div>\n' +
         '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>\n' +

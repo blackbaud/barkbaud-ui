@@ -668,12 +668,18 @@ angular.module('md5', []).constant('md5', (function() {
         return {
             scope: {
                 barkPhotoUrl: '=',
+                barkPhotoBase64: '=',
                 barkPhotoGravatarEmail: '='
             },
             bindToController: true,
             controller: angular.noop,
             controllerAs: 'barkPhoto',
             link: function (scope, el, attr, barkPhoto) {
+
+                function setImageData(data) {
+                    el.css('background-image', 'url("data:image/png;base64,' + data + '")');
+                }
+
                 function setImageUrl(url) {
                     el.css('background-image', 'url(\'' + url + '\')');
                 }
@@ -683,6 +689,14 @@ angular.module('md5', []).constant('md5', (function() {
                 }, function (newValue) {
                     if (newValue) {
                         setImageUrl(newValue.replace('http://', '//'));
+                    }
+                });
+
+                scope.$watch(function () {
+                    return barkPhoto.barkPhotoBase64;
+                }, function (newValue) {
+                    if (newValue) {
+                        setImageData(newValue);
                     }
                 });
 
@@ -1219,7 +1233,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <div class="row">\n' +
         '          <div class="col-md-3 col-lg-2">\n' +
         '            <a ui-sref="dog.views({dogId: dog.objectId})">\n' +
-        '              <bark-photo bark-photo-url="dog.image.url"></bark-photo>\n' +
+        '              <bark-photo bark-photo-base64="dog.image.data"></bark-photo>\n' +
         '            </a>\n' +
         '          </div>\n' +
         '          <div class="col-md-9 col-lg-10">\n' +
@@ -1320,7 +1334,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <div class="container-fluid">\n' +
         '        <div class="row">\n' +
         '            <div class="col-md-3 col-lg-2">\n' +
-        '                <bark-photo bark-photo-url="dogPage.dog.image.url"></bark-photo>\n' +
+        '                <bark-photo bark-photo-base64="dogPage.dog.image.data"></bark-photo>\n' +
         '            </div>\n' +
         '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>\n' +
