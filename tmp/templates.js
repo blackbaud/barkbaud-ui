@@ -10,16 +10,16 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    <div class="panel-body">\n' +
         '      <div class="row">\n' +
         '          <div class="col-md-3 col-lg-2">\n' +
-        '            <a ui-sref="dog.views({dogId: dog.objectId})">\n' +
+        '            <a ui-sref="dog.views({ dogId: dog._id })">\n' +
         '              <bark-photo bark-photo-base64="dog.image.data"></bark-photo>\n' +
         '            </a>\n' +
         '          </div>\n' +
         '          <div class="col-md-9 col-lg-10">\n' +
         '              <h1>\n' +
-        '                <a ui-sref="dog.views({dogId: dog.objectId})">{{dog.name}}</a>\n' +
+        '                <a ui-sref="dog.views({ dogId: dog._id })">{{ dog.name }}</a>\n' +
         '              </h1>\n' +
-        '              <h4>{{dog.breed}} &middot; {{dog.gender}}</h4>\n' +
-        '              <p class="bb-text-block bark-dog-bio">{{dog.bio}}</p>\n' +
+        '              <h4>{{ dog.breed }} &middot; {{ dog.gender }}</h4>\n' +
+        '              <p class="bb-text-block bark-dog-bio">{{ dog.bio }}</p>\n' +
         '          </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
@@ -116,11 +116,11 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            </div>\n' +
         '            <div class="col-md-9 col-lg-10">\n' +
         '                <h1>\n' +
-        '                  {{dogPage.dog.name}}\n' +
+        '                  {{ dogPage.dog.name }}\n' +
         '                </h1>\n' +
-        '                <h4>{{dogPage.dog.breed}} &middot; {{dogPage.dog.gender}}</h4>\n' +
+        '                <h4>{{ dogPage.dog.breed }} &middot; {{ dogPage.dog.gender }}</h4>\n' +
         '                <p></p>\n' +
-        '                <p class="bb-text-block bark-dog-bio">{{dogPage.dog.bio}}</p>\n' +
+        '                <p class="bb-text-block bark-dog-bio">{{ dogPage.dog.bio }}</p>\n' +
         '            </div>\n' +
         '        </div>\n' +
         '    </div>\n' +
@@ -204,7 +204,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        <div ng-switch-default class="bb-repeater">\n' +
         '          <div ng-repeat="previousHome in dogPreviousHomesTile.previousHomes" class="clearfix bb-repeater-item">\n' +
         '            <h4 class="pull-left">\n' +
-        '              <a ng-href="{{previousHome.constituentId | barkConstituentUrl}}" target="_blank">\n' +
+        '              <a ng-href="{{ previousHome.constituentId | barkConstituentUrl }}" target="_blank">\n' +
         '                {{ previousHome.constituent.name }}\n' +
         '              </a>\n' +
         '            </h4>\n' +
