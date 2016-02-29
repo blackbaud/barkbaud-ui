@@ -1439,8 +1439,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<head>\n' +
         '  <title>Barkbaud</title>\n' +
         '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
-        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.4.2/css/sky-bundle.css" />\n' +
-        '  <link rel="stylesheet" type="text/css" href="css/app.css" />\n' +
+        '  <link rel="icon" type="image/png" href="images/favicon.ico">\n' +
+        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.4.2/css/sky-bundle.css">\n' +
+        '  <link rel="stylesheet" type="text/css" href="css/app.css">\n' +
         '</head>\n' +
         '\n' +
         '<body ng-controller="MainController as mainController">\n' +

@@ -64,6 +64,14 @@ module.exports = function (grunt) {
                     src: ['index.html'],
                     dest: '<%= buildPath %>/'
                 }]
+            },
+            images: {
+                files: [{
+                    expand: true,
+                    cwd: 'src',
+                    src: ['images/**'],
+                    dest: '<%= buildPath %>/'
+                }]
             }
         },
         sass: {
