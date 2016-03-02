@@ -20,8 +20,8 @@
         };
 
         self.getSummaryDate = function (date) {
-            if (date && date.iso) {
-                return bbMoment(date.iso).format('MMM Do YY');
+            if (date) {
+                return bbMoment(date).format('MMM Do YY');
             }
         };
 

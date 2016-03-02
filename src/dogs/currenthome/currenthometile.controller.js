@@ -20,7 +20,7 @@
         };
 
         self.getTimeInHome = function (fromDate) {
-            var fromDateMoment = bbMoment(fromDate.iso);
+            var fromDateMoment = bbMoment(fromDate);
 
             return 'since ' + fromDateMoment.format('L') + ' (' + fromDateMoment.startOf('month').fromNow(true) + ')';
         };

@@ -2,15 +2,15 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 col-lg-2">
-                <bark-photo bark-photo-url="dogPage.dog.image.url"></bark-photo>
+                <bark-photo bark-photo-base64="dogPage.dog.image.data"></bark-photo>
             </div>
             <div class="col-md-9 col-lg-10">
                 <h1>
-                  {{dogPage.dog.name}}
+                  {{ dogPage.dog.name }}
                 </h1>
-                <h4>{{dogPage.dog.breed}} &middot; {{dogPage.dog.gender}}</h4>
+                <h4>{{ dogPage.dog.breed }} &middot; {{ dogPage.dog.gender }}</h4>
                 <p></p>
-                <p class="bb-text-block bark-dog-bio">{{dogPage.dog.bio}}</p>
+                <p class="bb-text-block bark-dog-bio">{{ dogPage.dog.bio }}</p>
             </div>
         </div>
     </div>
