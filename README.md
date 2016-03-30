@@ -1,5 +1,10 @@
-# sky-sample
-Sample Angular application built with Sky.
+# barkbaud-ui
+
+Sample Angular application built with SKY UX.
+
+## Introduction
+
+This project may be built as a stand-alone [Blackbaud SKY UX](http://skyux.developer.blackbaud.com/) application. To view sample code that interacts with [Blackbaud's SKY API](https://developer.sky.blackbaud.com/), go to the [barkbaud](https://github.com/blackbaud/barkbaud) repo, which implements the [Authorization Code Flow](https://apidocs.sky.blackbaud.com/docs/authorization/auth-code-flow/) for various endpoints, built on a Node.js/Express server. (The barkbaud repo consumes this repo for its front-end.)
 
 ## Build instructions
 
