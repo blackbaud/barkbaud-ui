@@ -12,7 +12,7 @@
                 return bbData.load({
                     data: 'api/dogs/' + dogId + '/findhome?searchText=' + searchText
                 }).then(function (results) {
-                    self.results = results.data.results;
+                    self.results = results.data.value;
                 }).catch(function (result) {
                     self.error = result.data.error;
                 });
@@ -39,7 +39,7 @@
         'bbData',
         'dogId'
     ];
-    
+
     angular.module('barkbaud')
         .controller('FindHomeController', FindHomeController);
 }());
