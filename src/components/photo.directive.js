@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function barkPhoto(gravatarService) {
+    function barkPhoto(bbData, gravatarService) {
         return {
             scope: {
                 barkPhotoUrl: '=',
@@ -52,7 +52,10 @@
         };
     }
 
-    barkPhoto.$inject = ['gravatarService'];
+    barkPhoto.$inject = [
+        'bbData',
+        'gravatarService'
+    ];
 
     angular.module('barkbaud')
         .directive('barkPhoto', barkPhoto);

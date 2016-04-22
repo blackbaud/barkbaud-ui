@@ -18,7 +18,8 @@
           <div bb-tile-section ng-switch-default>
             <div class="row">
               <div class="col-sm-3 col-xs-4">
-                <bark-photo class="bark-photo-small" bark-photo-gravatar-email="dogCurrentHomeTile.currentHome.constituent.email.address"></bark-photo>
+                <bark-photo class="bark-photo-small" ng-if="::dogCurrentHomeTile.currentHome.constituent.profile_picture" bark-photo-url="dogCurrentHomeTile.currentHome.constituent.profile_picture.thumbnail_url"></bark-photo>
+                <bark-photo class="bark-photo-small" ng-if="::!dogCurrentHomeTile.currentHome.constituent.profile_picture" bark-photo-gravatar-email="dogCurrentHomeTile.currentHome.constituent.email.address"></bark-photo>
               </div>
               <div class="col-sm-9 col-xs-8">
                 <h4>
