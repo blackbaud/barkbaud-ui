@@ -1255,7 +1255,6 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</div>\n' +
         '');
     $templateCache.put('dogs/currenthome/currenthometile.html',
-        '<pre>{{dogCurrentHomeTile.currentHome | json}}</pre>\n' +
         '<bb-tile bb-tile-header="\'Current home\'">\n' +
         '  <bb-tile-header-content ng-show="dogCurrentHomeTile.currentHome.constituentId">\n' +
         '      <bb-tile-header-check></bb-tile-header-check>\n' +
