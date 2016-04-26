@@ -52,7 +52,9 @@
         };
     }
 
-    barkPhoto.$inject = ['gravatarService'];
+    barkPhoto.$inject = [
+        'gravatarService'
+    ];
 
     angular.module('barkbaud')
         .directive('barkPhoto', barkPhoto);
