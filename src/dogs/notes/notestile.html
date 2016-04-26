@@ -12,10 +12,10 @@
           This dog has no medical history.
         </div>
         <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="note in dogNotesTile.notes" class="bb-repeater-item">
-            <h4 class="bb-repeater-item-title">{{ note.title }}</h4>
-            <h5>{{ dogNotesTile.getNoteDate(note.date) }}</h5>
-            <p>{{ note.description }}</p>
+          <div ng-repeat="note in ::dogNotesTile.notes.slice().reverse() track by $index" class="bb-repeater-item">
+            <h4 class="bb-repeater-item-title">{{:: note.title }}</h4>
+            <h5>{{:: dogNotesTile.getNoteDate(note.date) }}</h5>
+            <p>{{:: note.description }}</p>
           </div>
         </div>
       </div>
