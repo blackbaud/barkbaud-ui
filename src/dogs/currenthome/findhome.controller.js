@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function FindHomeController($modalInstance, bbData, dogId) {
+    function FindHomeController($uibModalInstance, bbData, dogId) {
         var self = this;
 
         self.search = function (searchText) {
@@ -26,7 +26,7 @@
                     data: self.constituent,
                     type: 'POST'
                 }).then(function (result) {
-                    $modalInstance.close(result.data);
+                    $uibModalInstance.close(result.data);
                 }).catch(function (result) {
                     self.error = result.data.error;
                 });
@@ -35,7 +35,7 @@
     }
 
     FindHomeController.$inject = [
-        '$modalInstance',
+        '$uibModalInstance',
         'bbData',
         'dogId'
     ];
