@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function NoteAddController($modalInstance, bbData, dogId) {
+    function NoteAddController($uibModalInstance, bbData, dogId) {
         var self = this;
 
         self.note = {};
@@ -13,7 +13,7 @@
                 data: self.note,
                 type: 'POST'
             }).then(function (result) {
-                $modalInstance.close(result.data);
+                $uibModalInstance.close(result.data);
             }).catch(function (result) {
                 self.error = result.data.error;
             });
@@ -21,7 +21,7 @@
     }
 
     NoteAddController.$inject = [
-        '$modalInstance',
+        '$uibModalInstance',
         'bbData',
         'dogId'
     ];
