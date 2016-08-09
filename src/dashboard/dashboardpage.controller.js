@@ -11,7 +11,7 @@
         bbData.load({
             data: 'api/dogs'
         }).then(function (result) {
-            self.dogs = result.data.data;
+            self.dogs = result.data.value;
             $scope.$emit('bbEndWait');
         }).catch(function (result) {
             self.error = result.data.error;

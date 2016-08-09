@@ -11,7 +11,7 @@
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/notes'
             }).then(function (result) {
-                self.notes = result.data.data;
+                self.notes = result.data.value;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
                 self.error = result.data.error;

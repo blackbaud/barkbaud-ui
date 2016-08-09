@@ -6,6 +6,12 @@
     function NoteAddController($uibModalInstance, bbData, dogId) {
         var self = this;
 
+        bbData.load({
+            data: 'api/dogs/notetypes'
+        }).then(function (result) {
+            self.noteTypes = result.data.value;
+        });
+
         self.note = {};
         self.saveData = function () {
             bbData.save({
