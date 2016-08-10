@@ -11,7 +11,7 @@
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
             }).then(function (result) {
-                self.currentHome = result.data.data;
+                self.currentHome = result.data;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
                 self.error = result.data.error;
@@ -21,7 +21,6 @@
 
         self.getTimeInHome = function (fromDate) {
             var fromDateMoment = bbMoment(fromDate);
-
             return 'since ' + fromDateMoment.format('L') + ' (' + fromDateMoment.startOf('month').fromNow(true) + ')';
         };
 

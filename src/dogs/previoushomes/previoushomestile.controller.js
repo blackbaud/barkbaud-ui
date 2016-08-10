@@ -11,7 +11,7 @@
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
             }).then(function (result) {
-                self.previousHomes = result.data.data;
+                self.previousHomes = result.data.value;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
                 self.error = result.data.error;

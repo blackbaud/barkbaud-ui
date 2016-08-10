@@ -9,7 +9,7 @@
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId) + '/summary'
         }).then(function (result) {
-            self.summary = result.data.data;
+            self.summary = result.data;
         });
 
         self.getSummaryDate = function (date) {

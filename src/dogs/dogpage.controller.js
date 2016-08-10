@@ -47,7 +47,7 @@
         bbData.load({
             data: 'api/dogs/' + encodeURIComponent(dogId)
         }).then(function (result) {
-            self.dog = result.data.data;
+            self.dog = result.data;
             bbWindow.setWindowTitle(self.dog.name);
         });
     }
