@@ -11,11 +11,9 @@
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
             }).then(function (result) {
-                console.log("Previous homes success.", result);
                 self.previousHomes = result.data.value;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
-                console.log("Previous homes error.", result);
                 self.error = result.data.error;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             });

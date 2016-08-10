@@ -11,11 +11,9 @@
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/currenthome'
             }).then(function (result) {
-                console.log("Current home success:", result);
                 self.currentHome = result.data;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
-                console.log("Current home error:", result);
                 self.error = result.data.error;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             });
