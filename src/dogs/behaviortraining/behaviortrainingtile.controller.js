@@ -32,7 +32,7 @@
         self.load();
     }
 
-    DogPreviousHomesTileController.$inject = [
+    DogBehaviorTrainingTileController.$inject = [
         '$scope',
         'bbData',
         'bbMoment',

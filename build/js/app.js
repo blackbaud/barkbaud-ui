@@ -806,7 +806,7 @@ angular.module('md5', []).constant('md5', (function() {
         self.load();
     }
 
-    DogPreviousHomesTileController.$inject = [
+    DogBehaviorTrainingTileController.$inject = [
         '$scope',
         'bbData',
         'bbMoment',
