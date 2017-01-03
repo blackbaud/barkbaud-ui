@@ -24,6 +24,12 @@
                 view_name: 'notes',
                 collapsed: false,
                 collapsed_small: false
+            },
+            {
+                id: 'DogBehaviorTile',
+                view_name: 'behaviortraining',
+                collapsed: false,
+                collapsed_small: false
             }
         ];
 
@@ -31,7 +37,8 @@
             one_column_layout: [
                 'DogCurrentHomeTile',
                 'DogPreviousHomesTile',
-                'DogNotesTile'
+                'DogNotesTile',
+                'DogBehaviorTrainingTile'
             ],
             two_column_layout: [
                 [
@@ -39,7 +46,8 @@
                     'DogPreviousHomesTile'
                 ],
                 [
-                    'DogNotesTile'
+                    'DogNotesTile',
+                    'DogBehaviorTrainingTile'
                 ]
             ]
         };
