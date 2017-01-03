@@ -26,7 +26,7 @@
                 collapsed_small: false
             },
             {
-                id: 'DogBehaviorTile',
+                id: 'DogBehaviorTrainingTile',
                 view_name: 'behaviortraining',
                 collapsed: false,
                 collapsed_small: false

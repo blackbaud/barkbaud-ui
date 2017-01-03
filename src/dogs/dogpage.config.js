@@ -30,7 +30,11 @@
                     'notes': {
                         controller: 'DogNotesTileController as dogNotesTile',
                         templateUrl: 'dogs/notes/notestile.html'
-                    }
+                    },
+                    'behaviortraining': {
+                        controller: 'DogBehaviorTrainingTileController as dogBehaviorTrainingTile',
+                        templateUrl: 'dogs/behaviortraining/behaviortrainingtile.html'
+                    },
                 }
             });
     }
