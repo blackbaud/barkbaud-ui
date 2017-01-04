@@ -772,51 +772,94 @@ angular.module('md5', []).constant('md5', (function() {
         .controller('DashboardPageController', DashboardPageController);
 }());
 
+/*jshint es5: true */
+/*jslint browser: false */
 /*global angular */
 
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId) {
-        var self = this;
+    function DogBehaviorTraningTileController($scope, bbData, dogRatingAddForm, dogId) {
 
-        self.load = function () {
-            $scope.$emit('bbBeginWait', { nonblocking: true });
-            bbData.load({
-                data: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings'
-            }).then(function (result) {
-                self.ratings = result.data.value;
-                $scope.$emit('bbEndWait', { nonblocking: true });
-            }).catch(function (result) {
-                self.error = result.data.error;
-                $scope.$emit('bbEndWait', { nonblocking: true });
-            });
+        $scope.range = function (size) {
+            return new Array(size);
         };
 
-        self.getSummaryDate = function (date) {
-            if (date) {
-                return bbMoment(date).format('MMM Do YY');
+        function calculateTileCount(data) {
+            if (!data.custom_ratings) {
+                return;
+            }
+
+            var tileCount = data.custom_ratings.length;
+
+            if (data.minimum_asset_rating || data.maximum_asset_rating) {
+                tileCount += 1;
+            }
+
+            if (data.minimum_ask_rating || data.maximum_ask_rating) {
+                tileCount += 1;
+            }
+
+            if (data.overall_wealth_rating) {
+                tileCount += 1;
+            }
+
+            if (data.donor_type_rating) {
+                tileCount += 1;
+            }
+
+            return tileCount;
+        }
+
+        function loadData() {
+
+            var data,
+                locals;
+
+            locals = $scope.locals;
+
+            return bbData.load({
+                data: '/api/dogs' + dogId + '/ratings'
+            }).then(function (result) {
+                $scope.data = data = result.data;
+
+                var ratingPageToDisplay = 1,
+                    i = 0,
+                    itemsPerPage,
+                    totalItems;
+
+                $scope.locals.tileCount = calculateTileCount(data);
+            }).catch(function () {
+                $scope.locals.tileIsVisible = false;
+            });
+        }
+
+        $scope.locals = {
+            max_star_rating: 5,
+            reloadData: loadData,
+            numericFieldOptions: {
+                mDec: 0 // No decimal places
             }
         };
 
-        $scope.$on('bbNewCurrentOwner', function () {
-            self.load();
-        });
-
-        self.load();
+        loadData();
     }
 
-    DogBehaviorTrainingTileController.$inject = [
-        '$scope',
-        'bbData',
-        'bbMoment',
-        'dogId'
-    ];
+    DogBehaviorTraningTileController.$inject = ['$scope', 'bbData', 'dogId'];
+
+    function ratingsList(bbModal, bbWait, bbData) {
+
+        return {
+            templateUrl: 'dogs/behaviortraining/behaviortrainingtile.html'
+        };
+    }
+
+    ratingsList.$inject = ['$scope', 'bbData', 'dogId'];
 
     angular.module('barkbaud')
-        .controller('DogBehaviorTrainingTileController', DogBehaviorTrainingTileController);
+        .controller('DogBehaviorTraningTileController', DogBehaviorTraningTileController)
+        .directive('ratingsList', ratingsList);
 }());
-
 /*global angular */
 
 (function () {
@@ -1316,34 +1359,28 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</div>\n' +
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
-        '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
-        '      {{ dogBehaviorTrainingTile.ratings.length }}\n' +
-        '  </bb-tile-header-content>\n' +
-        '  <div>\n' +
-        '    <div ng-show="dogBehaviorTrainingTile.ratings">\n' +
-        '      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">\n' +
-        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
-        '          This dog has no ratings.\n' +
+        '<bb-tile bb-tile-header="Behavior/Training" >\n' +
+        '    <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">\n' +
+        '        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>\n' +
+        '    </bb-tile-header-content>\n' +
+        '    <div class="ratings-tile-content">\n' +
+        '        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" data-bbauto-field="CustomRatingsSection">\n' +
+        '            <div class="custom-ratings-count-container">\n' +
+        '                <span class="custom-ratings-count" data-bbauto-field="CustomRatingsCount">{{data.value.length}}</span>\n' +
+        '                <span data-bbauto-field="CustomRatingsCountLabel">{{data.value.length === 1 ? \'Custom Rating\' : \'Custom Ratings\'}}</span>\n' +
+        '            </div>\n' +
+        '            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope">\n' +
+        '                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()" data-bbauto-field="AddCustomRatingButton">\n' +
+        '                    <span class="bb-toolbar-btn-label ng-binding">Add Rating</span>\n' +
+        '                </button>\n' +
+        '            </div>\n' +
+        '            <div bb-tile-section ng-if="data.custom_ratings.length > 0">\n' +
+        '                <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>\n' +
+        '            </div>\n' +
         '        </div>\n' +
-        '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="clearfix bb-repeater-item">\n' +
-        '            <h4 class="pull-left">\n' +
-        '              {{ rating.category }}\n' +
-        '            </h4>\n' +
-        '            <h5 class="pull-right">\n' +
-        '              {{ rating.value }}\n' +
-        '            </h5>\n' +
-        '          </div>\n' +
-        '        </div>\n' +
-        '      </div>\n' +
+        '        <div class="bb-no-records" ng-if="data.custom_ratings.length === 0" data-bbauto-field="NoRatingsMessage">No ratings were found.</div>\n' +
         '    </div>\n' +
-        '  </div>\n' +
-        '  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">\n' +
-        '    Error loading ratings.\n' +
-        '  </div>\n' +
-        '</bb-tile>\n' +
-        '');
+        '</bb-tile>');
     $templateCache.put('dogs/currenthome/currenthometile.html',
         '<bb-tile bb-tile-header="\'Current home\'">\n' +
         '  <bb-tile-header-content ng-show="dogCurrentHomeTile.currentHome.constituentId">\n' +

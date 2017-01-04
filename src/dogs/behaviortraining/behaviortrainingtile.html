@@ -1,27 +1,22 @@
-<bb-tile bb-tile-header="'Behavior/Training'">
-  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">
-      {{ dogBehaviorTrainingTile.ratings.length }}
-  </bb-tile-header-content>
-  <div>
-    <div ng-show="dogBehaviorTrainingTile.ratings">
-      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">
-        <div bb-tile-section ng-switch-when="0" class="bb-no-records">
-          This dog has no ratings.
+<bb-tile bb-tile-header="Behavior/Training" >
+    <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">
+        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>
+    </bb-tile-header-content>
+    <div class="ratings-tile-content">
+        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" data-bbauto-field="CustomRatingsSection">
+            <div class="custom-ratings-count-container">
+                <span class="custom-ratings-count" data-bbauto-field="CustomRatingsCount">{{data.value.length}}</span>
+                <span data-bbauto-field="CustomRatingsCountLabel">{{data.value.length === 1 ? 'Custom Rating' : 'Custom Ratings'}}</span>
+            </div>
+            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope">
+                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()" data-bbauto-field="AddCustomRatingButton">
+                    <span class="bb-toolbar-btn-label ng-binding">Add Rating</span>
+                </button>
+            </div>
+            <div bb-tile-section ng-if="data.custom_ratings.length > 0">
+                <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>
+            </div>
         </div>
-        <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="clearfix bb-repeater-item">
-            <h4 class="pull-left">
-              {{ rating.category }}
-            </h4>
-            <h5 class="pull-right">
-              {{ rating.value }}
-            </h5>
-          </div>
-        </div>
-      </div>
+        <div class="bb-no-records" ng-if="data.custom_ratings.length === 0" data-bbauto-field="NoRatingsMessage">No ratings were found.</div>
     </div>
-  </div>
-  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">
-    Error loading ratings.
-  </div>
 </bb-tile>
