@@ -30,26 +30,29 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</div>\n' +
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
+        '<bb-tile ng-if="::locals.tileIsVisible" bb-tile-header="\'Behavior/Training\'">\n' +
         '    <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">\n' +
-        '        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>\n' +
+        '        <div ng-model="locals.tileCount"></div>\n' +
         '    </bb-tile-header-content>\n' +
         '    <div class="ratings-tile-content">\n' +
-        '        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" data-bbauto-field="CustomRatingsSection">\n' +
+        '        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" >\n' +
         '            <div class="custom-ratings-count-container">\n' +
-        '                <span class="custom-ratings-count" data-bbauto-field="CustomRatingsCount">{{data.value.length}}</span>\n' +
-        '                <span data-bbauto-field="CustomRatingsCountLabel">{{data.value.length === 1 ? \'Custom Rating\' : \'Custom Ratings\'}}</span>\n' +
+        '                <span class="custom-ratings-count" >{{data.value.length}}</span>\n' +
+        '                <span>{{data.value.length === 1 ? \'Custom Rating\' : \'Custom Ratings\'}}</span>\n' +
         '            </div>\n' +
-        '            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope">\n' +
-        '                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()" data-bbauto-field="AddCustomRatingButton">\n' +
+        '            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope" ng-if="data.can_add_ratings">\n' +
+        '                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()">\n' +
         '                    <span class="bb-toolbar-btn-label ng-binding">Add Rating</span>\n' +
         '                </button>\n' +
         '            </div>\n' +
         '            <div bb-tile-section ng-if="data.custom_ratings.length > 0">\n' +
-        '                <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>\n' +
+        '                <div bb-pagination-content="locals.paged_ratings">\n' +
+        '                    <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>\n' +
+        '                </div>\n' +
+        '                <div bb-pagination="locals.paged_ratings" ></div>\n' +
         '            </div>\n' +
         '        </div>\n' +
-        '        <div class="bb-no-records" ng-if="data.custom_ratings.length === 0" data-bbauto-field="NoRatingsMessage">No ratings were found.</div>\n' +
+        '        <div class="bb-no-records" ng-if="data.value.length === 0" >No Ratings found.</div>\n' +
         '    </div>\n' +
         '</bb-tile>');
     $templateCache.put('dogs/currenthome/currenthometile.html',

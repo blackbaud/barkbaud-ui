@@ -779,7 +779,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogBehaviorTraningTileController($scope, bbData, dogRatingAddForm, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbPaging, bbDatepickerConfig, bbConstituentRatingAddForm, dogId) {
 
         $scope.range = function (size) {
             return new Array(size);
@@ -811,31 +811,67 @@ angular.module('md5', []).constant('md5', (function() {
             return tileCount;
         }
 
-        function loadData() {
+        function loadData(ratingCategory) {
 
             var data,
-                locals;
+                locals,
+                pagingConfig = {};
 
             locals = $scope.locals;
 
             return bbData.load({
-                data: '/api/dogs' + dogId + '/ratings'
+                data: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings',
+                loadManager: {
+                    scope: $scope,
+                    name: 'DogBehaviorTrainingTileController'
+                }
             }).then(function (result) {
                 $scope.data = data = result.data;
+                $scope.resources = result.resources;
 
                 var ratingPageToDisplay = 1,
                     i = 0,
                     itemsPerPage,
                     totalItems;
 
+                if (ratingTypeId) {
+
+                    //Set Initial Display Page
+                    if ($scope.data.value) {
+                        totalItems = $scope.data.value.length || 0;
+                    }
+
+                    if ($scope.locals.paged_ratings) {
+                        itemsPerPage = $scope.locals.paged_ratings.itemsPerPage || 5;
+                    }
+
+                    for (i = 0; i < totalItems; i += 1) {
+                        if ($scope.data.value[i].category.name === ratingCategory) {
+                            ratingPageToDisplay = Math.ceil(((i + 1) / itemsPerPage));
+                            break;
+                        }
+                    }
+                }
+
+                pagingConfig.currentPage = ratingPageToDisplay;
+
+                $scope.locals.paged_ratings = bbPaging.init(result.data.custom_ratings, pagingConfig);
+                $scope.locals.dateFormat = bbDatepickerConfig.currentCultureDateFormatString;
                 $scope.locals.tileCount = calculateTileCount(data);
             }).catch(function () {
                 $scope.locals.tileIsVisible = false;
             });
         }
 
+        function showRatingsAddForm() {
+            bbConstituentRatingAddForm.openForm({ constituentId: $stateParams.id }).then(function (ratingTypeId) {
+                loadData(ratingTypeId);
+            });
+        }
+
         $scope.locals = {
             max_star_rating: 5,
+            showRatingsAddForm: showRatingsAddForm,
             reloadData: loadData,
             numericFieldOptions: {
                 mDec: 0 // No decimal places
@@ -845,19 +881,46 @@ angular.module('md5', []).constant('md5', (function() {
         loadData();
     }
 
-    DogBehaviorTraningTileController.$inject = ['$scope', 'bbData', 'dogId'];
+    DogBehaviorTrainingTileController.$inject = ['$scope', 'bbData', 'bbPaging', 'bbDatepickerConfig', 'bbConstituentRatingAddForm'];
 
-    function ratingsList(bbModal, bbWait, bbData) {
+    function ratingsList(bbModal, bbWait, bbData, bbDatepickerConfig, bbConstituentRatingEditForm) {
+
+        function link(scope) {
+            scope.locals = {
+                dateFormat: bbDatepickerConfig.currentCultureDateFormatString
+            };
+
+            scope.showRatingsEditForm = function (ratingId) {
+                bbConstituentRatingEditForm.openForm({ constituentId: scope.constituentId, ratingId: ratingId }).then(function (ratingTypeId) {
+                    scope.reloadData(ratingTypeId);
+                });
+            };
+
+            scope.deleteRating = function (ratingId) {
+                return bbData.save({ url: 'prospectui/ratings/' + ratingId, type: 'delete' }).then(function () {
+                    scope.reloadData();
+                });
+            };
+        }
 
         return {
-            templateUrl: 'dogs/behaviortraining/behaviortrainingtile.html'
+            restrict: 'E',
+            link: link,
+            scope: {
+                ratings: '=',
+                canEditRatings: '=',
+                canDeleteRatings: '=',
+                resources: '=',
+                reloadData: '='
+            },
+            templateUrl: 'dogs/behaviortraining/behaviortraining.html'
         };
     }
 
-    ratingsList.$inject = ['$scope', 'bbData', 'dogId'];
+    ratingsList.$inject = ['bbModal', 'bbWait', 'bbData', 'bbDatepickerConfig', 'bbConstituentRatingEditForm'];
 
     angular.module('barkbaud')
-        .controller('DogBehaviorTraningTileController', DogBehaviorTraningTileController)
+        .controller('DogBehaviorTrainingTileController', DogBehaviorTrainingTileController)
         .directive('ratingsList', ratingsList);
 }());
 /*global angular */
@@ -1359,26 +1422,29 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</div>\n' +
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
+        '<bb-tile ng-if="::locals.tileIsVisible" bb-tile-header="\'Behavior/Training\'">\n' +
         '    <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">\n' +
-        '        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>\n' +
+        '        <div ng-model="locals.tileCount"></div>\n' +
         '    </bb-tile-header-content>\n' +
         '    <div class="ratings-tile-content">\n' +
-        '        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" data-bbauto-field="CustomRatingsSection">\n' +
+        '        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" >\n' +
         '            <div class="custom-ratings-count-container">\n' +
-        '                <span class="custom-ratings-count" data-bbauto-field="CustomRatingsCount">{{data.value.length}}</span>\n' +
-        '                <span data-bbauto-field="CustomRatingsCountLabel">{{data.value.length === 1 ? \'Custom Rating\' : \'Custom Ratings\'}}</span>\n' +
+        '                <span class="custom-ratings-count" >{{data.value.length}}</span>\n' +
+        '                <span>{{data.value.length === 1 ? \'Custom Rating\' : \'Custom Ratings\'}}</span>\n' +
         '            </div>\n' +
-        '            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope">\n' +
-        '                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()" data-bbauto-field="AddCustomRatingButton">\n' +
+        '            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope" ng-if="data.can_add_ratings">\n' +
+        '                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()">\n' +
         '                    <span class="bb-toolbar-btn-label ng-binding">Add Rating</span>\n' +
         '                </button>\n' +
         '            </div>\n' +
         '            <div bb-tile-section ng-if="data.custom_ratings.length > 0">\n' +
-        '                <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>\n' +
+        '                <div bb-pagination-content="locals.paged_ratings">\n' +
+        '                    <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>\n' +
+        '                </div>\n' +
+        '                <div bb-pagination="locals.paged_ratings" ></div>\n' +
         '            </div>\n' +
         '        </div>\n' +
-        '        <div class="bb-no-records" ng-if="data.custom_ratings.length === 0" data-bbauto-field="NoRatingsMessage">No ratings were found.</div>\n' +
+        '        <div class="bb-no-records" ng-if="data.value.length === 0" >No Ratings found.</div>\n' +
         '    </div>\n' +
         '</bb-tile>');
     $templateCache.put('dogs/currenthome/currenthometile.html',

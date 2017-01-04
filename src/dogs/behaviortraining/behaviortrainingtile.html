@@ -1,22 +1,25 @@
-<bb-tile bb-tile-header="'Behavior/Training'">
+<bb-tile ng-if="::locals.tileIsVisible" bb-tile-header="'Behavior/Training'">
     <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">
-        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>
+        <div ng-model="locals.tileCount"></div>
     </bb-tile-header-content>
     <div class="ratings-tile-content">
-        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" data-bbauto-field="CustomRatingsSection">
+        <div ng-if="data.custom_ratings.length >= 0" class="custom-ratings-section" >
             <div class="custom-ratings-count-container">
-                <span class="custom-ratings-count" data-bbauto-field="CustomRatingsCount">{{data.value.length}}</span>
-                <span data-bbauto-field="CustomRatingsCountLabel">{{data.value.length === 1 ? 'Custom Rating' : 'Custom Ratings'}}</span>
+                <span class="custom-ratings-count" >{{data.value.length}}</span>
+                <span>{{data.value.length === 1 ? 'Custom Rating' : 'Custom Ratings'}}</span>
             </div>
-            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope">
-                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()" data-bbauto-field="AddCustomRatingButton">
+            <div class="toolbar bb-tile-toolbar bb-prospectui-tile-actions-bar ng-scope" ng-if="data.can_add_ratings">
+                <button type="button" class="btn bb-btn-secondary" ng-click="locals.showRatingsAddForm()">
                     <span class="bb-toolbar-btn-label ng-binding">Add Rating</span>
                 </button>
             </div>
             <div bb-tile-section ng-if="data.custom_ratings.length > 0">
-                <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>
+                <div bb-pagination-content="locals.paged_ratings">
+                    <ratings-list ratings="locals.paged_ratings.items" reload_data="locals.reloadData"></ratings-list>
+                </div>
+                <div bb-pagination="locals.paged_ratings" ></div>
             </div>
         </div>
-        <div class="bb-no-records" ng-if="data.custom_ratings.length === 0" data-bbauto-field="NoRatingsMessage">No ratings were found.</div>
+        <div class="bb-no-records" ng-if="data.value.length === 0" >No Ratings found.</div>
     </div>
 </bb-tile>
