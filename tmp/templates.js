@@ -31,27 +31,22 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
         '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
-        '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.previousHomes.length">\n' +
-        '      {{ dogBehaviorTrainingTile.previousHomes.length }}\n' +
+        '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
+        '      {{ dogBehaviorTrainingTile.ratings.length }}\n' +
         '  </bb-tile-header-content>\n' +
         '  <div>\n' +
-        '    <div ng-show="dogBehaviorTrainingTile.previousHomes">\n' +
-        '      <div ng-switch="dogBehaviorTrainingTile.previousHomes.length || 0">\n' +
+        '    <div ng-show="dogBehaviorTrainingTile.ratings">\n' +
+        '      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">\n' +
         '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
-        '          This dog has no previous homes.\n' +
+        '          This dog has no ratings.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="previousHome in dogBehaviorTrainingTile.previousHomes" class="clearfix bb-repeater-item">\n' +
+        '          <div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="clearfix bb-repeater-item">\n' +
         '            <h4 class="pull-left">\n' +
-        '              <a ng-href="{{ previousHome.constituentId | barkConstituentUrl }}" target="_blank">\n' +
-        '                {{ previousHome.constituent.name }}\n' +
-        '              </a>\n' +
+        '              {{ rating.category }}\n' +
         '            </h4>\n' +
         '            <h5 class="pull-right">\n' +
-        '              {{ dogBehaviorTrainingTile.getSummaryDate(previousHome.fromDate) }}\n' +
-        '              <span ng-show="previousHome.toDate">\n' +
-        '                to {{ dogBehaviorTrainingTile.getSummaryDate(previousHome.toDate) }}\n' +
-        '              </span>\n' +
+        '              {{ rating.value }}\n' +
         '            </h5>\n' +
         '          </div>\n' +
         '        </div>\n' +
@@ -59,7 +54,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '    </div>\n' +
         '  </div>\n' +
         '  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">\n' +
-        '    Error loading previous homes.\n' +
+        '    Error loading ratings.\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');

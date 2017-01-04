@@ -9,9 +9,9 @@
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
             bbData.load({
-                data: 'api/dogs/' + encodeURIComponent(dogId) + '/previoushomes'
+                data: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings'
             }).then(function (result) {
-                self.previousHomes = result.data.value;
+                self.ratings = result.data.value;
                 $scope.$emit('bbEndWait', { nonblocking: true });
             }).catch(function (result) {
                 self.error = result.data.error;

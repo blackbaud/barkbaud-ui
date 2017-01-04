@@ -1,25 +1,20 @@
 <bb-tile bb-tile-header="'Behavior/Training'">
-  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.previousHomes.length">
-      {{ dogBehaviorTrainingTile.previousHomes.length }}
+  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">
+      {{ dogBehaviorTrainingTile.ratings.length }}
   </bb-tile-header-content>
   <div>
-    <div ng-show="dogBehaviorTrainingTile.previousHomes">
-      <div ng-switch="dogBehaviorTrainingTile.previousHomes.length || 0">
+    <div ng-show="dogBehaviorTrainingTile.ratings">
+      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">
         <div bb-tile-section ng-switch-when="0" class="bb-no-records">
-          This dog has no previous homes.
+          This dog has no ratings.
         </div>
         <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="previousHome in dogBehaviorTrainingTile.previousHomes" class="clearfix bb-repeater-item">
+          <div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="clearfix bb-repeater-item">
             <h4 class="pull-left">
-              <a ng-href="{{ previousHome.constituentId | barkConstituentUrl }}" target="_blank">
-                {{ previousHome.constituent.name }}
-              </a>
+              {{ rating.category }}
             </h4>
             <h5 class="pull-right">
-              {{ dogBehaviorTrainingTile.getSummaryDate(previousHome.fromDate) }}
-              <span ng-show="previousHome.toDate">
-                to {{ dogBehaviorTrainingTile.getSummaryDate(previousHome.toDate) }}
-              </span>
+              {{ rating.value }}
             </h5>
           </div>
         </div>
@@ -27,6 +22,6 @@
     </div>
   </div>
   <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">
-    Error loading previous homes.
+    Error loading ratings.
   </div>
 </bb-tile>
