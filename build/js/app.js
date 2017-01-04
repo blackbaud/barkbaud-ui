@@ -1359,7 +1359,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</div>\n' +
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="Behavior/Training" >\n' +
+        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
         '    <bb-tile-header-content class="header-content" ng-show="locals.tileCount > 0">\n' +
         '        <div ng-model="locals.tileCount" bb-autonumeric="number" bb-autonumeric-settings="::locals.numericFieldOptions" data-bbauto-field="HeaderContent"></div>\n' +
         '    </bb-tile-header-content>\n' +
