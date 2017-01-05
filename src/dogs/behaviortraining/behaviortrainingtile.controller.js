@@ -5,7 +5,7 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbPaging, bbDatepickerConfig, bbConstituentRatingAddForm, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbPaging, bbDatepickerConfig, RatingAddForm, dogId) {
 
         $scope.range = function (size) {
             return new Array(size);
@@ -107,7 +107,7 @@
         loadData();
     }
 
-    DogBehaviorTrainingTileController.$inject = ['$scope', 'bbData', 'bbPaging', 'bbDatepickerConfig', 'bbConstituentRatingAddForm'];
+    DogBehaviorTrainingTileController.$inject = ['$scope', 'bbData', 'bbPaging', 'bbDatepickerConfig', 'RatingAddForm'];
 
     function ratingsList(bbModal, bbWait, bbData, bbDatepickerConfig, bbConstituentRatingEditForm) {
 
@@ -143,7 +143,7 @@
         };
     }
 
-    ratingsList.$inject = ['bbModal', 'bbWait', 'bbData', 'bbDatepickerConfig', 'bbConstituentRatingEditForm'];
+    ratingsList.$inject = ['bbModal', 'bbWait', 'bbData', 'bbDatepickerConfig', 'RatingEditForm'];
 
     angular.module('barkbaud')
         .controller('DogBehaviorTrainingTileController', DogBehaviorTrainingTileController)
