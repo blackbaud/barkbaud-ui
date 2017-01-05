@@ -19,7 +19,7 @@
         };
     }
 
-    barkNoteAdd.$inject = ['bbModal'];
+    barkBehaviorTrainingAdd.$inject = ['bbModal'];
 
     angular.module('barkbaud')
         .factory('barkBehaviorTrainingAdd', barkBehaviorTrainingAdd);

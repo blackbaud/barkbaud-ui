@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkNoteAdd, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, dogId) {
         var self = this;
 
         self.load = function () {
@@ -20,7 +20,7 @@
         };
 
         self.addNote = function () {
-            barkNoteAdd.open(dogId).result.then(self.load);
+            barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
         self.load();
@@ -30,7 +30,7 @@
         '$scope',
         'bbData',
         'bbMoment',
-        'barkNoteAdd',
+        'barkBehaviorTrainingAdd',
         'dogId'
     ];
 

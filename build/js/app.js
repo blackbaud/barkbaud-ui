@@ -831,7 +831,7 @@ angular.module('md5', []).constant('md5', (function() {
         };
     }
 
-    barkNoteAdd.$inject = ['bbModal'];
+    barkBehaviorTrainingAdd.$inject = ['bbModal'];
 
     angular.module('barkbaud')
         .factory('barkBehaviorTrainingAdd', barkBehaviorTrainingAdd);
@@ -842,7 +842,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkNoteAdd, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, dogId) {
         var self = this;
 
         self.load = function () {
@@ -859,7 +859,7 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.addNote = function () {
-            barkNoteAdd.open(dogId).result.then(self.load);
+            barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
         self.load();
@@ -869,7 +869,7 @@ angular.module('md5', []).constant('md5', (function() {
         '$scope',
         'bbData',
         'bbMoment',
-        'barkNoteAdd',
+        'barkBehaviorTrainingAdd',
         'dogId'
     ];
 
@@ -1377,7 +1377,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingadd.html',
         '<bb-modal>\n' +
-        '  <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">\n' +
+        '  <form name="behaviorTrainingAdd.formAdd" ng-submit="behaviorTrainingAdd.saveData()">\n' +
         '    <div class="modal-form">\n' +
         '      <bb-modal-header>Add medical history</bb-modal-header>\n' +
         '      <div bb-modal-body>\n' +
@@ -1385,14 +1385,14 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Title</label>\n' +
-        '              <input type="text" class="form-control" ng-model="noteAdd.note.title" />\n' +
+        '              <input type="text" class="form-control" ng-model="behaviorTrainingAdd.note.title" />\n' +
         '            </div>\n' +
         '          </div>\n' +
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Note Type</label>\n' +
-        '              <select class="form-control" ng-model="noteAdd.note.type">\n' +
-        '                <option ng-repeat="option in ::noteAdd.noteTypes" ng-bind="option" value="{{::option}}"></option>\n' +
+        '              <select class="form-control" ng-model="behaviorTrainingAdd.note.type">\n' +
+        '                <option ng-repeat="option in ::behaviorTrainingAdd.noteTypes" ng-bind="option" value="{{::option}}"></option>\n' +
         '              </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
@@ -1401,11 +1401,11 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-12">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Description</label>\n' +
-        '              <textarea class="form-control" ng-model="noteAdd.note.description"></textarea>\n' +
+        '              <textarea class="form-control" ng-model="behaviorTrainingAdd.note.description"></textarea>\n' +
         '            </div>\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">\n' +
-        '                <input type="checkbox" bb-check ng-model="noteAdd.note.addConstituentNote" />\n' +
+        '                <input type="checkbox" bb-check ng-model="behaviorTrainingAdd.note.addConstituentNote" />\n' +
         '                Add as note on current owner\'s Raisers Edge NXT record.\n' +
         '              </label>\n' +
         '            </div>\n' +
@@ -1415,9 +1415,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      <bb-modal-footer>\n' +
         '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
         '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
-        '        <span ng-show="noteAdd.error" class="text-danger">\n' +
-        '          <span ng-show="noteAdd.error.message">{{ noteAdd.error.message }}</span>\n' +
-        '          <span ng-hide="noteAdd.error.message">Unknown error occured.</span>\n' +
+        '        <span ng-show="behaviorTrainingAdd.error" class="text-danger">\n' +
+        '          <span ng-show="behaviorTrainingAdd.error.message">{{ behaviorTrainingAdd.error.message }}</span>\n' +
+        '          <span ng-hide="behaviorTrainingAdd.error.message">Unknown error occured.</span>\n' +
         '        </span>\n' +
         '      </bb-modal-footer>\n' +
         '    </div>\n' +
