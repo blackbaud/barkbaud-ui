@@ -781,12 +781,20 @@ angular.module('md5', []).constant('md5', (function() {
         var self = this;
 
         bbData.load({
-            data: 'api/dogs/ratings/categories'
+            data: 'api/dogs/ratings/sources'
         }).then(function (result) {
-            self.ratingCategories = result.data.value;
+            self.sources = result.data.value;
         });
 
-        self.note = {};
+        self.loadCategories = function(source) {
+            bbData.load({
+                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source)
+            }).then(function (result) {
+                self.categories = result.data.value;
+            });
+        };
+
+        self.behaviortraining = {}
         self.saveData = function () {
             bbData.save({
                 url: 'api/dogs/' + dogId + '/notes',
@@ -1379,21 +1387,23 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '<bb-modal>\n' +
         '  <form name="behaviorTrainingAdd.formAdd" ng-submit="behaviorTrainingAdd.saveData()">\n' +
         '    <div class="modal-form">\n' +
-        '      <bb-modal-header>Add medical history</bb-modal-header>\n' +
+        '      <bb-modal-header>Add Behavior/Training</bb-modal-header>\n' +
         '      <div bb-modal-body>\n' +
         '        <div class="row">\n' +
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
-        '              <label class="control-label">Title</label>\n' +
-        '              <input type="text" class="form-control" ng-model="behaviorTrainingAdd.note.title" />\n' +
+        '              <label class="control-label">Source:</label>\n' +
+        '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">\n' +
+        '                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source)" ng-bind="source" value="{{::source}}"></option>\n' +
+        '              </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
-        '              <label class="control-label">Note Type</label>\n' +
-        '              <select class="form-control" ng-model="behaviorTrainingAdd.note.type">\n' +
-        '                <option ng-repeat="option in ::behaviorTrainingAdd.noteTypes" ng-bind="option" value="{{::option}}"></option>\n' +
-        '              </select>\n' +
+        '              <label class="control-label">Category:</label>\n' +
+        '              <select class="form-control" ng-disabled="!behaviorTrainingAdd.formAdd.source" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
+        '               <option ng-repeat="category in ::behaviorTrainingAdd.categories" ng-bind="category" value="{{::category}}"></option>\n' +
+        '             </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
         '        </div>\n' +

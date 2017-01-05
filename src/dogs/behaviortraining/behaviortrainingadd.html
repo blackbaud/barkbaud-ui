@@ -1,21 +1,23 @@
 <bb-modal>
   <form name="behaviorTrainingAdd.formAdd" ng-submit="behaviorTrainingAdd.saveData()">
     <div class="modal-form">
-      <bb-modal-header>Add medical history</bb-modal-header>
+      <bb-modal-header>Add Behavior/Training</bb-modal-header>
       <div bb-modal-body>
         <div class="row">
           <div class="col-sm-6">
             <div class="form-group">
-              <label class="control-label">Title</label>
-              <input type="text" class="form-control" ng-model="behaviorTrainingAdd.note.title" />
+              <label class="control-label">Source:</label>
+              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">
+                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source)" ng-bind="source" value="{{::source}}"></option>
+              </select>
             </div>
           </div>
           <div class="col-sm-6">
             <div class="form-group">
-              <label class="control-label">Note Type</label>
-              <select class="form-control" ng-model="behaviorTrainingAdd.note.type">
-                <option ng-repeat="option in ::behaviorTrainingAdd.noteTypes" ng-bind="option" value="{{::option}}"></option>
-              </select>
+              <label class="control-label">Category:</label>
+              <select class="form-control" ng-disabled="!behaviorTrainingAdd.formAdd.source" ng-model="behaviorTrainingAdd.behaviortraining.category">
+               <option ng-repeat="category in ::behaviorTrainingAdd.categories" ng-bind="category" value="{{::category}}"></option>
+             </select>
             </div>
           </div>
         </div>
