@@ -1,27 +1,27 @@
-<bb-tile bb-tile-header="'Medical history'">
-  <bb-tile-header-content ng-show="dogNotesTile.ratings.length">
-      {{ dogNotesTile.ratings.length }}
+<bb-tile bb-tile-header="'Behavior/Training'">
+  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">
+      {{ dogBehaviorTrainingTile.ratings.length }}
   </bb-tile-header-content>
   <div>
     <div class="toolbar bb-tile-toolbar">
-      <button type="button" class="btn bb-btn-secondary" ng-click="dogNotesTile.addNote()"><i class="fa fa-plus-circle"></i> Add History</button>
+      <button type="button" class="btn bb-btn-secondary" ng-click="dogBehaviorTrainingTile.addBehaviorTraining()"><i class="fa fa-plus-circle"></i> Add Behavior/Training</button>
     </div>
-    <div ng-show="dogNotesTile.ratings">
-      <div ng-switch="dogNotesTile.ratings.length || 0">
+    <div ng-show="dogBehaviorTrainingTile.ratings">
+      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">
         <div bb-tile-section ng-switch-when="0" class="bb-no-records">
-          This dog has no medical history.
+          This dog has no behaviors/trainings.
         </div>
         <div ng-switch-default class="bb-repeater">
-          <div ng-repeat="note in ::dogNotesTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">
-            <h4 class="bb-repeater-item-title">{{:: note.title }}</h4>
-            <h5>{{:: dogNotesTile.getNoteDate(note.date) }}</h5>
-            <p>{{:: note.description }}</p>
+          <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">
+            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>
+            <h5>{{:: rating.value }}</h5>
+            <p ng-if=":: rating.source">{{:: rating.source }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div bb-tile-section class="text-danger" ng-show="dogNotesTile.error">
-    Error loading notes
+  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">
+    Error loading behaviors/trainings.
   </div>
 </bb-tile>

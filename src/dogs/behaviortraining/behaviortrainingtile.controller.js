@@ -19,7 +19,7 @@
             });
         };
 
-        self.addNote = function () {
+        self.addBehaviorTraining = function () {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 

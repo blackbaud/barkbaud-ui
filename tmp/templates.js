@@ -79,31 +79,31 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '</bb-modal>\n' +
         '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="\'Medical history\'">\n' +
-        '  <bb-tile-header-content ng-show="dogNotesTile.ratings.length">\n' +
-        '      {{ dogNotesTile.ratings.length }}\n' +
+        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
+        '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
+        '      {{ dogBehaviorTrainingTile.ratings.length }}\n' +
         '  </bb-tile-header-content>\n' +
         '  <div>\n' +
         '    <div class="toolbar bb-tile-toolbar">\n' +
-        '      <button type="button" class="btn bb-btn-secondary" ng-click="dogNotesTile.addNote()"><i class="fa fa-plus-circle"></i> Add History</button>\n' +
+        '      <button type="button" class="btn bb-btn-secondary" ng-click="dogBehaviorTrainingTile.addBehaviorTraining()"><i class="fa fa-plus-circle"></i> Add Behavior/Training</button>\n' +
         '    </div>\n' +
-        '    <div ng-show="dogNotesTile.ratings">\n' +
-        '      <div ng-switch="dogNotesTile.ratings.length || 0">\n' +
+        '    <div ng-show="dogBehaviorTrainingTile.ratings">\n' +
+        '      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">\n' +
         '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
-        '          This dog has no medical history.\n' +
+        '          This dog has no behaviors/trainings.\n' +
         '        </div>\n' +
         '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="note in ::dogNotesTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">\n' +
-        '            <h4 class="bb-repeater-item-title">{{:: note.title }}</h4>\n' +
-        '            <h5>{{:: dogNotesTile.getNoteDate(note.date) }}</h5>\n' +
-        '            <p>{{:: note.description }}</p>\n' +
+        '          <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">\n' +
+        '            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>\n' +
+        '            <h5>{{:: rating.value }}</h5>\n' +
+        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
         '  </div>\n' +
-        '  <div bb-tile-section class="text-danger" ng-show="dogNotesTile.error">\n' +
-        '    Error loading notes\n' +
+        '  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">\n' +
+        '    Error loading behaviors/trainings.\n' +
         '  </div>\n' +
         '</bb-tile>\n' +
         '');
