@@ -1,0 +1,47 @@
+<bb-modal>
+  <form name="noteAdd.formAdd" ng-submit="noteAdd.saveData()">
+    <div class="modal-form">
+      <bb-modal-header>Add medical history</bb-modal-header>
+      <div bb-modal-body>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="control-label">Title</label>
+              <input type="text" class="form-control" ng-model="noteAdd.note.title" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="control-label">Note Type</label>
+              <select class="form-control" ng-model="noteAdd.note.type">
+                <option ng-repeat="option in ::noteAdd.noteTypes" ng-bind="option" value="{{::option}}"></option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label class="control-label">Description</label>
+              <textarea class="form-control" ng-model="noteAdd.note.description"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="control-label">
+                <input type="checkbox" bb-check ng-model="noteAdd.note.addConstituentNote" />
+                Add as note on current owner's Raisers Edge NXT record.
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <bb-modal-footer>
+        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>
+        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
+        <span ng-show="noteAdd.error" class="text-danger">
+          <span ng-show="noteAdd.error.message">{{ noteAdd.error.message }}</span>
+          <span ng-hide="noteAdd.error.message">Unknown error occured.</span>
+        </span>
+      </bb-modal-footer>
+    </div>
+  </form>
+</bb-modal>
