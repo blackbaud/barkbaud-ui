@@ -1012,7 +1012,7 @@ angular.module('md5', []).constant('md5', (function() {
 
     RatingAddForm.$inject = ['bbData', 'bbModal', 'bbWait'];
 
-    angular.module('rex.prospect.views')
+    angular.module('barkbaud')
         .controller('BehaviorAddController', BehaviorAddController)
         .service('RatingAddForm', RatingAddForm);
 
