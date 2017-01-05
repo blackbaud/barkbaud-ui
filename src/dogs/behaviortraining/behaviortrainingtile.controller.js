@@ -139,7 +139,7 @@
                 resources: '=',
                 reloadData: '='
             },
-            templateUrl: 'dogs/behaviortraining/behaviortraining.html'
+            templateUrl: 'dogs/behaviortraining/behaviortrainingtile.html'
         };
     }
 

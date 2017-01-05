@@ -1320,7 +1320,7 @@ angular.module('md5', []).constant('md5', (function() {
                 resources: '=',
                 reloadData: '='
             },
-            templateUrl: 'dogs/behaviortraining/behaviortraining.html'
+            templateUrl: 'dogs/behaviortraining/behaviortrainingtile.html'
         };
     }
 
