@@ -1397,8 +1397,8 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Source:</label>\n' +
-        '              <select class="form-control" ng-change="behaviorTrainingAdd.loadCategories(behaviorTrainingAdd.behaviortraining.source)" ng-model="behaviorTrainingAdd.behaviortraining.source">\n' +
-        '                <option ng-repeat="source in behaviorTrainingAdd.sources" ng-bind="source" value="{{source}}"></option>\n' +
+        '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">\n' +
+        '                <option ng-repeat="sourceOption in behaviorTrainingAdd.sources" ng-bind="sourceOption" value="{{sourceOption}}"></option>\n' +
         '              </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
@@ -1406,7 +1406,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            <div class="form-group">\n' +
         '              <label class="control-label">Category:</label>\n' +
         '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
-        '               <option ng-repeat="category in behaviorTrainingAdd.categories" ng-bind="category.name" value="{{category.name}}"></option>\n' +
+        '               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>\n' +
         '             </select>\n' +
         '            </div>\n' +
         '          </div>\n' +

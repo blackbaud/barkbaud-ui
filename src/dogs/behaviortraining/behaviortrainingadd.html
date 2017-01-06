@@ -7,8 +7,8 @@
           <div class="col-sm-6">
             <div class="form-group">
               <label class="control-label">Source:</label>
-              <select class="form-control" ng-change="behaviorTrainingAdd.loadCategories(behaviorTrainingAdd.behaviortraining.source)" ng-model="behaviorTrainingAdd.behaviortraining.source">
-                <option ng-repeat="source in behaviorTrainingAdd.sources" ng-bind="source" value="{{source}}"></option>
+              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">
+                <option ng-repeat="sourceOption in behaviorTrainingAdd.sources" ng-bind="sourceOption" value="{{sourceOption}}"></option>
               </select>
             </div>
           </div>
@@ -16,7 +16,7 @@
             <div class="form-group">
               <label class="control-label">Category:</label>
               <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">
-               <option ng-repeat="category in behaviorTrainingAdd.categories" ng-bind="category.name" value="{{category.name}}"></option>
+               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>
              </select>
             </div>
           </div>
