@@ -19,7 +19,7 @@
 
         self.loadCategories = function(source) {
             bbData.load({
-                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source)
+                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source || '')
             }).then(function (result) {
                 self.categories = result.data.value;
             });
@@ -44,7 +44,7 @@
                     self.categoryValues = result.data.value;
                 })
             }
-        }
+        };
 
         self.findCategoryByName = function(categoryName) {
             for (var category in self.categories) {
@@ -52,7 +52,7 @@
                     return category;
                 }
             }
-        }
+        };
 
         self.behaviortraining = {}
         self.saveData = function () {

@@ -793,7 +793,7 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.loadCategories = function(source) {
             bbData.load({
-                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source)
+                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source || '')
             }).then(function (result) {
                 self.categories = result.data.value;
             });
@@ -818,7 +818,7 @@ angular.module('md5', []).constant('md5', (function() {
                     self.categoryValues = result.data.value;
                 })
             }
-        }
+        };
 
         self.findCategoryByName = function(categoryName) {
             for (var category in self.categories) {
@@ -826,7 +826,7 @@ angular.module('md5', []).constant('md5', (function() {
                     return category;
                 }
             }
-        }
+        };
 
         self.behaviortraining = {}
         self.saveData = function () {
