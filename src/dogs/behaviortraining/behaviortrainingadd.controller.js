@@ -25,20 +25,15 @@
             });
         };
 
-        self.checkLoadValues = function(category) {
+        self.checkLoadValues = function(categoryName, categoryType, categorySource) {
             var optional = '';
 
-            bbData.load({
-                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
-            }).then(function (result) {
-                self.categoryValues = result.data.value;
-            })
-            if (category.source) {
-                optional = 'sourceName=' + encodeURIComponent(category.source);
+            if (categorySource) {
+                optional = 'sourceName=' + encodeURIComponent(categorySource);
             }
-            if (category.type === 'codetable') {
+            if (categoryType === 'codetable') {
                 bbData.load({
-                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(categoryName) + optional
                 }).then(function (result) {
                     self.categoryValues = result.data.value;
                 })
