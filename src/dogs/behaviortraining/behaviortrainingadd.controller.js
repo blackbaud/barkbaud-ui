@@ -25,18 +25,30 @@
             });
         };
 
-        self.checkLoadValues = function(categoryName, categoryType, categorySource) {
-            var optional = '';
+        self.checkLoadValues = function(categoryName) {
+            var optional,
+                category;
 
-            if (categorySource) {
-                optional = 'sourceName=' + encodeURIComponent(categorySource);
+            optional = '';
+            category = self.findCategoryByName(categoryName);
+
+            if (category.source) {
+                optional = 'sourceName=' + encodeURIComponent(category.source);
             }
-            if (categoryType === 'codetable') {
+            if (category.type === 'codetable') {
                 bbData.load({
-                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(categoryName) + optional
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
                 }).then(function (result) {
                     self.categoryValues = result.data.value;
                 })
+            }
+        }
+
+        self.findCategoryByName = function(categoryName) {
+            for (var category in self.categories) {
+                if (category.name === categoryName) {
+                    return category;
+                }
             }
         }
 
