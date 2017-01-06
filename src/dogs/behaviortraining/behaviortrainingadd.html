@@ -8,7 +8,7 @@
             <div class="form-group">
               <label class="control-label">Source:</label>
               <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">
-                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source)" ng-bind="source" value="{{::source}}"></option>
+                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source.name)" ng-bind="source" value="{{source.name}}"></option>
               </select>
             </div>
           </div>

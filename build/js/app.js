@@ -781,14 +781,20 @@ angular.module('md5', []).constant('md5', (function() {
         var self = this;
 
         bbData.load({
-            data: 'api/dogs/ratings/sources'
+            data: {
+                sources: 'api/dogs/ratings/sources',
+                categories: 'api/dogs/ratings/categories?sourceName='
+            }
         }).then(function (result) {
-            self.sources = result.data.value;
+            self.sources = result.data.sources.value;
+            self.categories = result.data.categories.value;
         });
 
         self.loadCategories = function(source) {
             bbData.load({
-                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source)
+                data: {
+                    sources: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source),
+                }
             }).then(function (result) {
                 self.categories = result.data.value;
             });
@@ -1394,7 +1400,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '            <div class="form-group">\n' +
         '              <label class="control-label">Source:</label>\n' +
         '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.source">\n' +
-        '                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source)" ng-bind="source" value="{{::source}}"></option>\n' +
+        '                <option ng-repeat="source in ::behaviorTrainingAdd.sources" ng-change="behaviorTrainingAdd.loadCategories(source.name)" ng-bind="source" value="{{source.name}}"></option>\n' +
         '              </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
