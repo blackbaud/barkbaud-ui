@@ -28,6 +28,11 @@
         self.checkLoadValues = function(category) {
             var optional = '';
 
+            bbData.load({
+                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
+            }).then(function (result) {
+                self.categoryValues = result.data.value;
+            })
             if (category.source) {
                 optional = 'sourceName=' + encodeURIComponent(category.source);
             }
