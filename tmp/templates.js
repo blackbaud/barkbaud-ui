@@ -47,22 +47,24 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Category:</label>\n' +
-        '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
-        '               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>\n' +
+        '              <select class="form-control" ng-change="behaviorTraningAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category) ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
+        '               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption}}"></option>\n' +
         '             </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '        <div class="row">\n' +
         '          <div class="col-sm-12">\n' +
-        '            <div class="form-group">\n' +
-        '              <label class="control-label">Description</label>\n' +
-        '              <textarea class="form-control" ng-model="behaviorTrainingAdd.note.description"></textarea>\n' +
+        '            <div class="form-group" ng-switch on="behaviorTrainingAdd.behaviortraining.category.type">\n' +
+        '              <label class="control-label">Value:</label>\n' +
+        '              <select class="form-control" ng-switch-when="codetable" ng-model="behaviorTrainingAdd.behaviortraining.value">\n' +
+        '               <option ng-repeat="categoryValue in behaviorTrainingAdd.categoryValues" ng-bind="categoryValue" value="{{categoryValue}}"></option>\n' +
+        '             </select>\n' +
         '            </div>\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">\n' +
-        '                <input type="checkbox" bb-check ng-model="behaviorTrainingAdd.note.addConstituentNote" />\n' +
-        '                Add as note on current owner\'s Raisers Edge NXT record.\n' +
+        '                <input type="checkbox" bb-check ng-model="behaviorTrainingAdd.behaviortraining.addConstituentRating" />\n' +
+        '                Add as rating on current owner\'s Raisers Edge NXT record.\n' +
         '              </label>\n' +
         '            </div>\n' +
         '          </div>\n' +

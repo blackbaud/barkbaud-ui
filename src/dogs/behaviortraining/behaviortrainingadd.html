@@ -15,22 +15,24 @@
           <div class="col-sm-6">
             <div class="form-group">
               <label class="control-label">Category:</label>
-              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">
-               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>
+              <select class="form-control" ng-change="behaviorTraningAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category) ng-model="behaviorTrainingAdd.behaviortraining.category">
+               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption}}"></option>
              </select>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="form-group">
-              <label class="control-label">Description</label>
-              <textarea class="form-control" ng-model="behaviorTrainingAdd.note.description"></textarea>
+            <div class="form-group" ng-switch on="behaviorTrainingAdd.behaviortraining.category.type">
+              <label class="control-label">Value:</label>
+              <select class="form-control" ng-switch-when="codetable" ng-model="behaviorTrainingAdd.behaviortraining.value">
+               <option ng-repeat="categoryValue in behaviorTrainingAdd.categoryValues" ng-bind="categoryValue" value="{{categoryValue}}"></option>
+             </select>
             </div>
             <div class="form-group">
               <label class="control-label">
-                <input type="checkbox" bb-check ng-model="behaviorTrainingAdd.note.addConstituentNote" />
-                Add as note on current owner's Raisers Edge NXT record.
+                <input type="checkbox" bb-check ng-model="behaviorTrainingAdd.behaviortraining.addConstituentRating" />
+                Add as rating on current owner's Raisers Edge NXT record.
               </label>
             </div>
           </div>

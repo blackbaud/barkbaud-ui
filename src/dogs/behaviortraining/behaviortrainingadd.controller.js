@@ -25,6 +25,16 @@
             });
         };
 
+        self.checkLoadValues = function(category) {
+            if (category.type === 'codetable') {
+                bbData.load({
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name)
+                }).then(function (result) {
+                    self.categoryValues = result.data.value;
+                })
+            }
+        }
+
         self.behaviortraining = {}
         self.saveData = function () {
             bbData.save({
