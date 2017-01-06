@@ -47,8 +47,8 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Category:</label>\n' +
-        '              <select class="form-control" ng-disabled="!behaviorTrainingAdd.formAdd.source" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
-        '               <option ng-repeat="category in ::behaviorTrainingAdd.categories" ng-bind="category" value="{{::category}}"></option>\n' +
+        '              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
+        '               <option ng-repeat="category in behaviorTrainingAdd.categories" ng-bind="category" value="{{category}}"></option>\n' +
         '             </select>\n' +
         '            </div>\n' +
         '          </div>\n' +

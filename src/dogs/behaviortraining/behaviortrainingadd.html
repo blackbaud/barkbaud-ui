@@ -15,8 +15,8 @@
           <div class="col-sm-6">
             <div class="form-group">
               <label class="control-label">Category:</label>
-              <select class="form-control" ng-disabled="!behaviorTrainingAdd.formAdd.source" ng-model="behaviorTrainingAdd.behaviortraining.category">
-               <option ng-repeat="category in ::behaviorTrainingAdd.categories" ng-bind="category" value="{{::category}}"></option>
+              <select class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.category">
+               <option ng-repeat="category in behaviorTrainingAdd.categories" ng-bind="category" value="{{category}}"></option>
              </select>
             </div>
           </div>
