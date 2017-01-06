@@ -800,10 +800,14 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.checkLoadValues = function(category) {
-            self.test = category;
+            var optional = '';
+
+            if (category.source) {
+                optional = 'sourceName=' + encodeURIComponent(category.source);
+            }
             if (category.type === 'codetable') {
                 bbData.load({
-                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name)
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
                 }).then(function (result) {
                     self.categoryValues = result.data.value;
                 })
