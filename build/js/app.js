@@ -783,11 +783,12 @@ angular.module('md5', []).constant('md5', (function() {
         bbData.load({
             data: {
                 sources: 'api/dogs/ratings/sources',
-                categories: 'api/dogs/ratings/categories'
+                categories: 'api/dogs/ratings/categories?sourceName='
             }
         }).then(function (result) {
             self.sources = result.data.sources.value;
             self.categories = result.data.categories.value;
+            debugger;
         });
 
         self.loadCategories = function(source) {
