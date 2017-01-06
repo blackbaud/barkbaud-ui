@@ -792,9 +792,7 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.loadCategories = function(source) {
             bbData.load({
-                data: {
-                    sources: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source),
-                }
+                data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source)
             }).then(function (result) {
                 self.categories = result.data.value;
             });
