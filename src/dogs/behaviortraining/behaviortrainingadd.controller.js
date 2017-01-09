@@ -26,24 +26,13 @@
         };
 
         self.checkLoadValues = function(categoryName) {
-            var optional,
-                category;
-
-            optional = '';
-            category = self.findCategoryByName(categoryName);
-            self.behaviortraining.category = category;
-
-            if (category.source) {
-                optional = 'sourceName=' + encodeURIComponent(category.source);
-            }
-            
-            if (category.type === 'codetable') {
-                bbData.load({
-                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(category.name) + optional
-                }).then(function (result) {
-                    self.categoryValues = result.data.value;
-                })
-            }
+            self.behaviortraining.category = self.findCategoryByName(categoryName);
+            console.log("testing");
+            bbData.load({
+                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
+            }).then(function (result) {
+                self.categoryValues = result.data.value;
+            });
         };
 
         self.findCategoryByName = function(categoryName) {
