@@ -47,13 +47,15 @@
         };
 
         self.behaviortraining = {}
-        yesno: [{
+        self.yesno = [{
                     value: true,
                     label: "Yes"
                 }, {
                     value: false,
                     label: "No"
                 }];
+        self.minDate = 1700;
+        self.maxDate = 3000;
         self.saveData = function () {
             bbData.save({
                 url: 'api/dogs/' + dogId + '/notes',
