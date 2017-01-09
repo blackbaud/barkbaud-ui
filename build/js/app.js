@@ -812,7 +812,9 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.findCategoryByName = function(categoryName) {
             for (var category in self.categories) {
+                console.log(category.name);
                 if (category.name === categoryName) {
+                    console.log(category);
                     return category;
                 }
             }

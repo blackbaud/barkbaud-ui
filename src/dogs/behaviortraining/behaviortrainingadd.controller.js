@@ -38,7 +38,9 @@
 
         self.findCategoryByName = function(categoryName) {
             for (var category in self.categories) {
+                console.log(category.name);
                 if (category.name === categoryName) {
+                    console.log(category);
                     return category;
                 }
             }
