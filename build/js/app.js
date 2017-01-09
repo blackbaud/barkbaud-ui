@@ -835,8 +835,8 @@ angular.module('md5', []).constant('md5', (function() {
         self.maxDate = 3000;
         self.saveData = function () {
             bbData.save({
-                url: 'api/dogs/' + dogId + '/notes',
-                data: self.note,
+                url: 'api/dogs/' + dogId + '/ratings',
+                data: self.behaviortraining,
                 type: 'POST'
             }).then(function (result) {
                 $uibModalInstance.close(result.data);
