@@ -18,6 +18,9 @@
         });
 
         self.loadCategories = function(source) {
+            self.categoryValues = null;
+            self.behaviortraining.category = null;
+            self.behaviortraining.value = null;
             bbData.load({
                 data: 'api/dogs/ratings/categories?sourceName=' + encodeURIComponent(source || '')
             }).then(function (result) {
