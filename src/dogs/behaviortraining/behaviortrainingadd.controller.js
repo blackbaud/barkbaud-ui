@@ -39,11 +39,13 @@
         };
 
         self.findCategoryByName = function(categoryName) {
+            var categoryToReturn;
             self.categories.forEach( function (category) {
                 if (category.name === categoryName) {
-                    return category;
+                    categoryToReturn = category;
                 }
             });
+            return categoryToReturn;
         };
 
         self.behaviortraining = {}

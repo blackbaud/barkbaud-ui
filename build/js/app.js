@@ -813,11 +813,13 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.findCategoryByName = function(categoryName) {
+            var categoryToReturn;
             self.categories.forEach( function (category) {
                 if (category.name === categoryName) {
-                    return category;
+                    categoryToReturn = category;
                 }
             });
+            return categoryToReturn;
         };
 
         self.behaviortraining = {}
