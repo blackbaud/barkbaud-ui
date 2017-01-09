@@ -27,12 +27,13 @@
 
         self.checkLoadValues = function(categoryName) {
             self.behaviortraining.category = self.findCategoryByName(categoryName);
-            console.log("testing");
-            bbData.load({
-                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
-            }).then(function (result) {
-                self.categoryValues = result.data.value;
-            });
+            if (self.behaviortraining.category.type === 'codetable') {
+                bbData.load({
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
+                }).then(function (result) {
+                    self.categoryValues = result.data.value;
+                });
+            }
         };
 
         self.findCategoryByName = function(categoryName) {

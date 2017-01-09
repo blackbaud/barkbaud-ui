@@ -801,12 +801,13 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.checkLoadValues = function(categoryName) {
             self.behaviortraining.category = self.findCategoryByName(categoryName);
-            console.log("testing");
-            bbData.load({
-                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
-            }).then(function (result) {
-                self.categoryValues = result.data.value;
-            });
+            if (self.behaviortraining.category.type === 'codetable') {
+                bbData.load({
+                    data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
+                }).then(function (result) {
+                    self.categoryValues = result.data.value;
+                });
+            }
         };
 
         self.findCategoryByName = function(categoryName) {
@@ -1424,9 +1425,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Category:</label>\n' +
-        '              <select class="form-control" ng-change="behaviorTraningAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
-        '               <option value="test">test</option>\n' +
-        '               <option value="test2">test2</option>\n' +
+        '              <select class="form-control" ng-change="behaviorTrainingAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-model="behaviorTrainingAdd.behaviortraining.category.name">\n' +
         '               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>\n' +
         '             </select>\n' +
         '            </div>\n' +
