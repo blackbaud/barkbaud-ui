@@ -27,6 +27,8 @@
 
         self.checkLoadValues = function(categoryName) {
             self.behaviortraining.category = self.findCategoryByName(categoryName);
+            console.log(self.findCategoryByName(categoryName));
+            console.log(self.behaviortraining.category);
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
                     data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
@@ -39,7 +41,6 @@
         self.findCategoryByName = function(categoryName) {
             self.categories.forEach( function (category) {
                 if (category.name === categoryName) {
-                    console.log(category);
                     return category;
                 }
             });
