@@ -27,8 +27,6 @@
 
         self.checkLoadValues = function(categoryName) {
             self.behaviortraining.category = self.findCategoryByName(categoryName);
-            console.log(self.findCategoryByName(categoryName));
-            console.log(self.behaviortraining.category);
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
                     data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
@@ -49,6 +47,13 @@
         };
 
         self.behaviortraining = {}
+        yesno: [{
+                    value: true,
+                    label: "Yes"
+                }, {
+                    value: false,
+                    label: "No"
+                }];
         self.saveData = function () {
             bbData.save({
                 url: 'api/dogs/' + dogId + '/notes',

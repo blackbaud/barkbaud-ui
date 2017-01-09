@@ -57,9 +57,37 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-12">\n' +
         '            <div class="form-group" ng-switch on="behaviorTrainingAdd.behaviortraining.category.type">\n' +
         '              <label class="control-label">Value:</label>\n' +
-        '              <select class="form-control" ng-switch-when="codetable" ng-model="behaviorTrainingAdd.behaviortraining.value">\n' +
-        '               <option ng-repeat="categoryValue in behaviorTrainingAdd.categoryValues" ng-bind="categoryValue" value="{{categoryValue}}"></option>\n' +
-        '             </select>\n' +
+        '              <span ng-switch="behaviorTrainingAdd.behaviortraining.category.type">\n' +
+        '                        <!--None selected -->\n' +
+        '                        <input type="text" class="form-control" ng-disabled="true" ng-if="!behaviorTrainingAdd.behaviortraining.category" />\n' +
+        '                        <!--Unknown -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="unknown" ng-maxlength="255" />\n' +
+        '                        <!--Text -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="text" ng-maxlength="255" />\n' +
+        '                        <!--Number -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="number" />\n' +
+        '                        <!--Date -->\n' +
+        '                        <bb-datepicker bb-datepicker-name="Value"\n' +
+        '                                       ng-model="behaviorTrainingAdd.behaviortraining.value"\n' +
+        '                                       ng-switch-when="datetime"\n' +
+        '                                       bb-datepicker-min="behaviorTrainingAdd.minDate"\n' +
+        '                                       bb-datepicker-max="behaviorTrainingAdd.maxDate"\n' +
+        '                                       bb-datepicker-append-to-body="true">\n' +
+        '                        </bb-datepicker>\n' +
+        '                        <!--Currency = 4, -->\n' +
+        '                        <input type="text" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="currency" />\n' +
+        '                        <!--Boolean = 5, -->\n' +
+        '                        <select class="form-control"\n' +
+        '                                ng-model="behaviorTrainingAdd.behaviortraining.value"\n' +
+        '                                ng-options="yes_or_no.value as yes_or_no.label for yes_or_no in behaviorTrainingAdd.yesno"\n' +
+        '                                ng-switch-when="boolean"></select>\n' +
+        '                        <!--CodeTableEntry = 6, -->\n' +
+        '                        <select class="form-control"\n' +
+        '                                ng-model="behaviorTrainingAdd.behaviortraining.value"\n' +
+        '                                ng-options="categoryValue as categoryValue for categoryValue in behaviorTrainingAdd.categoryValues"\n' +
+        '                                ng-switch-when="codetable">\n' +
+        '                        </select>\n' +
+        '                    </span>\n' +
         '            </div>\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">\n' +

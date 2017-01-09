@@ -25,9 +25,37 @@
           <div class="col-sm-12">
             <div class="form-group" ng-switch on="behaviorTrainingAdd.behaviortraining.category.type">
               <label class="control-label">Value:</label>
-              <select class="form-control" ng-switch-when="codetable" ng-model="behaviorTrainingAdd.behaviortraining.value">
-               <option ng-repeat="categoryValue in behaviorTrainingAdd.categoryValues" ng-bind="categoryValue" value="{{categoryValue}}"></option>
-             </select>
+              <span ng-switch="behaviorTrainingAdd.behaviortraining.category.type">
+                        <!--None selected -->
+                        <input type="text" class="form-control" ng-disabled="true" ng-if="!behaviorTrainingAdd.behaviortraining.category" />
+                        <!--Unknown -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="unknown" ng-maxlength="255" />
+                        <!--Text -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="text" ng-maxlength="255" />
+                        <!--Number -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="number" />
+                        <!--Date -->
+                        <bb-datepicker bb-datepicker-name="Value"
+                                       ng-model="behaviorTrainingAdd.behaviortraining.value"
+                                       ng-switch-when="datetime"
+                                       bb-datepicker-min="behaviorTrainingAdd.minDate"
+                                       bb-datepicker-max="behaviorTrainingAdd.maxDate"
+                                       bb-datepicker-append-to-body="true">
+                        </bb-datepicker>
+                        <!--Currency = 4, -->
+                        <input type="text" class="form-control" ng-model="behaviorTrainingAdd.behaviortraining.value" ng-switch-when="currency" />
+                        <!--Boolean = 5, -->
+                        <select class="form-control"
+                                ng-model="behaviorTrainingAdd.behaviortraining.value"
+                                ng-options="yes_or_no.value as yes_or_no.label for yes_or_no in behaviorTrainingAdd.yesno"
+                                ng-switch-when="boolean"></select>
+                        <!--CodeTableEntry = 6, -->
+                        <select class="form-control"
+                                ng-model="behaviorTrainingAdd.behaviortraining.value"
+                                ng-options="categoryValue as categoryValue for categoryValue in behaviorTrainingAdd.categoryValues"
+                                ng-switch-when="codetable">
+                        </select>
+                    </span>
             </div>
             <div class="form-group">
               <label class="control-label">
