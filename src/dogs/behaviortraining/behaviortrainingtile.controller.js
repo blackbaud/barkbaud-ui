@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, behaviorTrainingAdd) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, bbModal, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
         var self = this;
         console.log(dogId);
 
@@ -24,8 +24,12 @@
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
+        self.addBehaviorTraining = function (behaviorTrainingId) {
+            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
+        };
+
         self.load();
-    }
+    };
 
     DogBehaviorTrainingTileController.$inject = [
         '$scope',
@@ -33,7 +37,8 @@
         'bbMoment',
         'bbModal',
         'dogId',
-        'behaviorTrainingAdd'
+        'barkBehaviorTrainingAdd',
+        'barkBehaviorTrainingDelete'
     ];
 
     angular.module('barkbaud')
