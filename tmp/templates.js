@@ -119,9 +119,9 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        <div class="row">\n' +
         '          <div class="col-sm-12">\n' +
         '            <h3>Are you sure you want to delete the following rating?</h3>\n' +
-        '            <h4>{{:: rating.category.name }}</h4>\n' +
-        '            <h5>{{:: rating.value }}</h5>\n' +
-        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
+        '            <h4>{{:: behaviorTrainingDelete.rating.category.name }}</h4>\n' +
+        '            <h5>{{:: behaviorTrainingDelete.rating.value }}</h5>\n' +
+        '            <p ng-if=":: rating.source">{{:: behaviorTrainingDelete.rating.source }}</p>\n' +
         '          </div>\n' +
         '      </div>\n' +
         '      <bb-modal-footer>\n' +
