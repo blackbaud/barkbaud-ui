@@ -3,8 +3,9 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd) {
         var self = this;
+        console.log(dogId);
 
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
@@ -23,10 +24,6 @@
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.deleteBehaviorTraining = function (behaviorTrainingId) {
-            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
-        };
-
         self.load();
     }
 
@@ -36,8 +33,7 @@
         'bbMoment',
         'bbModal',
         'dogId',
-        'barkBehaviorTrainingAdd',
-        'barkBehaviorTrainingDelete'
+        'barkBehaviorTrainingAdd'
     ];
 
     angular.module('barkbaud')

@@ -957,6 +957,7 @@ angular.module('md5', []).constant('md5', (function() {
 
     function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
         var self = this;
+        console.log(dogId);
 
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
