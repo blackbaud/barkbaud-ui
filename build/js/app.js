@@ -889,12 +889,14 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function BehaviorTrainingDeleteController(formOptions, loadResult, $uibModalInstance, bbData, bbEventTracker, bbDatepickerConfig, bbWait, bbToast) {
+    function BehaviorTrainingDeleteController($uibModalInstance, bbData, dogId, behaviorTrainingId) {
 
-        function save() {
+        var self = this;
+
+        function saveData() {
             if (self.confirmDelete) {
                 bbData.save({
-                    url: 'api/dogs/' + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId),
+                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId),
                     type: 'DELETE'
                 }).then(function (result) {
                     $uibModalInstance.close(result.data);
@@ -905,17 +907,15 @@ angular.module('md5', []).constant('md5', (function() {
         }
 
         bbData.load({
-            data: "api/dogs/" + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId)
+            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId)
         }).then(function (result) {
             self.rating = result.data;
         }).catch(function (result) {
             self.error = result.data.error;
         })
-
-        self.confirmDelete;
     }
 
-    BehaviorTrainingDeleteController.$inject = ['formOptions', '$uibModalInstance', 'bbData', 'bbEventTracker', 'bbDatepickerConfig', 'bbWait', 'bbToast'];
+    BehaviorTrainingDeleteController.$inject = ['$uibModalInstance', 'bbData', 'dogId', 'behaviorTrainingId'];
 
     angular.module('barkbaud')
         .controller('BehaviorTrainingDeleteController', BehaviorTrainingDeleteController)
@@ -955,7 +955,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
         var self = this;
 
         self.load = function () {
@@ -988,9 +988,9 @@ angular.module('md5', []).constant('md5', (function() {
         'bbData',
         'bbMoment',
         'bbModal',
+        'dogId',
         'barkBehaviorTrainingAdd',
-        'barkBehaviorTrainingDelete',
-        'dogId'
+        'barkBehaviorTrainingDelete'
     ];
 
     angular.module('barkbaud')
@@ -1624,7 +1624,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
         '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating.id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
         '                </bb-context-menu>\n' +
         '            </span>\n' +

@@ -4,12 +4,14 @@
 (function () {
     'use strict';
 
-    function BehaviorTrainingDeleteController(formOptions, loadResult, $uibModalInstance, bbData, bbEventTracker, bbDatepickerConfig, bbWait, bbToast) {
+    function BehaviorTrainingDeleteController($uibModalInstance, bbData, dogId, behaviorTrainingId) {
 
-        function save() {
+        var self = this;
+
+        function saveData() {
             if (self.confirmDelete) {
                 bbData.save({
-                    url: 'api/dogs/' + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId),
+                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId),
                     type: 'DELETE'
                 }).then(function (result) {
                     $uibModalInstance.close(result.data);
@@ -20,17 +22,15 @@
         }
 
         bbData.load({
-            data: "api/dogs/" + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId)
+            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId)
         }).then(function (result) {
             self.rating = result.data;
         }).catch(function (result) {
             self.error = result.data.error;
         })
-
-        self.confirmDelete;
     }
 
-    BehaviorTrainingDeleteController.$inject = ['formOptions', '$uibModalInstance', 'bbData', 'bbEventTracker', 'bbDatepickerConfig', 'bbWait', 'bbToast'];
+    BehaviorTrainingDeleteController.$inject = ['$uibModalInstance', 'bbData', 'dogId', 'behaviorTrainingId'];
 
     angular.module('barkbaud')
         .controller('BehaviorTrainingDeleteController', BehaviorTrainingDeleteController)

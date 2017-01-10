@@ -158,7 +158,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
         '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating.id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
         '                </bb-context-menu>\n' +
         '            </span>\n' +

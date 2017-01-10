@@ -3,7 +3,9 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete, dogId) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, 
+        // barkBehaviorTrainingAdd, barkBehaviorTrainingDelete
+        ) {
         var self = this;
 
         self.load = function () {
@@ -20,13 +22,13 @@
             });
         };
 
-        self.addBehaviorTraining = function () {
-            barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
-        };
+        // self.addBehaviorTraining = function () {
+        //     barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
+        // };
 
-        self.deleteBehaviorTraining = function (behaviorTrainingId) {
-            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
-        };
+        // self.deleteBehaviorTraining = function (behaviorTrainingId) {
+        //     barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
+        // };
 
         self.load();
     }
@@ -36,9 +38,9 @@
         'bbData',
         'bbMoment',
         'bbModal',
-        'barkBehaviorTrainingAdd',
-        'barkBehaviorTrainingDelete',
-        'dogId'
+        'dogId',
+        // 'barkBehaviorTrainingAdd',
+        // 'barkBehaviorTrainingDelete'
     ];
 
     angular.module('barkbaud')
