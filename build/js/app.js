@@ -960,7 +960,6 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
-            console.log(dogId);
             bbData.load({
                 data: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings'
             }).then(function (result) {
