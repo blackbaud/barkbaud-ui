@@ -8,8 +8,9 @@
 
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
+            console.log(dogId);
             bbData.load({
-                data: 'api/dogs/' + dogId + '/ratings'
+                data: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings'
             }).then(function (result) {
                 self.ratings = result.data.value;
                 $scope.$emit('bbEndWait', { nonblocking: true });
