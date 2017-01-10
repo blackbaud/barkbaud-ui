@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function barkBehaviorTrainingAdd(bbModal) {
+    function behaviorTrainingAdd(bbModal) {
         return {
             open: function (dogId) {
                 return bbModal.open({
@@ -19,8 +19,8 @@
         };
     }
 
-    barkBehaviorTrainingAdd.$inject = ['bbModal'];
+    barkNoteAdd.$inject = ['bbModal'];
 
     angular.module('barkbaud')
-        .factory('barkBehaviorTrainingAdd', barkBehaviorTrainingAdd);
+        .factory('behaviorTrainingAdd', behaviorTrainingAdd);
 }());

@@ -861,7 +861,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function barkBehaviorTrainingAdd(bbModal) {
+    function behaviorTrainingAdd(bbModal) {
         return {
             open: function (dogId) {
                 return bbModal.open({
@@ -877,77 +877,10 @@ angular.module('md5', []).constant('md5', (function() {
         };
     }
 
-    barkBehaviorTrainingAdd.$inject = ['bbModal'];
+    barkNoteAdd.$inject = ['bbModal'];
 
     angular.module('barkbaud')
-        .factory('barkBehaviorTrainingAdd', barkBehaviorTrainingAdd);
-}());
-
-/*jslint browser: false */
-/*global angular */
-
-(function () {
-    'use strict';
-
-    function BehaviorTrainingDeleteController($uibModalInstance, bbData, dogId, behaviorTrainingId) {
-
-        var self = this;
-
-        function saveData() {
-            if (self.confirmDelete) {
-                bbData.save({
-                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId),
-                    type: 'DELETE'
-                }).then(function (result) {
-                    $uibModalInstance.close(result.data);
-                }).catch(function (result) {
-                    self.error = result.data.error;
-                });
-            }
-        }
-
-        bbData.load({
-            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId)
-        }).then(function (result) {
-            self.rating = result.data;
-        }).catch(function (result) {
-            self.error = result.data.error;
-        })
-    }
-
-    BehaviorTrainingDeleteController.$inject = ['$uibModalInstance', 'bbData', 'dogId', 'behaviorTrainingId'];
-
-    angular.module('barkbaud')
-        .controller('BehaviorTrainingDeleteController', BehaviorTrainingDeleteController)
-}());
-/*global angular */
-
-(function () {
-    'use strict';
-
-    function barkBehaviorTrainingDelete(bbModal) {
-        return {
-            open: function (dogId, behaviorTrainingId) {
-                return bbModal.open({
-                    controller: 'BehaviorTrainingDeleteController as behaviorTrainingDelete',
-                    templateUrl: 'dogs/behaviortraining/behaviortrainingdelete.html',
-                    resolve: {
-                        dogId: function () {
-                            return dogId;
-                        },
-                        behaviorTrainingId: function() {
-                            return behaviorTrainingId;
-                        }
-                    }
-                });
-            }
-        };
-    }
-
-    barkBehaviorTrainingDelete.$inject = ['bbModal'];
-
-    angular.module('barkbaud')
-        .factory('barkBehaviorTrainingDelete', barkBehaviorTrainingDelete);
+        .factory('behaviorTrainingAdd', behaviorTrainingAdd);
 }());
 
 /*global angular */
@@ -955,7 +888,7 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, behaviorTrainingAdd) {
         var self = this;
         console.log(dogId);
 
@@ -976,10 +909,6 @@ angular.module('md5', []).constant('md5', (function() {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.deleteBehaviorTraining = function (behaviorTrainingId) {
-            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
-        };
-
         self.load();
     }
 
@@ -989,8 +918,7 @@ angular.module('md5', []).constant('md5', (function() {
         'bbMoment',
         'bbModal',
         'dogId',
-        'barkBehaviorTrainingAdd',
-        'barkBehaviorTrainingDelete'
+        'behaviorTrainingAdd'
     ];
 
     angular.module('barkbaud')
@@ -1566,32 +1494,6 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '      </div>\n' +
         '      <bb-modal-footer>\n' +
         '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
-        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
-        '        <span ng-show="behaviorTrainingAdd.error" class="text-danger">\n' +
-        '          <span ng-show="behaviorTrainingAdd.error.message">{{ behaviorTrainingAdd.error.message }}</span>\n' +
-        '          <span ng-hide="behaviorTrainingAdd.error.message">Unknown error occured.</span>\n' +
-        '        </span>\n' +
-        '      </bb-modal-footer>\n' +
-        '    </div>\n' +
-        '  </form>\n' +
-        '</bb-modal>\n' +
-        '');
-    $templateCache.put('dogs/behaviortraining/behaviortrainingdelete.html',
-        '<bb-modal>\n' +
-        '  <form name="behaviorTrainingDelete.formDelete" ng-submit="behaviorTrainingDelete.saveData()">\n' +
-        '    <div class="modal-form">\n' +
-        '      <bb-modal-header>Delete Behavior/Training</bb-modal-header>\n' +
-        '      <div bb-modal-body>\n' +
-        '        <div class="row">\n' +
-        '          <div class="col-sm-12">\n' +
-        '            <h3>Are you sure you want to delete the following rating?</h3>\n' +
-        '            <h4>{{:: rating.category.name }}</h4>\n' +
-        '            <h5>{{:: rating.value }}</h5>\n' +
-        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
-        '          </div>\n' +
-        '      </div>\n' +
-        '      <bb-modal-footer>\n' +
-        '        <bb-modal-footer-button-primary>Confirm</bb-modal-footer-button-primary>\n' +
         '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
         '        <span ng-show="behaviorTrainingAdd.error" class="text-danger">\n' +
         '          <span ng-show="behaviorTrainingAdd.error.message">{{ behaviorTrainingAdd.error.message }}</span>\n' +

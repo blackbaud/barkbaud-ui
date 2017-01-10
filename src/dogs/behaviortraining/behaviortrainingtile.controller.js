@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, barkBehaviorTrainingAdd) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, dogId, behaviorTrainingAdd) {
         var self = this;
         console.log(dogId);
 
@@ -33,7 +33,7 @@
         'bbMoment',
         'bbModal',
         'dogId',
-        'barkBehaviorTrainingAdd'
+        'behaviorTrainingAdd'
     ];
 
     angular.module('barkbaud')
