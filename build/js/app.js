@@ -883,12 +883,79 @@ angular.module('md5', []).constant('md5', (function() {
         .factory('barkBehaviorTrainingAdd', barkBehaviorTrainingAdd);
 }());
 
+/*jslint browser: false */
 /*global angular */
 
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, dogId) {
+    function BehaviorTrainingDeleteController(formOptions, loadResult, $uibModalInstance, bbData, bbEventTracker, bbDatepickerConfig, bbWait, bbToast) {
+
+        function save() {
+            if (self.confirmDelete) {
+                bbData.save({
+                    url: 'api/dogs/' + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId),
+                    type: 'DELETE'
+                }).then(function (result) {
+                    $uibModalInstance.close(result.data);
+                }).catch(function (result) {
+                    self.error = result.data.error;
+                });
+            }
+        }
+
+        bbData.load({
+            data: "api/dogs/" + encodeURIComponent(formOptions.dogId) + '/ratings' + encodeURIComponent(formOptions.behaviorTrainingId)
+        }).then(function (result) {
+            self.rating = result.data;
+        }).catch(function (result) {
+            self.error = result.data.error;
+        })
+
+        self.confirmDelete;
+    }
+
+    BehaviorTrainingDeleteController.$inject = ['formOptions', '$uibModalInstance', 'bbData', 'bbEventTracker', 'bbDatepickerConfig', 'bbWait', 'bbToast'];
+
+    angular.module('barkbaud')
+        .controller('BehaviorTrainingDeleteController', BehaviorTrainingDeleteController)
+}());
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function barkBehaviorTrainingDelete(bbModal) {
+        return {
+            open: function (dogId, behaviorTrainingId) {
+                return bbModal.open({
+                    controller: 'BehaviorTrainingDeleteController as behaviorTrainingDelete',
+                    templateUrl: 'dogs/behaviortraining/behaviortrainingdelete.html',
+                    resolve: {
+                        dogId: function () {
+                            return dogId;
+                        },
+                        behaviorTrainingId: function() {
+                            return behaviorTrainingId;
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    barkBehaviorTrainingDelete.$inject = ['bbModal'];
+
+    angular.module('barkbaud')
+        .factory('barkBehaviorTrainingDelete', barkBehaviorTrainingDelete);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete, dogId) {
         var self = this;
 
         self.load = function () {
@@ -908,6 +975,9 @@ angular.module('md5', []).constant('md5', (function() {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
+        self.locals = {
+            dogId: dogId
+        };
         self.load();
     }
 
@@ -915,7 +985,9 @@ angular.module('md5', []).constant('md5', (function() {
         '$scope',
         'bbData',
         'bbMoment',
+        'bbModal',
         'barkBehaviorTrainingAdd',
+        'barkBehaviorTrainingDelete',
         'dogId'
     ];
 
@@ -1502,6 +1574,32 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </form>\n' +
         '</bb-modal>\n' +
         '');
+    $templateCache.put('dogs/behaviortraining/behaviortrainingdelete.html',
+        '<bb-modal>\n' +
+        '  <form name="behaviorTrainingDelete.formDelete" ng-submit="behaviorTrainingDelete.saveData()">\n' +
+        '    <div class="modal-form">\n' +
+        '      <bb-modal-header>Delete Behavior/Training</bb-modal-header>\n' +
+        '      <div bb-modal-body>\n' +
+        '        <div class="row">\n' +
+        '          <div class="col-sm-12">\n' +
+        '            <h3>Are you sure you want to delete the following rating?</h3>\n' +
+        '            <h4>{{:: rating.category.name }}</h4>\n' +
+        '            <h5>{{:: rating.value }}</h5>\n' +
+        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
+        '          </div>\n' +
+        '      </div>\n' +
+        '      <bb-modal-footer>\n' +
+        '        <bb-modal-footer-button-primary>Confirm</bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '        <span ng-show="behaviorTrainingAdd.error" class="text-danger">\n' +
+        '          <span ng-show="behaviorTrainingAdd.error.message">{{ behaviorTrainingAdd.error.message }}</span>\n' +
+        '          <span ng-hide="behaviorTrainingAdd.error.message">Unknown error occured.</span>\n' +
+        '        </span>\n' +
+        '      </bb-modal-footer>\n' +
+        '    </div>\n' +
+        '  </form>\n' +
+        '</bb-modal>\n' +
+        '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
         '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
         '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
@@ -1519,19 +1617,18 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        <div ng-switch-default class="bb-repeater">\n' +
         '          <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">\n' +
         '            <span class="custom-rating-dropdown">\n' +
-        '                <!--<bb-context-menu>\n' +
-        '                    <li role="presentation">\n' +
+        '                <bb-context-menu>\n' +
+        '                    <!--<li role="presentation">\n' +
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
-        '                    </li>\n' +
+        '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingDeleteForm(rating.id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="BehaviorTrainingDeleteForm.openForm(dogBehaviorTrainingTile.locals.dogId, rating._id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
-        '                </bb-context-menu>-->\n' +
+        '                </bb-context-menu>\n' +
         '            </span>\n' +
         '            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>\n' +
         '            <h5>{{:: rating.value }}</h5>\n' +
         '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
-        '            <p ng-if=":: rating.constituentRatingId">RatingId: {{:: rating.consituentRatingId }}</p>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +

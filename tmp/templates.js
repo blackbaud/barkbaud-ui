@@ -110,6 +110,32 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </form>\n' +
         '</bb-modal>\n' +
         '');
+    $templateCache.put('dogs/behaviortraining/behaviortrainingdelete.html',
+        '<bb-modal>\n' +
+        '  <form name="behaviorTrainingDelete.formDelete" ng-submit="behaviorTrainingDelete.saveData()">\n' +
+        '    <div class="modal-form">\n' +
+        '      <bb-modal-header>Delete Behavior/Training</bb-modal-header>\n' +
+        '      <div bb-modal-body>\n' +
+        '        <div class="row">\n' +
+        '          <div class="col-sm-12">\n' +
+        '            <h3>Are you sure you want to delete the following rating?</h3>\n' +
+        '            <h4>{{:: rating.category.name }}</h4>\n' +
+        '            <h5>{{:: rating.value }}</h5>\n' +
+        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
+        '          </div>\n' +
+        '      </div>\n' +
+        '      <bb-modal-footer>\n' +
+        '        <bb-modal-footer-button-primary>Confirm</bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '        <span ng-show="behaviorTrainingAdd.error" class="text-danger">\n' +
+        '          <span ng-show="behaviorTrainingAdd.error.message">{{ behaviorTrainingAdd.error.message }}</span>\n' +
+        '          <span ng-hide="behaviorTrainingAdd.error.message">Unknown error occured.</span>\n' +
+        '        </span>\n' +
+        '      </bb-modal-footer>\n' +
+        '    </div>\n' +
+        '  </form>\n' +
+        '</bb-modal>\n' +
+        '');
     $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
         '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
         '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
@@ -127,19 +153,18 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '        <div ng-switch-default class="bb-repeater">\n' +
         '          <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">\n' +
         '            <span class="custom-rating-dropdown">\n' +
-        '                <!--<bb-context-menu>\n' +
-        '                    <li role="presentation">\n' +
+        '                <bb-context-menu>\n' +
+        '                    <!--<li role="presentation">\n' +
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
-        '                    </li>\n' +
+        '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingDeleteForm(rating.id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="BehaviorTrainingDeleteForm.openForm(dogBehaviorTrainingTile.locals.dogId, rating._id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
-        '                </bb-context-menu>-->\n' +
+        '                </bb-context-menu>\n' +
         '            </span>\n' +
         '            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>\n' +
         '            <h5>{{:: rating.value }}</h5>\n' +
         '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
-        '            <p ng-if=":: rating.constituentRatingId">RatingId: {{:: rating.consituentRatingId }}</p>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +

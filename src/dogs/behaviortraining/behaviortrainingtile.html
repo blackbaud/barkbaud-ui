@@ -14,19 +14,18 @@
         <div ng-switch-default class="bb-repeater">
           <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">
             <span class="custom-rating-dropdown">
-                <!--<bb-context-menu>
-                    <li role="presentation">
+                <bb-context-menu>
+                    <!--<li role="presentation">
                         <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>
-                    </li>
+                    </li>-->
                     <li role="presentation">
-                        <a role="menuitem" href="" ng-click="showBehaviorTrainingDeleteForm(rating.id)" >Delete Behavior/Training</a>
+                        <a role="menuitem" href="" ng-click="BehaviorTrainingDeleteForm.openForm(dogBehaviorTrainingTile.locals.dogId, rating._id)" >Delete Behavior/Training</a>
                     </li>
-                </bb-context-menu>-->
+                </bb-context-menu>
             </span>
             <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>
             <h5>{{:: rating.value }}</h5>
             <p ng-if=":: rating.source">{{:: rating.source }}</p>
-            <p ng-if=":: rating.constituentRatingId">RatingId: {{:: rating.consituentRatingId }}</p>
           </div>
         </div>
       </div>
