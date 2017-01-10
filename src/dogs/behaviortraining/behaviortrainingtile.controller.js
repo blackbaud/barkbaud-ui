@@ -23,9 +23,6 @@
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.locals = {
-            dogId: dogId
-        };
         self.load();
     }
 

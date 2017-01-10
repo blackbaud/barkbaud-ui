@@ -975,9 +975,6 @@ angular.module('md5', []).constant('md5', (function() {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.locals = {
-            dogId: dogId
-        };
         self.load();
     }
 
@@ -1622,7 +1619,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
         '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="BehaviorTrainingDeleteForm.openForm(dogBehaviorTrainingTile.locals.dogId, rating._id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="BehaviorTrainingDeleteForm.openForm(dogId, rating._id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
         '                </bb-context-menu>\n' +
         '            </span>\n' +
