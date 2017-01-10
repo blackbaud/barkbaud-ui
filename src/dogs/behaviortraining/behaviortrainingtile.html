@@ -19,13 +19,14 @@
                         <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>
                     </li>-->
                     <li role="presentation">
-                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating.id)" >Delete Behavior/Training</a>
+                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>
                     </li>
                 </bb-context-menu>
             </span>
             <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>
             <h5>{{:: rating.value }}</h5>
             <p ng-if=":: rating.source">{{:: rating.source }}</p>
+            <p>{{:: rating._id }}</p>
           </div>
         </div>
       </div>

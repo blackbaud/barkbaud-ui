@@ -158,13 +158,14 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
         '                    </li>-->\n' +
         '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating.id)" >Delete Behavior/Training</a>\n' +
+        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>\n' +
         '                    </li>\n' +
         '                </bb-context-menu>\n' +
         '            </span>\n' +
         '            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>\n' +
         '            <h5>{{:: rating.value }}</h5>\n' +
         '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
+        '            <p>{{:: rating._id }}</p>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +

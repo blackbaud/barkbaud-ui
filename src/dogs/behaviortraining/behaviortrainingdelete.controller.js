@@ -11,7 +11,7 @@
         function saveData() {
             if (self.confirmDelete) {
                 bbData.save({
-                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId),
+                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId),
                     type: 'DELETE'
                 }).then(function (result) {
                     $uibModalInstance.close(result.data);
