@@ -892,7 +892,7 @@ angular.module('md5', []).constant('md5', (function() {
     function BehaviorTrainingDeleteController($uibModalInstance, bbData, dogId, behaviorTrainingId) {
 
         var self = this;
-
+        console.log('in behavior delete controller');
         function saveData() {
             if (self.confirmDelete) {
                 bbData.save({
@@ -912,7 +912,7 @@ angular.module('md5', []).constant('md5', (function() {
             self.rating = result.data;
         }).catch(function (result) {
             self.error = result.data.error;
-        })
+        });
     }
 
     BehaviorTrainingDeleteController.$inject = ['$uibModalInstance', 'bbData', 'dogId', 'behaviorTrainingId'];
@@ -976,7 +976,7 @@ angular.module('md5', []).constant('md5', (function() {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.addBehaviorTraining = function (behaviorTrainingId) {
+        self.deleteBehaviorTraining = function (behaviorTrainingId) {
             barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
         };
 

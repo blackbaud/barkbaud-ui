@@ -7,7 +7,7 @@
     function BehaviorTrainingDeleteController($uibModalInstance, bbData, dogId, behaviorTrainingId) {
 
         var self = this;
-
+        console.log('in behavior delete controller');
         function saveData() {
             if (self.confirmDelete) {
                 bbData.save({
@@ -27,7 +27,7 @@
             self.rating = result.data;
         }).catch(function (result) {
             self.error = result.data.error;
-        })
+        });
     }
 
     BehaviorTrainingDeleteController.$inject = ['$uibModalInstance', 'bbData', 'dogId', 'behaviorTrainingId'];
