@@ -907,7 +907,7 @@ angular.module('md5', []).constant('md5', (function() {
         }
 
         bbData.load({
-            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId)
+            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId)
         }).then(function (result) {
             self.rating = result.data;
         }).catch(function (result) {

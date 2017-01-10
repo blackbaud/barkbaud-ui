@@ -22,7 +22,7 @@
         }
 
         bbData.load({
-            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings' + encodeURIComponent(behaviorTrainingId)
+            data: "api/dogs/" + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId)
         }).then(function (result) {
             self.rating = result.data;
         }).catch(function (result) {
