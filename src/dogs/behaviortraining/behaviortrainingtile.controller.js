@@ -24,7 +24,7 @@
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
-        self.addBehaviorTraining = function (behaviorTrainingId) {
+        self.deleteBehaviorTraining = function (behaviorTrainingId) {
             barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
         };
 
