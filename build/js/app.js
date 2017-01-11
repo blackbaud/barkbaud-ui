@@ -804,6 +804,7 @@ angular.module('md5', []).constant('md5', (function() {
 
         self.checkLoadValues = function(categoryName) {
             self.behaviortraining.value = null;
+            console.log(self.findCategoryByName(categoryName));
             self.behaviortraining.category = self.findCategoryByName(categoryName);
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
@@ -817,7 +818,7 @@ angular.module('md5', []).constant('md5', (function() {
         self.findCategoryByName = function(categoryName) {
             var categoryToReturn;
             self.categories.forEach( function (category) {
-                if (category.name === categoryName) {
+                if (category.name == categoryName) {
                     categoryToReturn = category;
                 }
             });
