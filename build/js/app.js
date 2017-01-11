@@ -893,7 +893,7 @@ angular.module('md5', []).constant('md5', (function() {
 
         var self = this;
         console.log('in behavior delete controller');
-        function saveData() {
+        self.saveData = function() {
             bbData.save({
                 url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId),
                 type: 'DELETE'

@@ -8,7 +8,7 @@
 
         var self = this;
         console.log('in behavior delete controller');
-        function saveData() {
+        self.saveData = function() {
             bbData.save({
                 url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId),
                 type: 'DELETE'
