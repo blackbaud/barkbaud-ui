@@ -894,16 +894,14 @@ angular.module('md5', []).constant('md5', (function() {
         var self = this;
         console.log('in behavior delete controller');
         function saveData() {
-            if (self.confirmDelete) {
-                bbData.save({
-                    url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId),
-                    type: 'DELETE'
-                }).then(function (result) {
-                    $uibModalInstance.close(result.data);
-                }).catch(function (result) {
-                    self.error = result.data.error;
-                });
-            }
+            bbData.save({
+                url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviorTrainingId),
+                type: 'DELETE'
+            }).then(function (result) {
+                $uibModalInstance.close(result.data);
+            }).catch(function (result) {
+                self.error = result.data.error;
+            });
         }
 
         bbData.load({
