@@ -803,6 +803,7 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.checkLoadValues = function(categoryName) {
+            self.behaviortraining.value = null;
             self.behaviortraining.category = self.findCategoryByName(categoryName);
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({

@@ -29,6 +29,7 @@
         };
 
         self.checkLoadValues = function(categoryName) {
+            self.behaviortraining.value = null;
             self.behaviortraining.category = self.findCategoryByName(categoryName);
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
