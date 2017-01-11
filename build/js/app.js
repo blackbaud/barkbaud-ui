@@ -816,13 +816,14 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.findCategoryByName = function(categoryName) {
-            var categoryToReturn;
-            self.categories.forEach( function (category) {
-                if (category.name == categoryName) {
-                    categoryToReturn = category;
+            var lookup;
+            for (var i = 0; i < self.categories.length; i++) {
+                if (self.categories[i].name == categoryName) {
+                    lookup = i;
+                    break;
                 }
-            });
-            return categoryToReturn;
+            }
+            return self.categories[lookup];
         };
 
         self.behaviortraining = {}
