@@ -1,0 +1,78 @@
+<bb-modal>
+  <form name="behaviorTrainingEdit.formEdit" ng-submit="behaviorTrainingEdit.saveData()">
+    <div class="modal-form">
+      <bb-modal-header>Edit Behavior/Training</bb-modal-header>
+      <div bb-modal-body>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="control-label">Source:</label>
+              <select class="form-control" ng-disabled="true">
+                <option ng-bind="behaviorTrainingEdit.behaviortraining.source"></option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="control-label">Category:</label>
+                <select class="form-control" ng-disabled="true">
+                  <option ng-bind="behaviorTrainingEdit.behaviortraining.category.name"></option>
+                </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group" ng-switch on="behaviorTrainingEdit.behaviortraining.category.type">
+              <label class="control-label">Value:</label>
+              <span ng-switch="behaviorTrainingEdit.behaviortraining.category.type">
+                        <!--None selected -->
+                        <input type="text" class="form-control" ng-disabled="true" ng-if="!behaviorTrainingEdit.behaviortraining.category" />
+                        <!--Unknown -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="unknown" ng-maxlength="255" />
+                        <!--Text -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="text" ng-maxlength="255" />
+                        <!--Number -->
+                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="number" />
+                        <!--Date -->
+                        <bb-datepicker bb-datepicker-name="Value"
+                                       ng-model="behaviorTrainingEdit.behaviortraining.value"
+                                       ng-switch-when="datetime"
+                                       bb-datepicker-min="behaviorTrainingEdit.minDate"
+                                       bb-datepicker-max="behaviorTrainingEdit.maxDate"
+                                       bb-datepicker-append-to-body="true">
+                        </bb-datepicker>
+                        <!--Currency = 4, -->
+                        <input type="text" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="currency" />
+                        <!--Boolean = 5, -->
+                        <select class="form-control"
+                                ng-model="behaviorTrainingEdit.behaviortraining.value"
+                                ng-options="yes_or_no.value as yes_or_no.label for yes_or_no in behaviorTrainingEdit.yesno"
+                                ng-switch-when="boolean"></select>
+                        <!--CodeTableEntry = 6, -->
+                        <select class="form-control"
+                                ng-model="behaviorTrainingEdit.behaviortraining.value"
+                                ng-options="categoryValue as categoryValue for categoryValue in behaviorTrainingEdit.categoryValues"
+                                ng-switch-when="codetable">
+                        </select>
+                    </span>
+            </div>
+            <div class="form-group" ng-if="behaviorTrainingEdit.behaviortraining.constituentRatingId">
+              <label class="control-label">
+                <span>Added as rating on current owner's Raisers Edge NXT record.</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <bb-modal-footer>
+        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>
+        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>
+        <span ng-show="behaviorTrainingEdit.error" class="text-danger">
+          <span ng-show="behaviorTrainingEdit.error.message">{{ behaviorTrainingEdit.error.message }}</span>
+          <span ng-hide="behaviorTrainingEdit.error.message">Unknown error occured.</span>
+        </span>
+      </bb-modal-footer>
+    </div>
+  </form>
+</bb-modal>

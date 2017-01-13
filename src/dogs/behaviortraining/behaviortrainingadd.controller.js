@@ -6,18 +6,8 @@
     function BehaviorTrainingAddController($uibModalInstance, bbData, dogId) {
         var self = this;
 
-        bbData.load({
-            data: {
-                sources: 'api/dogs/ratings/sources',
-                categories: 'api/dogs/ratings/categories?sourceName='
-            }
-        }).then(function (result) {
-            self.sources = result.data.sources.value;
-            self.categories = result.data.categories.value;
-            debugger;
-        });
-
         self.loadCategories = function(source) {
+            self.categories = null;
             self.categoryValues = null;
             self.behaviortraining.category = null;
             self.behaviortraining.value = null;
@@ -29,9 +19,10 @@
         };
 
         self.checkLoadValues = function(categoryName) {
+            // clear out value
+            self.categoryValues = null; 
             self.behaviortraining.value = null;
-            console.log(self.findCategoryByName(categoryName));
-            self.behaviortraining.category = self.findCategoryByName(categoryName);
+
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
                     data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
@@ -41,27 +32,6 @@
             }
         };
 
-        self.findCategoryByName = function(categoryName) {
-            var lookup;
-            for (var i = 0; i < self.categories.length; i++) {
-                if (self.categories[i].name == categoryName) {
-                    lookup = i;
-                    break;
-                }
-            }
-            return self.categories[lookup];
-        };
-
-        self.behaviortraining = {}
-        self.yesno = [{
-                    value: true,
-                    label: "Yes"
-                }, {
-                    value: false,
-                    label: "No"
-                }];
-        self.minDate = 1700;
-        self.maxDate = 3000;
         self.saveData = function () {
             bbData.save({
                 url: 'api/dogs/' + dogId + '/ratings',
@@ -73,6 +43,27 @@
                 self.error = result.data.error;
             });
         };
+
+        bbData.load({
+            data: {
+                sources: 'api/dogs/ratings/sources',
+                categories: 'api/dogs/ratings/categories?sourceName='
+            }
+        }).then(function (result) {
+            self.sources = result.data.sources.value;
+            self.categories = result.data.categories.value;
+        });
+
+        self.behaviortraining = {}
+        self.yesno = [{
+                    value: true,
+                    label: "Yes"
+                }, {
+                    value: false,
+                    label: "No"
+                }];
+        self.minDate = 1700;
+        self.maxDate = 3000;
     }
 
     BehaviorTrainingAddController.$inject = [

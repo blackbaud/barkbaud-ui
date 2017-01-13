@@ -780,18 +780,8 @@ angular.module('md5', []).constant('md5', (function() {
     function BehaviorTrainingAddController($uibModalInstance, bbData, dogId) {
         var self = this;
 
-        bbData.load({
-            data: {
-                sources: 'api/dogs/ratings/sources',
-                categories: 'api/dogs/ratings/categories?sourceName='
-            }
-        }).then(function (result) {
-            self.sources = result.data.sources.value;
-            self.categories = result.data.categories.value;
-            debugger;
-        });
-
         self.loadCategories = function(source) {
+            self.categories = null;
             self.categoryValues = null;
             self.behaviortraining.category = null;
             self.behaviortraining.value = null;
@@ -803,9 +793,12 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.checkLoadValues = function(categoryName) {
+            // clear out value
+            self.categoryValues = null; 
             self.behaviortraining.value = null;
-            console.log(self.findCategoryByName(categoryName));
-            self.behaviortraining.category = self.findCategoryByName(categoryName);
+
+            console.log(self.behaviortraining.category)
+
             if (self.behaviortraining.category.type === 'codetable') {
                 bbData.load({
                     data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
@@ -815,27 +808,6 @@ angular.module('md5', []).constant('md5', (function() {
             }
         };
 
-        self.findCategoryByName = function(categoryName) {
-            var lookup;
-            for (var i = 0; i < self.categories.length; i++) {
-                if (self.categories[i].name == categoryName) {
-                    lookup = i;
-                    break;
-                }
-            }
-            return self.categories[lookup];
-        };
-
-        self.behaviortraining = {}
-        self.yesno = [{
-                    value: true,
-                    label: "Yes"
-                }, {
-                    value: false,
-                    label: "No"
-                }];
-        self.minDate = 1700;
-        self.maxDate = 3000;
         self.saveData = function () {
             bbData.save({
                 url: 'api/dogs/' + dogId + '/ratings',
@@ -847,6 +819,27 @@ angular.module('md5', []).constant('md5', (function() {
                 self.error = result.data.error;
             });
         };
+
+        bbData.load({
+            data: {
+                sources: 'api/dogs/ratings/sources',
+                categories: 'api/dogs/ratings/categories?sourceName='
+            }
+        }).then(function (result) {
+            self.sources = result.data.sources.value;
+            self.categories = result.data.categories.value;
+        });
+
+        self.behaviortraining = {}
+        self.yesno = [{
+                    value: true,
+                    label: "Yes"
+                }, {
+                    value: false,
+                    label: "No"
+                }];
+        self.minDate = 1700;
+        self.maxDate = 3000;
     }
 
     BehaviorTrainingAddController.$inject = [
@@ -956,7 +949,88 @@ angular.module('md5', []).constant('md5', (function() {
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, bbModal, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
+    function BehaviorTrainingEditController($uibModalInstance, bbData, behaviortraining, dogId) {
+        var self = this;
+
+        self.saveData = function () {
+            bbData.save({
+                url: 'api/dogs/' + encodeURIComponent(dogId) + '/ratings/' + encodeURIComponent(behaviortraining._id),
+                data: self.behaviortraining,
+                type: 'PATCH'
+            }).then(function (result) {
+                $uibModalInstance.close(result.data);
+            }).catch(function (result) {
+                self.error = result.data.error;
+            });
+        };
+
+        self.behaviortraining = behaviortraining;
+        self.yesno = [{
+                    value: true,
+                    label: "Yes"
+                }, {
+                    value: false,
+                    label: "No"
+                }];
+        self.minDate = 1700;
+        self.maxDate = 3000;
+
+        if (self.behaviortraining.category.type === 'codetable') {
+            bbData.load({
+                data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
+            }).then(function (result) {
+                self.categoryValues = result.data.value;
+            });
+        }
+    }
+
+    BehaviorTrainingEditController.$inject = [
+        '$uibModalInstance',
+        'bbData',
+        'behaviortraining',
+        'dogId'
+    ];
+
+    angular.module('barkbaud')
+        .controller('BehaviorTrainingEditController', BehaviorTrainingEditController);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function barkBehaviorTrainingEdit(bbModal) {
+        return {
+            open: function (dogId, behaviortraining) {
+                return bbModal.open({
+                    controller: 'BehaviorTrainingEditController as behaviorTrainingEdit',
+                    templateUrl: 'dogs/behaviortraining/behaviortrainingedit.html',
+                    resolve: {
+                        dogId: function () {
+                            return dogId;
+                        },
+                        behaviortraining: function () {
+                            return behaviortraining;
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    barkBehaviorTrainingEdit.$inject = ['bbModal'];
+
+    angular.module('barkbaud')
+        .factory('barkBehaviorTrainingEdit', barkBehaviorTrainingEdit);
+}());
+
+/*global angular */
+
+(function () {
+    'use strict';
+
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, bbModal, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingEdit, barkBehaviorTrainingDelete) {
         var self = this;
         console.log(dogId);
 
@@ -977,6 +1051,10 @@ angular.module('md5', []).constant('md5', (function() {
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
+        self.editBehaviorTraining = function (behaviortraining) {
+            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load);
+        };
+
         self.deleteBehaviorTraining = function (behaviorTrainingId) {
             barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
         };
@@ -991,6 +1069,7 @@ angular.module('md5', []).constant('md5', (function() {
         'bbModal',
         'dogId',
         'barkBehaviorTrainingAdd',
+        'barkBehaviorTrainingEdit',
         'barkBehaviorTrainingDelete'
     ];
 
@@ -1514,8 +1593,8 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '          <div class="col-sm-6">\n' +
         '            <div class="form-group">\n' +
         '              <label class="control-label">Category:</label>\n' +
-        '              <select class="form-control" ng-change="behaviorTrainingAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-model="behaviorTrainingAdd.behaviortraining.category.name">\n' +
-        '               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>\n' +
+        '              <select class="form-control" ng-change="behaviorTrainingAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-options="categoryOption.name for categoryOption in behaviorTrainingAdd.categories" ng-model="behaviorTrainingAdd.behaviortraining.category">\n' +
+        '               <option value=""></option>\n' +
         '             </select>\n' +
         '            </div>\n' +
         '          </div>\n' +
@@ -1603,44 +1682,154 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '  </form>\n' +
         '</bb-modal>\n' +
         '');
-    $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
-        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
-        '  <bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
-        '      {{ dogBehaviorTrainingTile.ratings.length }}\n' +
-        '  </bb-tile-header-content>\n' +
-        '  <div>\n' +
-        '    <div class="toolbar bb-tile-toolbar">\n' +
-        '      <button type="button" class="btn bb-btn-secondary" ng-click="dogBehaviorTrainingTile.addBehaviorTraining()"><i class="fa fa-plus-circle"></i> Add Behavior/Training</button>\n' +
-        '    </div>\n' +
-        '    <div ng-show="dogBehaviorTrainingTile.ratings">\n' +
-        '      <div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">\n' +
-        '        <div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
-        '          This dog has no behaviors/trainings.\n' +
+    $templateCache.put('dogs/behaviortraining/behaviortrainingedit.html',
+        '<bb-modal>\n' +
+        '  <form name="behaviorTrainingEdit.formEdit" ng-submit="behaviorTrainingEdit.saveData()">\n' +
+        '    <div class="modal-form">\n' +
+        '      <bb-modal-header>Edit Behavior/Training</bb-modal-header>\n' +
+        '      <div bb-modal-body>\n' +
+        '        <div class="row">\n' +
+        '          <div class="col-sm-6">\n' +
+        '            <div class="form-group">\n' +
+        '              <label class="control-label">Source:</label>\n' +
+        '              <select class="form-control" ng-disabled="true">\n' +
+        '                <option ng-bind="behaviorTrainingEdit.behaviortraining.source"></option>\n' +
+        '              </select>\n' +
+        '            </div>\n' +
+        '          </div>\n' +
+        '          <div class="col-sm-6">\n' +
+        '            <div class="form-group">\n' +
+        '              <label class="control-label">Category:</label>\n' +
+        '                <select class="form-control" ng-disabled="true">\n' +
+        '                  <option ng-bind="behaviorTrainingEdit.behaviortraining.category.name"></option>\n' +
+        '                </select>\n' +
+        '            </div>\n' +
+        '          </div>\n' +
         '        </div>\n' +
-        '        <div ng-switch-default class="bb-repeater">\n' +
-        '          <div ng-repeat="rating in ::dogBehaviorTrainingTile.ratings.slice().reverse() track by $index" class="bb-repeater-item">\n' +
-        '            <span class="custom-rating-dropdown">\n' +
-        '                <bb-context-menu>\n' +
-        '                    <!--<li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="showBehaviorTrainingEditForm(rating.id)" >Edit Behavior/Training</a>\n' +
-        '                    </li>-->\n' +
-        '                    <li role="presentation">\n' +
-        '                        <a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>\n' +
-        '                    </li>\n' +
-        '                </bb-context-menu>\n' +
-        '            </span>\n' +
-        '            <h4 class="bb-repeater-item-title">{{:: rating.category.name }}</h4>\n' +
-        '            <h5>{{:: rating.value }}</h5>\n' +
-        '            <p ng-if=":: rating.source">{{:: rating.source }}</p>\n' +
-        '            <p>{{:: rating._id }}</p>\n' +
+        '        <div class="row">\n' +
+        '          <div class="col-sm-12">\n' +
+        '            <div class="form-group" ng-switch on="behaviorTrainingEdit.behaviortraining.category.type">\n' +
+        '              <label class="control-label">Value:</label>\n' +
+        '              <span ng-switch="behaviorTrainingEdit.behaviortraining.category.type">\n' +
+        '                        <!--None selected -->\n' +
+        '                        <input type="text" class="form-control" ng-disabled="true" ng-if="!behaviorTrainingEdit.behaviortraining.category" />\n' +
+        '                        <!--Unknown -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="unknown" ng-maxlength="255" />\n' +
+        '                        <!--Text -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="text" ng-maxlength="255" />\n' +
+        '                        <!--Number -->\n' +
+        '                        <input type="text" name="Value" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="number" />\n' +
+        '                        <!--Date -->\n' +
+        '                        <bb-datepicker bb-datepicker-name="Value"\n' +
+        '                                       ng-model="behaviorTrainingEdit.behaviortraining.value"\n' +
+        '                                       ng-switch-when="datetime"\n' +
+        '                                       bb-datepicker-min="behaviorTrainingEdit.minDate"\n' +
+        '                                       bb-datepicker-max="behaviorTrainingEdit.maxDate"\n' +
+        '                                       bb-datepicker-append-to-body="true">\n' +
+        '                        </bb-datepicker>\n' +
+        '                        <!--Currency = 4, -->\n' +
+        '                        <input type="text" class="form-control" ng-model="behaviorTrainingEdit.behaviortraining.value" ng-switch-when="currency" />\n' +
+        '                        <!--Boolean = 5, -->\n' +
+        '                        <select class="form-control"\n' +
+        '                                ng-model="behaviorTrainingEdit.behaviortraining.value"\n' +
+        '                                ng-options="yes_or_no.value as yes_or_no.label for yes_or_no in behaviorTrainingEdit.yesno"\n' +
+        '                                ng-switch-when="boolean"></select>\n' +
+        '                        <!--CodeTableEntry = 6, -->\n' +
+        '                        <select class="form-control"\n' +
+        '                                ng-model="behaviorTrainingEdit.behaviortraining.value"\n' +
+        '                                ng-options="categoryValue as categoryValue for categoryValue in behaviorTrainingEdit.categoryValues"\n' +
+        '                                ng-switch-when="codetable">\n' +
+        '                        </select>\n' +
+        '                    </span>\n' +
+        '            </div>\n' +
+        '            <div class="form-group" ng-if="behaviorTrainingEdit.behaviortraining.constituentRatingId">\n' +
+        '              <label class="control-label">\n' +
+        '                <span>Added as rating on current owner\'s Raisers Edge NXT record.</span>\n' +
+        '              </label>\n' +
+        '            </div>\n' +
         '          </div>\n' +
         '        </div>\n' +
         '      </div>\n' +
+        '      <bb-modal-footer>\n' +
+        '        <bb-modal-footer-button-primary></bb-modal-footer-button-primary>\n' +
+        '        <bb-modal-footer-button-cancel></bb-modal-footer-button-cancel>\n' +
+        '        <span ng-show="behaviorTrainingEdit.error" class="text-danger">\n' +
+        '          <span ng-show="behaviorTrainingEdit.error.message">{{ behaviorTrainingEdit.error.message }}</span>\n' +
+        '          <span ng-hide="behaviorTrainingEdit.error.message">Unknown error occured.</span>\n' +
+        '        </span>\n' +
+        '      </bb-modal-footer>\n' +
         '    </div>\n' +
-        '  </div>\n' +
-        '  <div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">\n' +
-        '    Error loading behaviors/trainings.\n' +
-        '  </div>\n' +
+        '  </form>\n' +
+        '</bb-modal>\n' +
+        '');
+    $templateCache.put('dogs/behaviortraining/behaviortrainingtile.html',
+        '<bb-tile bb-tile-header="\'Behavior/Training\'">\n' +
+        '	<bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">\n' +
+        '		{{ dogBehaviorTrainingTile.ratings.length }}\n' +
+        '	</bb-tile-header-content>\n' +
+        '	<div>\n' +
+        '		<div class="toolbar bb-tile-toolbar">\n' +
+        '			<button type="button" class="btn bb-btn-secondary" ng-click="dogBehaviorTrainingTile.addBehaviorTraining()"><i class="fa fa-plus-circle"></i> Add Behavior/Training</button>\n' +
+        '		</div>\n' +
+        '		<div ng-show="dogBehaviorTrainingTile.ratings">\n' +
+        '			<div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">\n' +
+        '				<div bb-tile-section ng-switch-when="0" class="bb-no-records">\n' +
+        '					This dog has no behaviors/trainings.\n' +
+        '				</div>\n' +
+        '				<div ng-switch-default class="bb-repeater">\n' +
+        '					<div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="bb-prospectui-custom-ratings-row">\n' +
+        '							<div class="custom-rating-content-row">\n' +
+        '									<div class="custom-ratings-rating-content">\n' +
+        '										<div>\n' +
+        '												<span class="custom-rating-dropdown">\n' +
+        '														<bb-context-menu>\n' +
+        '																<li role="presentation">\n' +
+        '																		<a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.editBehaviorTraining(rating)" >Edit Behavior/Training</a>\n' +
+        '																</li>\n' +
+        '																<li role="presentation">\n' +
+        '																		<a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>\n' +
+        '																</li>\n' +
+        '														</bb-context-menu>\n' +
+        '												</span>\n' +
+        '												<span class="emptyspace"></span>\n' +
+        '												<span>\n' +
+        '														<span>\n' +
+        '																<span ng-switch="rating.category.type" class="bb-prospectui-rating-description bb-prospectui-ellipsis">\n' +
+        '																		<span ng-switch-when="datetime">\n' +
+        '																			<span ng-if="rating.value">{{::rating.value | date : "shortDate"}}</span>\n' +
+        '																			<span ng-if="!rating.value">No Rating</span>\n' +
+        '																		</span>\n' +
+        '																		<span ng-switch-default>{{::rating.value || \'No Rating\'}}</span>\n' +
+        '																</span>\n' +
+        '														</span>\n' +
+        '														<span class="custom-rating-category bb-prospectui-ellipsis">{{::rating.category.name}}</span>\n' +
+        '												</span>\n' +
+        '										</div>\n' +
+        '										<div>\n' +
+        '												<div>\n' +
+        '														<span class="custom-rating-source bb-prospectui-ellipsis" ng-if="::rating.source">\n' +
+        '																<span class="constituent-summary-label" data-bbauto-field="SourceLabel">Source:</span>\n' +
+        '																<span>{{::rating.source}}</span>\n' +
+        '														</span>\n' +
+        '												</div>\n' +
+        '										</div>\n' +
+        '									</div>\n' +
+        '									<div class="custom-rating-and" ng-if="::rating.constituentRatingId">\n' +
+        '											<span class="bb-show-more" >\n' +
+        '													<span>\n' +
+        '															<span>Added To Owner</span>\n' +
+        '													</span>\n' +
+        '											</span>\n' +
+        '									</div>\n' +
+        '							</div>\n' +
+        '					</div>\n' +
+        '				</div>\n' +
+        '			</div>\n' +
+        '		</div>\n' +
+        '	</div>\n' +
+        '	<div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">\n' +
+        '		Error loading behaviors/trainings.\n' +
+        '	</div>\n' +
         '</bb-tile>\n' +
         '');
     $templateCache.put('dogs/currenthome/currenthometile.html',

@@ -1,4 +1,6 @@
 @import "../../bower_components/blackbaud-skyux/scss/mixins";
+@import "../../bower_components/blackbaud-skyux/scss/_variables.scss";
+@import "../../bower_components/blackbaud-skyux/scss/_mixins.scss";
 
 .bark-dog-bio {
     white-space: pre-wrap;
@@ -29,4 +31,216 @@ a:hover .bark-dog-photo {
 
 .modal-authorize .close {
   display: none;
+}
+
+$tooltip-cursor: default;
+$font-weight-bold: 600;
+$font-weight-light: 300;
+
+$nxt-ratings-space: 10px;
+$nxt-ratings-column-space: $nxt-ratings-space * 2;
+$custom-ratings-container-border-size: 1px;
+$custom-ratings-border-type: solid;
+
+.bb-prospectui-ratings-tile {
+    // reset some styles that SKY is currently overriding which is breaking angular ui bootstrap
+    .tooltip-inner {
+        white-space: normal !important;
+        max-width: 200px !important;
+        padding: 3px 8px 0 0 !important;
+        text-align: center !important;
+        font-size: 12px !important;
+    }
+    // more resets
+    .tooltip-arrow {
+        display: none !important;
+    }
+
+    .header-content {
+        div {
+            display: inline;
+        }
+    }
+
+    .nxt-ratings-info-section {
+        margin-bottom: 15px;
+
+        .nxt-ratings-info-icon {
+            color: $bb-color-blue;
+            cursor: pointer;
+        }
+
+        .nxt-ratings-info-title {
+            font-weight: $font-weight-bold;
+            font-size: $bb-font-size-lg;
+        }
+
+        .nxt-ratings-info-date-text {
+            font-style: italic;
+        }
+    }
+
+    .nxt-ratings-section {
+        display: flex;
+        margin-top: -$nxt-ratings-space;
+        margin-bottom: -$nxt-ratings-space;
+        max-width: 400px;
+        justify-content: space-between;
+        -ms-flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
+        flex-wrap: wrap;
+
+        .nxt-ratings-col {
+            padding-top: $nxt-ratings-space;
+            padding-bottom: $nxt-ratings-space;
+        }
+        // only give margin to second item in the nxt ratings column
+        .nxt-ratings-col > div:not(:first-child) {
+            margin-top: $nxt-ratings-column-space;
+        }
+
+        .nxt-ratings-stars {
+            font-size: $bb-alternate-font-size-base;
+        }
+
+        .nxt-ratings-stars i {
+            padding: 0 1px;
+        }
+
+        .nxt-ratings-stars-filled {
+            color: $bb-color-yellow;
+        }
+
+        .nxt-ratings-stars-empty {
+            color: $gray;
+        }
+
+        .nxt-ratings-has-tooltip {
+            cursor: $tooltip-cursor;
+        }
+    }
+    // don't show the top border of the custom ratings section if we are hiding nxt ratings
+    .ratings-tile-content > div:not(:first-child) {
+        border-top: $custom-ratings-container-border-size $custom-ratings-border-type $border-color;
+    }
+
+    .custom-ratings-section {
+        .custom-ratings-count-container {
+            border-bottom: $custom-ratings-container-border-size $custom-ratings-border-type $border-color;
+            padding: 3px 15px;
+        }
+
+        .custom-ratings-count {
+            font-family: $bb-font-family-narrow;
+            font-size: $bb-alternate-font-size-lg;
+        }
+    }
+}
+
+.bb-prospectui-custom-ratings-row {
+    border-bottom: 1px dotted $gray-lighter;
+    padding-top: 10px;
+
+    .custom-rating-content-row {
+        display: flex;
+        -ms-flex-direction: row;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-rating-and {
+        margin-left: 5px;
+    }
+
+    .emptyspace {
+        width: 7px;
+    }
+
+    // on mobile we want the more ratings button on each rating row to be at the bottom for a better layout
+    @media (max-width: $screen-xs-min) {
+        .custom-rating-content-row {
+            display: flex;
+            -ms-flex-direction: column;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+
+        .custom-rating-and {
+            margin-bottom: 5px;
+            align-self: center;
+        }
+    }
+
+    .custom-ratings-rating-content {
+        flex-grow: 1;
+        min-width: 0;
+        width: 100%;
+    }
+
+    &:first-child {
+        padding-top: 0;
+    }
+
+    .custom-rating-category {
+        display: inline-block;
+        line-height: 1.7;
+    }
+
+    .custom-rating-dropdown {
+        display: inline-block;
+        vertical-align: 80%;
+    }
+
+    .custom-rating-date {
+        font-size: $bb-font-size-sm;
+        vertical-align: top;
+    }
+
+    .custom-rating-source {
+        font-size: $bb-font-size-sm;
+        display: inline-block;
+    }
+
+    .bb-text-expand-text {
+        -ms-word-wrap: break-word;
+        word-wrap: break-word;
+    }
+
+    .custom-rating-comment > div {
+        max-width: 100%;
+        -ms-word-wrap: break-word;
+        word-wrap: break-word;
+    }
+}
+
+.bb-prospectui-rating-description {
+    font-family: $bb-font-family-narrow;
+    font-size: $bb-alternate-font-size-base;
+    font-weight: $font-weight-light;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.bb-prospectui-moreratings-modal {
+    .bb-prospectui-custom-ratings-row:last-child {
+        border: none;
+    }
+}
+
+.bb-prospectui-no-rating {
+    @extend .bb-prospectui-rating-description;
+    color: $gray-lighter;
+}
+
+.bb-prospectui-ellipsis {
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
 }

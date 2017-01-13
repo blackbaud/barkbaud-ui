@@ -15,8 +15,8 @@
           <div class="col-sm-6">
             <div class="form-group">
               <label class="control-label">Category:</label>
-              <select class="form-control" ng-change="behaviorTrainingAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-model="behaviorTrainingAdd.behaviortraining.category.name">
-               <option ng-repeat="categoryOption in behaviorTrainingAdd.categories" ng-bind="categoryOption.name" value="{{categoryOption.name}}"></option>
+              <select class="form-control" ng-change="behaviorTrainingAdd.checkLoadValues(behaviorTrainingAdd.behaviortraining.category.name)" ng-options="categoryOption.name for categoryOption in behaviorTrainingAdd.categories" ng-model="behaviorTrainingAdd.behaviortraining.category">
+               <option value=""></option>
              </select>
             </div>
           </div>

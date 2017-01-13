@@ -3,9 +3,8 @@
 (function () {
     'use strict';
 
-    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, bbModal, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingDelete) {
+    function DogBehaviorTrainingTileController($scope, bbData, bbMoment, bbModal, dogId, barkBehaviorTrainingAdd, barkBehaviorTrainingEdit, barkBehaviorTrainingDelete) {
         var self = this;
-        console.log(dogId);
 
         self.load = function () {
             $scope.$emit('bbBeginWait', { nonblocking: true });
@@ -24,6 +23,10 @@
             barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
         };
 
+        self.editBehaviorTraining = function (behaviortraining) {
+            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load);
+        };
+
         self.deleteBehaviorTraining = function (behaviorTrainingId) {
             barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
         };
@@ -38,6 +41,7 @@
         'bbModal',
         'dogId',
         'barkBehaviorTrainingAdd',
+        'barkBehaviorTrainingEdit',
         'barkBehaviorTrainingDelete'
     ];
 
