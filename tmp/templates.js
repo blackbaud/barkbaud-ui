@@ -251,9 +251,10 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function($templa
         '																<span ng-switch="rating.category.type" class="bb-prospectui-rating-description bb-prospectui-ellipsis">\n' +
         '																		<span ng-switch-when="datetime">\n' +
         '																			<span ng-if="rating.value">{{::rating.value | date : "shortDate"}}</span>\n' +
-        '																			<span ng-if="!rating.value">No Rating</span>\n' +
+        '																			<span ng-if="typeof rating.value === \'undefined\'">No Rating</span>\n' +
         '																		</span>\n' +
-        '																		<span ng-switch-default>{{::rating.value || \'No Rating\'}}</span>\n' +
+        '																		<span ng-switch-when="boolean">{{rating.value ? \'Yes\' : \'No\'}}</span>\n' +
+        '																		<span ng-switch-default>{{::rating.value != undefined ? rating.value : \'No Rating\'}}</span>\n' +
         '																</span>\n' +
         '														</span>\n' +
         '														<span class="custom-rating-category bb-prospectui-ellipsis">{{::rating.category.name}}</span>\n' +
