@@ -1,0 +1,69 @@
+<bb-tile bb-tile-header="'Behavior/Training'">
+	<bb-tile-header-content ng-show="dogBehaviorTrainingTile.ratings.length">
+		{{ dogBehaviorTrainingTile.ratings.length }}
+	</bb-tile-header-content>
+	<div>
+		<div class="toolbar bb-tile-toolbar">
+			<button type="button" class="btn bb-btn-secondary" ng-click="dogBehaviorTrainingTile.addBehaviorTraining()"><i class="fa fa-plus-circle"></i> Add Behavior/Training</button>
+		</div>
+		<div ng-show="dogBehaviorTrainingTile.ratings">
+			<div ng-switch="dogBehaviorTrainingTile.ratings.length || 0">
+				<div bb-tile-section ng-switch-when="0" class="bb-no-records">
+					This dog has no behaviors/trainings.
+				</div>
+				<div ng-switch-default class="bb-repeater">
+					<div ng-repeat="rating in dogBehaviorTrainingTile.ratings" class="bb-prospectui-custom-ratings-row">
+							<div class="custom-rating-content-row">
+									<div class="custom-ratings-rating-content">
+										<div>
+												<span class="custom-rating-dropdown">
+														<bb-context-menu>
+																<li role="presentation">
+																		<a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.editBehaviorTraining(rating)" >Edit Behavior/Training</a>
+																</li>
+																<li role="presentation">
+																		<a role="menuitem" href="" ng-click="dogBehaviorTrainingTile.deleteBehaviorTraining(rating._id)" >Delete Behavior/Training</a>
+																</li>
+														</bb-context-menu>
+												</span>
+												<span class="emptyspace"></span>
+												<span>
+														<span>
+																<span ng-switch="rating.category.type" class="bb-prospectui-rating-description bb-prospectui-ellipsis">
+																		<span ng-switch-when="datetime">
+																			<span ng-if="rating.value">{{::rating.value | date : "shortDate"}}</span>
+																			<span ng-if="typeof rating.value === 'undefined'">No Rating</span>
+																		</span>
+																		<span ng-switch-when="boolean">{{::rating.value ? 'Yes' : 'No'}}</span>
+																		<span ng-switch-default>{{::rating.value != undefined ? rating.value : 'No Rating'}}</span>
+																</span>
+														</span>
+														<span class="custom-rating-category bb-prospectui-ellipsis">{{::rating.category.name}}</span>
+												</span>
+										</div>
+										<div>
+												<div>
+														<span class="custom-rating-source bb-prospectui-ellipsis" ng-if="::rating.source">
+																<span class="constituent-summary-label" data-bbauto-field="SourceLabel">Source:</span>
+																<span>{{::rating.source}}</span>
+														</span>
+												</div>
+										</div>
+									</div>
+									<div class="custom-rating-and" ng-if="::rating.constituentRatingId">
+											<span class="bb-show-more" >
+													<span>
+															<span>Added To Owner</span>
+													</span>
+											</span>
+									</div>
+							</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div bb-tile-section class="text-danger" ng-show="dogBehaviorTrainingTile.error">
+		Error loading behaviors/trainings.
+	</div>
+</bb-tile>

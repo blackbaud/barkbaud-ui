@@ -72,7 +72,7 @@ module.exports = function (grunt) {
                     src: ['images/**'],
                     dest: '<%= buildPath %>/'
                 }]
-            }
+            },
         },
         sass: {
             libs: {
@@ -131,7 +131,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-html2js');
     grunt.loadNpmTasks('grunt-skylint');
 
-    grunt.registerTask('compileappscripts', ['concat_sourcemap:app', 'uglify:app', 'copy:js']);
+    grunt.registerTask('compileappscripts', ['concat_sourcemap:app', 'uglify:app', 'copy']);
     grunt.registerTask('default', ['html2js', 'concat_sourcemap', 'uglify', 'sass', 'copy']);
     grunt.registerTask('build', ['default']);
     grunt.registerTask('buildfromsrc', ['copy:dist', 'build']);
