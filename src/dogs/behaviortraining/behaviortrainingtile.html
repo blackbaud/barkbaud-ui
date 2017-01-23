@@ -34,7 +34,7 @@
 																			<span ng-if="rating.value">{{::rating.value | date : "shortDate"}}</span>
 																			<span ng-if="typeof rating.value === 'undefined'">No Rating</span>
 																		</span>
-																		<span ng-switch-when="boolean">{{rating.value ? 'Yes' : 'No'}}</span>
+																		<span ng-switch-when="boolean">{{::rating.value ? 'Yes' : 'No'}}</span>
 																		<span ng-switch-default>{{::rating.value != undefined ? rating.value : 'No Rating'}}</span>
 																</span>
 														</span>
