@@ -9,8 +9,7 @@
     "tests"
   ],
   "devDependencies": {
-    "angular-gravatar": "~0.4.1",
-    "blackbaud-skyux": "~1.5.22"
+    "angular-gravatar": "~0.4.1"
   },
   "resolutions": {
     "angular": "1.4.8",
