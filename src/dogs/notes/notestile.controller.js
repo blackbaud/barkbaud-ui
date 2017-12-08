@@ -26,7 +26,7 @@
         };
 
         self.addNote = function () {
-            barkNoteAdd.open(dogId).result.then(self.load);
+            barkNoteAdd.open(dogId).result.then(self.load, angular.noop);
         };
 
         self.load();

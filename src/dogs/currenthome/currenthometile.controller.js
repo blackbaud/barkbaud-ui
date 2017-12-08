@@ -28,7 +28,8 @@
             barkFindHome.open(dogId).result.then(function () {
                 self.load();
                 $rootScope.$broadcast('bbNewCurrentOwner');
-            });
+            },
+            angular.noop);
         };
 
         self.load();

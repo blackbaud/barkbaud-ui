@@ -20,15 +20,15 @@
         };
 
         self.addBehaviorTraining = function () {
-            barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
+            barkBehaviorTrainingAdd.open(dogId).result.then(self.load, angular.noop);
         };
 
         self.editBehaviorTraining = function (behaviortraining) {
-            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load);
+            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load, angular.noop);
         };
 
         self.deleteBehaviorTraining = function (behaviorTrainingId) {
-            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
+            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load, angular.noop);
         };
 
         self.load();

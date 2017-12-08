@@ -797,7 +797,7 @@ angular.module('md5', []).constant('md5', (function() {
             self.categoryValues = null; 
             self.behaviortraining.value = null;
 
-            if (self.behaviortraining.category.type === 'CodeTable') {
+            if (self.behaviortraining.category && self.behaviortraining.category.type === 'CodeTable') {
                 bbData.load({
                     data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
                 }).then(function (result) {
@@ -1045,15 +1045,15 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.addBehaviorTraining = function () {
-            barkBehaviorTrainingAdd.open(dogId).result.then(self.load);
+            barkBehaviorTrainingAdd.open(dogId).result.then(self.load, angular.noop);
         };
 
         self.editBehaviorTraining = function (behaviortraining) {
-            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load);
+            barkBehaviorTrainingEdit.open(dogId, behaviortraining).result.then(self.load, angular.noop);
         };
 
         self.deleteBehaviorTraining = function (behaviorTrainingId) {
-            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load);
+            barkBehaviorTrainingDelete.open(dogId, behaviorTrainingId).result.then(self.load, angular.noop);
         };
 
         self.load();
@@ -1104,7 +1104,8 @@ angular.module('md5', []).constant('md5', (function() {
             barkFindHome.open(dogId).result.then(function () {
                 self.load();
                 $rootScope.$broadcast('bbNewCurrentOwner');
-            });
+            },
+            angular.noop);
         };
 
         self.load();
@@ -1449,7 +1450,7 @@ angular.module('md5', []).constant('md5', (function() {
         };
 
         self.addNote = function () {
-            barkNoteAdd.open(dogId).result.then(self.load);
+            barkNoteAdd.open(dogId).result.then(self.load, angular.noop);
         };
 
         self.load();
