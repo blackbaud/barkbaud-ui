@@ -2,6 +2,7 @@
   "name": "barkbaud-ui",
   "version": "1.0.0",
   "devDependencies": {
+    "blackbaud-skyux": "~1.19.1",
     "grunt": "^0.4.5",
     "grunt-bump": "~0.3.0",
     "grunt-concat-sourcemap": "~0.4.3",

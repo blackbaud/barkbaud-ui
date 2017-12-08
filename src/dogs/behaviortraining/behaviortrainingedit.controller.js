@@ -29,7 +29,7 @@
         self.minDate = 1700;
         self.maxDate = 3000;
 
-        if (self.behaviortraining.category.type === 'codetable') {
+        if (self.behaviortraining.category.type === 'CodeTable') {
             bbData.load({
                 data: 'api/dogs/ratings/categories/values?categoryName=' + encodeURIComponent(self.behaviortraining.category.name)
             }).then(function (result) {
