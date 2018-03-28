@@ -1,6 +1,19 @@
-@import "../../node_modules/blackbaud-skyux/scss/mixins";
-@import "../../node_modules/blackbaud-skyux/scss/_variables.scss";
-@import "../../node_modules/blackbaud-skyux/scss/_mixins.scss";
+@import "../../node_modules/@blackbaud/skyux-design-tokens/scss/mixins.scss";
+
+// variables copied from blackbaud-skyux/scss/ [version 1.19.1] because of sass compilation issue
+$margin: 10px;
+$bb-font-family-narrow: "Blackbaud Sans Condensed", "Helvetica Neue Condensed", "Arial Narrow" !default;
+$font-size-base: 15px;
+$bb-font-size-sm: ceil(($font-size-base * 0.833)) !default; // ~10px
+$bb-font-size-lg: ceil(($font-size-base * 1.07)) !default; // ~14px
+$bb-alternate-font-size-base: ceil(($font-size-base * 1.833)) !default; // ~22px
+$screen-xs: 480px !default;
+
+// colors
+$gray: $sky-color-gray-70;
+$gray-lighter: $sky-color-gray-20;
+$bb-color-blue: $sky-color-blue-70 !default;
+$bb-color-yellow: $sky-color-yellow-50 !default;
 
 .bark-dog-bio {
     white-space: pre-wrap;
@@ -119,22 +132,6 @@ $custom-ratings-border-type: solid;
             cursor: $tooltip-cursor;
         }
     }
-    // don't show the top border of the custom ratings section if we are hiding nxt ratings
-    .ratings-tile-content > div:not(:first-child) {
-        border-top: $custom-ratings-container-border-size $custom-ratings-border-type $border-color;
-    }
-
-    .custom-ratings-section {
-        .custom-ratings-count-container {
-            border-bottom: $custom-ratings-container-border-size $custom-ratings-border-type $border-color;
-            padding: 3px 15px;
-        }
-
-        .custom-ratings-count {
-            font-family: $bb-font-family-narrow;
-            font-size: $bb-alternate-font-size-lg;
-        }
-    }
 }
 
 .bb-prospectui-custom-ratings-row {
@@ -159,7 +156,7 @@ $custom-ratings-border-type: solid;
     }
 
     // on mobile we want the more ratings button on each rating row to be at the bottom for a better layout
-    @media (max-width: $screen-xs-min) {
+    @media (max-width: $screen-xs) {
         .custom-rating-content-row {
             display: flex;
             -ms-flex-direction: column;
