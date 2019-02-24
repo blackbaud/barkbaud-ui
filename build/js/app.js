@@ -1581,7 +1581,7 @@ angular.module('md5', []).constant('md5', (function() {
         .controller('LoginPageController', LoginPageController);
 }());
 
-angular.module('barkbaud.templates', []).run(['$templateCache', function ($templateCache) {
+angular.module('barkbaud.templates', []).run(['$templateCache', function($templateCache) {
     $templateCache.put('components/photo.directive.html',
         '<div class="bark-photo img-circle center-block">\n' +
         '</div>\n' +
@@ -2096,7 +2096,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function ($templ
         '  <title>Barkbaud</title>\n' +
         '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
         '  <link rel="icon" type="image/png" href="images/favicon.ico">\n' +
-        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.19.1/css/sky-bundle.css">\n' +
+        '  <link rel="stylesheet" type="text/css" href="https://sky.blackbaudcdn.net/skyux/1.22.0/css/sky-bundle.css">\n' +
         '  <link rel="stylesheet" type="text/css" href="css/app.css">\n' +
         '</head>\n' +
         '\n' +
@@ -2116,7 +2116,7 @@ angular.module('barkbaud.templates', []).run(['$templateCache', function ($templ
         '    </div>\n' +
         '  </bb-navbar>\n' +
         '  <div ui-view></div>\n' +
-        '  <script src="https://sky.blackbaudcdn.net/skyux/1.19.1/js/sky-bundle.min.js"></script>\n' +
+        '  <script src="https://sky.blackbaudcdn.net/skyux/1.22.0/js/sky-bundle.min.js"></script>\n' +
         '  <script src="js/app.min.js"></script>\n' +
         '</body>\n' +
         '</html>\n' +
