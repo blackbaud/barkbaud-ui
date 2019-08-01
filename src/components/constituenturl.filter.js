@@ -8,8 +8,8 @@
             return [
                 'https://renxt.blackbaud.com/constituents/',
                 encodeURIComponent(constituentId),
-                '?tenantid=',
-                barkbaudAuthService.tenantId
+                '?envid=',
+                barkbaudAuthService.environmentId
             ].join('');
         };
     }
