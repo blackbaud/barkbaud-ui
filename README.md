@@ -1,3 +1,7 @@
+# Obsolete
+
+This project is obsolete as the UI for the Barkbaud sample application now lives within the [barkbaud](https://github.com/blackbaud/barkbaud) repo.
+
 # barkbaud-ui
 
 Sample Angular application built with SKY UX.
